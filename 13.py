@@ -2,7 +2,7 @@ from collections import defaultdict
 from itertools import permutations
 import sys
 
-diff = defaultdict(lambda: dict())
+diff = defaultdict(dict)
 
 def Evaluate(names, wraparound = True):
 	return sum(

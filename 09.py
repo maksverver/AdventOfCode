@@ -1,7 +1,7 @@
 from collections import defaultdict
 import sys
 
-dists = defaultdict(lambda: {})
+dists = defaultdict(dict)
 
 def Search(path, total_dist, combiner):
     if len(path) == len(dists):
