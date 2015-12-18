@@ -1,5 +1,3 @@
-from collections import defaultdict
-from math import *
 import sys
 
 def count_nearby(grid, r1, c1):
