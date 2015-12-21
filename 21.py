@@ -31,7 +31,7 @@ armor  = lambda outfit: sum(a for _, _, _, a in outfit)
 
 def hits(my_damage, his_armor, his_health):
 	damage_per_hit = max(1, my_damage - his_armor)
-	# Return his_health divided by damage_per-Hit, rounded up.
+	# Return his_health divided by damage_per_hit, rounded up.
 	return (his_health // damage_per_hit) + (his_health % damage_per_hit != 0)
 
 def winning(outfit):
