@@ -17,5 +17,5 @@ for line in sys.stdin:
     src, _, dst, _, dist = line.split()
     dists[src][dst] = dists[dst][src] = int(dist)
 
-print Search([], 0, min)  # Part 1
-print Search([], 0, max)  # Part 2
+print Search([], 0, min)[0]  # Part 1
+print Search([], 0, max)[0]  # Part 2

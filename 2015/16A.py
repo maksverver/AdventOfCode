@@ -20,4 +20,5 @@ for line in sys.stdin:
 		value = int(value.strip())
 		if required[prop] != value: break
 	else:
-		print name
+		sue, number = name.split()
+		print number
