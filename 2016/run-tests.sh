@@ -10,10 +10,10 @@ run_test() {
 	fi
 	received=$(${PYTHON} "$1.py" <"$input")
 	expected=$(cat "${TESTDIR}/$1.ref")
-	if [ "$3" = "$4" ]; then
+	if [ "$expected" = "$received" ]; then
 		echo "$1 passed"
 	else
-		echo "$1 FAILED: expected $3, received $4"
+		echo "$1 FAILED: expected $expected, received $received"
 	fi
 }
 
