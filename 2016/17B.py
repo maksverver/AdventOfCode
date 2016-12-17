@@ -1,13 +1,6 @@
 import sys
 import md5
 
-dirs = {
-  'U': (-1, 0),
-  'D': (+1, 0),
-  'L': (0, -1),
-  'R': (0, +1),
-}
-
 password = sys.stdin.readline().strip()
 queue = [(0, 0, '')]
 for r, c, path in queue:
