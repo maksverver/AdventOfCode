@@ -1,16 +1,14 @@
-import numpy as np
 import sys
 
-def Solve(row, height):
+def Solve(row, width, height):
   answer = 0
-  pad = np.array([True, True])
+  mask = (1 << width) - 1
   for _ in range(height):
-    answer += row.sum()
-    l = np.concatenate((pad, row))
-    r = np.concatenate((row, pad))
-    row = (l == r)[1:-1]
+    answer += width - bin(row).count('1')
+    row = ((row >> 1) ^ (row << 1)) & mask
   return answer
 
-row = np.array([c == '.' for c in sys.stdin.readline().strip()])
-print Solve(row, 40)
-print Solve(row, 400000)
+input = sys.stdin.readline().strip()
+row = int(input.replace('.', '0').replace('^', '1'), 2)
+print Solve(row, len(input), 40)
+print Solve(row, len(input), 400000)
