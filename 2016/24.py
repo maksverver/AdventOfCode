@@ -31,7 +31,8 @@ for r, row in enumerate(grid):
 distances = {}
 for a in waypoints:
   for b in waypoints:
-    distances[a, b] = Distance(a, b)
+    if a < b:
+      distances[a, b] = distances[b, a] = Distance(a, b)
 
 print ShortestPath([start], False)  # Part 1
 print ShortestPath([start], True)   # Part 2
