@@ -1,11 +1,9 @@
-data GarbageData = GarbageChar Char | EscapedChar Char deriving Show
-data BlockData = Block [BlockData] | BlockChar Char | BlockGarbage [GarbageData] deriving Show
+data BlockData = Block [BlockData] | BlockGarbage String deriving Show
 
-parseGarbage :: String -> ([GarbageData], String)
-parseGarbage ('>':rest) = ([], rest)
-parseGarbage ('!':ch:rest) = (EscapedChar ch:restData, restInput)
-    where (restData, restInput) = parseGarbage rest
-parseGarbage (ch:rest) = (GarbageChar ch:restData, restInput)
+parseGarbage :: String -> (String, String)
+parseGarbage ('>':rest) = ("", rest)
+parseGarbage ('!':ch:rest) = parseGarbage rest
+parseGarbage (ch:rest) = (ch:restData, restInput)
     where (restData, restInput) = parseGarbage rest
 
 parseBlock :: String -> ([BlockData], String)
@@ -18,8 +16,7 @@ parseBlock ('{':rest) = (Block blockData:restData, restInput')
     where
         (blockData, restInput) = parseBlock rest
         (restData, restInput') = parseBlock restInput
-parseBlock (ch:rest) = (BlockChar ch:restData, restInput)
-    where (restData, restInput) = parseBlock rest
+parseBlock (',':rest) = parseBlock rest
 
 parse :: String -> [BlockData]
 parse ('{':rest) = contents
@@ -37,10 +34,7 @@ countGarbage :: [BlockData] -> Int
 countGarbage contents = sum (map evalBlock contents)
     where
         evalBlock (Block contents) = sum (map evalBlock contents)
-        evalBlock (BlockGarbage contents) = sum (map evalGarbage contents)
-        evalBlock _ = 0
-        evalGarbage (GarbageChar _) = 1
-        evalGarbage _ = 0
+        evalBlock (BlockGarbage contents) = length contents
 
 main = do
     input <- getLine
