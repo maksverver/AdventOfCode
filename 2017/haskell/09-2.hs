@@ -2,7 +2,7 @@ data BlockData = Block [BlockData] | BlockGarbage String deriving Show
 
 parseGarbage :: String -> (String, String)
 parseGarbage ('>':rest) = ("", rest)
-parseGarbage ('!':ch:rest) = parseGarbage rest
+parseGarbage ('!':_:rest) = parseGarbage rest
 parseGarbage (ch:rest) = (ch:restData, restInput)
     where (restData, restInput) = parseGarbage rest
 
