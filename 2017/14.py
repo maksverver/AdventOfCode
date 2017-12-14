@@ -1,16 +1,19 @@
 import sys
 from KnotHash import GetLengths, KnotHash, ReduceToInt
 
-def Hash(string):
-    return ReduceToInt(KnotHash(GetLengths(string)))
-
-def IntToBits(i):
-    return [(i >> j)&1 for j in range(SIZE)]
+def MakeGrid(input):
+    def HashRow(row):
+        return ReduceToInt(KnotHash(GetLengths('%s-%d'%(input, row))))
+    def IntToBits(i):
+        return [(i >> j)&1 for j in range(SIZE)]
+    return [IntToBits(HashRow(row)) for row in range(SIZE)]
 
 def Part1():
     return sum(sum(row) for row in GRID)
 
 def Part2():
+    # Clears the bit at (r, c), and all adjecent ones. Modifies the global GRID,
+    # which is not so nice, but meh.
     def Clear(r, c):
         GRID[r][c] = 0
         for nr, nc in ((r, c - 1), (r, c + 1), (r - 1, c), (r + 1, c)):
@@ -25,8 +28,6 @@ def Part2():
     return regions
 
 SIZE = 128
-INPUT = sys.stdin.readline().strip()
-GRID = [IntToBits(Hash('%s-%d'%(INPUT, row))) for row in range(SIZE)]
-
+GRID = MakeGrid(sys.stdin.readline().strip())
 print(Part1())
 print(Part2())
