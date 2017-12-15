@@ -8,11 +8,19 @@ SEED_B = int(sys.stdin.readline().lstrip('Generator B starts with'))
 MULT_A = 16807
 MULT_B = 48271
 
+def GenerateMultipliers(multiply, chunk_size):
+    '''Returns an array a of length chunk_size such that:
+        a[i] == multiply**(i + 1) % MOD'''
+    a = np.array([multiply], dtype=np.uint64)
+    while len(a) < chunk_size:
+        a = np.concatenate([a, a * multiply % MOD])
+        multiply = multiply * multiply % MOD
+    return a[:chunk_size]
+
 def Part1(iterations, chunk_size=10000):
-    multiply_values = np.array(
-        [(pow(MULT_A, i + 1, MOD), pow(MULT_B, i + 1, MOD))
-            for i in range(chunk_size)],
-        dtype=np.uint64)
+    multiply_values = np.column_stack([
+        GenerateMultipliers(MULT_A, chunk_size),
+        GenerateMultipliers(MULT_B, chunk_size)])
     seed = np.array([SEED_A, SEED_B], dtype=np.uint64)
     multiply_seed = np.array(
         [pow(MULT_A, chunk_size, MOD), pow(MULT_B, chunk_size, MOD)],
@@ -31,9 +39,7 @@ def Part2(iterations, chunk_size=10000):
         parts = []
         total = 0
         multiply_seed = pow(multiply, chunk_size, MOD)
-        multiply_values = np.array(
-            [pow(multiply, i + 1, MOD) for i in range(chunk_size)],
-            dtype=np.uint64)
+        multiply_values = GenerateMultipliers(multiply, chunk_size)
         while total < iterations:
             values = multiply_values * seed % MOD
             seed = seed * multiply_seed % MOD
