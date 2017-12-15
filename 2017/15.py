@@ -5,10 +5,10 @@ MOD = 2147483647
 SEED_A = int(sys.stdin.readline().lstrip('Generator A starts with'))
 SEED_B = int(sys.stdin.readline().lstrip('Generator B starts with'))
 
-def Generate(value, multiply, modulo, multiples=1):
+def Generate(value, multiply, modulo, multiples):
     while True:
-        value = (value*multiply)%modulo
-        if value%multiples == 0:
+        value = (value * multiply) % modulo
+        if value % multiples == 0:
             yield value
 
 def CountMatches(multiples_a, multiples_b, iterations):
