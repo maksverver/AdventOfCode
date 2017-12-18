@@ -1,13 +1,11 @@
 import sys
 
 def Solve(K, N):
-    succ = [0]*(N + 1)
-    for i in range(N):
-        v = i
-        for _ in range(K):
-            v = succ[v]
-        succ[i + 1] = succ[v]
-        succ[v] = i + 1
-    return succ[0]
+    pos = -1
+    for n in range(1, N + 1):
+        pos = (pos + 1 + K)%n
+        if pos == 0:
+            answer = n
+    return answer
 
 print(Solve(int(sys.stdin.readline()), 50000000))
