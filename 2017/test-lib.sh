@@ -1,7 +1,13 @@
 #!/bin/sh
 
 export PYTHON=${PYTHON:-/usr/bin/python}
+export PYPY=${PYPY:-/usr/bin/pypy3}
 export TESTDIR=${TESTDIR:-testdata}
+
+if [ -x "$PYPY" ]; then
+	# Use PyPy instead of Python if it's available.
+	PYTHON=$PYPY
+fi
 
 run_test() {
   base=${1%.ref*}
