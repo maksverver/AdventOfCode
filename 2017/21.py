@@ -39,32 +39,6 @@ def Transform(grid):
     return [''.join(tiles[i//T][j//T][i%T][j%T] for j in range(N//S*T))
         for i in range(N//S*T)]
 
-def SolveSlowly(grid, iterations):
-    for _ in range(iterations):
-        grid = Transform(grid)
-    return sum(row.count('#') for row in grid)
-
-def Part2():
-    mapping3 = {}
-    for src, dst in mapping.items():
-        if len(src) == 3:
-            assert len(dst) == 4
-            dst = Transform(Transform(dst))
-            assert len(dst) == 9
-            mapping3[src] = Counter(
-                Id([dst[3*i + k][3*j:3*j + 3] for k in range(3)])
-                for i in range(3) for j in range(3))
-    counts = Counter({Id(INITIAL_TILE): 1})
-    for _ in range(18 // 3):
-        new_counts = Counter()
-        for tile, count in counts.items():
-            for new_tile, new_count in mapping3[tile].items():
-                new_counts[new_tile] += count*new_count
-        counts = new_counts
-    return sum(
-        count*sum(row.count('#') for row in tile)
-        for tile, count in counts.items())
-
 def Solve(iterations):
     counts = Counter({Id(INITIAL_TILE): 1})
     for _ in range(iterations//3):
