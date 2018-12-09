@@ -1,6 +1,6 @@
 import sys
 
-class Node:
+class Node(object):
     def __init__(self, numbers):
         n = next(numbers)
         m = next(numbers)
