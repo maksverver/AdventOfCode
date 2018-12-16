@@ -67,8 +67,7 @@ def Part2(samples, program):
     # For each opcode, calculate the set of possible mnemonics.
     possible_mnemnonics = [set(mnemonics) for _ in range(16)]
     for before, instr, after in samples:
-        opcode = instr[0]
-        args = instr[1:4]
+        opcode, *args = instr
         possible_mnemnonics[opcode].intersection_update(
             mnem for mnem in mnemonics if ExecuteStep(before, mnem, args) == after)
 
