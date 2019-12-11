@@ -105,15 +105,20 @@ class Machine:
             if opcode == 4:
                 return MachineState.OUTPUT
 
-def RunMachine(ints, inputs):
+def RunInteractive(ints, get_input, put_output):
     machine = Machine(ints)
-    for input in inputs:
-        machine.PutInput(input)
-    outputs = []
     while True:
         state = machine.Run()
+        if state == MachineState.INPUT:
+            machine.PutInput(get_input())
+            continue
         if state == MachineState.OUTPUT:
-            outputs.append(machine.GetOutput())
+            put_output(machine.GetOutput())
             continue
         assert state == MachineState.HALT
-        return outputs
+        return
+
+def RunMachine(ints, inputs):
+    outputs = []
+    RunInteractive(ints, iter(inputs).__next__, outputs.append)
+    return outputs
