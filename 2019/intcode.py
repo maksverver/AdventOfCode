@@ -1,3 +1,4 @@
+from collections import defaultdict
 from enum import Enum
 from operator import add, mul, lt, eq
 
@@ -16,8 +17,9 @@ class MachineState(Enum):
 class Machine:
 
     def __init__(self, ints):
-        self.ints = list(ints)
+        self.ints = defaultdict(int, enumerate(ints))
         self.ip = 0
+        self.relbase = 0
         self.inputs = []
         self.outputs = []
         self.opcode_map = {
@@ -29,6 +31,7 @@ class Machine:
             6: ('IIP', jif),
             7: ('IIO', lt),
             8: ('IIO', eq),
+            9: ('I', self.AdjustRelbase),
         }
 
     def PutInput(self, input):
@@ -46,6 +49,9 @@ class Machine:
         output = self.outputs[0]
         del self.outputs[0]
         return output
+
+    def AdjustRelbase(self, offset):
+        self.relbase += offset
 
     def Step(self):
         assert self.ip >= 0
@@ -67,6 +73,9 @@ class Machine:
             rem //= 10
             operand = self.ints[self.ip]
             self.ip += 1
+            if mode == 2:
+                operand += self.relbase
+                mode = 0
             if t == 'I':
                 assert mode in (0, 1)
                 if mode == 0:
@@ -76,6 +85,7 @@ class Machine:
                 args.append(arg)
             else:
                 assert mode == 0
+                assert operand >= 0
                 dests.append(operand)
         result = func(*args)
         if update_ip:
