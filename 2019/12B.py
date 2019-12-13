@@ -17,12 +17,15 @@ def Update(pv, other_pvs):
 
 def Solve(moons, d):
     '''Solve in dimension `d` only.'''
-    pvs = tuple((moon[d], 0) for moon in moons)
-    seen = set()
-    while pvs not in seen:
-        seen.add(pvs)
+    # This assumes that the initial state is part of the cycle, which is true
+    # (but it's not very obvious).
+    initial_pvs = pvs = tuple((moon[d], 0) for moon in moons)
+    steps = 0
+    while True:
         pvs = tuple(Update(pv, pvs) for pv in pvs)
-    return len(seen)
+        steps += 1
+        if pvs == initial_pvs:
+            return steps
 
 moons = tuple(map(ParseLine, sys.stdin))
 print(reduce(LeastCommonMultiple, (Solve(moons, d) for d in range(3))))
