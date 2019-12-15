@@ -48,28 +48,14 @@ def ReconstructPath(r, c, last_d, previous_dir):
     path.reverse()
     return path
 
-def FindPathToNewCell(r, c):
-    '''Returns a path (as a list of directions) to an undiscovered cell.'''
+def ShortestPath(r, c, is_goal):
+    '''Finds the shortest path from (r, c) to a cell at (rr, cc), such that goal(rr, cc) is true.'''
     previous_dir = {(r, c): None}
     todo = [(r, c)]
     for (r, c) in todo:
         for d, (dr, dc) in enumerate(DIRS):
             rr, cc = r + dr, c + dc
-            if (rr, cc) not in grid:
-                return ReconstructPath(rr, cc, d, previous_dir)
-            if grid[rr, cc] == Status.WALL or (rr, cc) in previous_dir:
-                continue
-            previous_dir[rr, cc] = d
-            todo.append((rr, cc))
-
-def ShortestPath(r1, c1, r2, c2):
-    '''Finds the shortest path through discovered cells from (r1, c1) to (r2, c2).'''
-    previous_dir = {(r1, c1): None}
-    todo = [(r1, c1)]
-    for (r, c) in todo:
-        for d, (dr, dc) in enumerate(DIRS):
-            rr, cc = r + dr, c + dc
-            if (rr, cc) == (r2, c2):
+            if is_goal(rr, cc):
                 return ReconstructPath(rr, cc, d, previous_dir)
             if grid[rr, cc] == Status.WALL or (rr, cc) in previous_dir:
                 continue
@@ -92,7 +78,7 @@ def MaxDistance(r, c):
 def ExploreGrid(r, c):
     grid[r, c] = Status.EMPTY
     while True:
-        path = FindPathToNewCell(r, c)
+        path = ShortestPath(r, c, lambda r, c: (r, c) not in grid)
         if path is None:
             return (r, c)
         for d in path[:-1]:
@@ -110,5 +96,5 @@ def ExploreGrid(r, c):
 end_r, end_c = ExploreGrid(0, 0)
 #PrintGrid(end_r, end_c, file=sys.stderr)
 (oxygen_r, oxygen_c), = (rc for (rc, status) in grid.items() if status == Status.OXYGEN)
-print(len(ShortestPath(0, 0, oxygen_r, oxygen_c)))  # Part 1
+print(len(ShortestPath(0, 0, lambda r, c: (r, c) == (oxygen_r, oxygen_c))))  # Part 1
 print(MaxDistance(oxygen_r, oxygen_c))  # Part 2
