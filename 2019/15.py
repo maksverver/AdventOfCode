@@ -83,7 +83,7 @@ def ExploreGrid(r, c):
             return (r, c)
         for d in path[:-1]:
             dr, dc = DIRS[d]
-            assert Status(TryMove(d)) == Status.EMPTY
+            assert Status(TryMove(d)) != Status.WALL
             r, c = r + dr, c + dc
         d = path[-1]
         dr, dc = DIRS[d]
