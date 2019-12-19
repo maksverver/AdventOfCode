@@ -1,8 +1,7 @@
-from intcode import Machine, MachineState
+from intcode import ReadInts, Machine, MachineState
 from itertools import permutations
-import sys
 
-ints = list(map(int, sys.stdin.readline().split(',')))
+ints = ReadInts()
 
 def CalculateOutputSignal(phases):
     machines = []

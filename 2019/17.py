@@ -1,4 +1,4 @@
-from intcode import RunMachine
+from intcode import ReadInts, RunMachine
 import sys
 
 DIRS = (
@@ -9,7 +9,7 @@ DIRS = (
 )
 DIR_CHARS = '^>v<'
 
-ints = list(map(int, sys.stdin.readline().split(',')))
+ints = ReadInts()
 grid = ''.join(map(chr, RunMachine(ints, []))).rstrip('\n').split('\n')
 H = len(grid)
 W = len(grid[0])

@@ -1,11 +1,8 @@
-from intcode import RunMachine
-import sys
-
-ints = list(map(int, sys.stdin.readline().split(',')))
+from intcode import ReadInts, RunMachine
 
 blocks = {}
 x = y = None
-for i in RunMachine(ints, []):
+for i in RunMachine(ReadInts(), []):
     if x is None:
         x = i
     elif y is None:

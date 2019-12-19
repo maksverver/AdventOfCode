@@ -1,5 +1,5 @@
 from enum import Enum
-from intcode import Machine, MachineState
+from intcode import ReadInts, Machine, MachineState
 import sys
 
 class Status(Enum):
@@ -10,7 +10,7 @@ class Status(Enum):
 
 DIRS = ((-1, 0), (1, 0), (0, 1), (0, -1))
 
-ints = list(map(int, sys.stdin.readline().split(',')))
+ints = ReadInts()
 machine = Machine(ints)
 grid = {}
 

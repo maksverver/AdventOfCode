@@ -1,7 +1,6 @@
-from intcode import RunMachine
-import sys
+from intcode import ReadInts, RunMachine
 
-ints = list(map(int, sys.stdin.readline().split(',')))
+ints = ReadInts()
 
 print(*RunMachine(ints, [1]))  # Part 1
 print(*RunMachine(ints, [2]))  # Part 2

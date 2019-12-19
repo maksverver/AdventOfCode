@@ -1,6 +1,7 @@
 from collections import defaultdict
 from enum import Enum
 from operator import add, mul, lt, eq
+import sys
 
 def jit(cond, new_ip, cur_ip):
     return new_ip if cond != 0 else cur_ip
@@ -122,3 +123,6 @@ def RunMachine(ints, inputs):
     outputs = []
     RunInteractive(ints, iter(inputs).__next__, outputs.append)
     return outputs
+
+def ReadInts(file=sys.stdin):
+    return list(map(int, file.readline().split(',')))

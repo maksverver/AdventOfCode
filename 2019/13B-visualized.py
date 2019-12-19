@@ -1,9 +1,9 @@
-from intcode import RunInteractive
+from intcode import ReadInts, RunInteractive
 from time import sleep
 import curses
 
 with open('testdata/13.in') as f:
-    ints = list(map(int, f.readline().split(',')))
+    ints = ReadInts(f)
 ints[0] = 2
 
 x = y = None

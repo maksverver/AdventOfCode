@@ -1,7 +1,6 @@
-from intcode import RunInteractive
-import sys
+from intcode import ReadInts, RunInteractive
 
-ints = list(map(int, sys.stdin.readline().split(',')))
+ints = ReadInts()
 
 DIRS = ((-1, 0), (0, -1), (1, 0), (0, 1))
 

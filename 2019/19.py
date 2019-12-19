@@ -1,7 +1,6 @@
-from intcode import RunMachine
-import sys
+from intcode import ReadInts, RunMachine
 
-ints = list(map(int, sys.stdin.readline().split(',')))
+ints = ReadInts()
 
 def Probe(x, y):
     result, = RunMachine(ints, (x, y))
