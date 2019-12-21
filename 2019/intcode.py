@@ -126,3 +126,14 @@ def RunMachine(ints, inputs):
 
 def ReadInts(file=sys.stdin):
     return list(map(int, file.readline().split(',')))
+
+def Main():
+    if len(sys.argv) != 2:
+        print('Usage: python {} <intcode-filename>'.format(sys.argv[0]))
+        sys.exit(1)
+    with open(sys.argv[1], 'rt') as f:
+        ints = ReadInts(f)
+    RunInteractive(ints, lambda: ord(sys.stdin.read(1)), lambda i: sys.stdout.write(chr(i)))
+
+if __name__ == '__main__':
+    Main()
