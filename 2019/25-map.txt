@@ -1,0 +1,34 @@
+         6----7
+         |    |
+         5-4  20
+         | |
+    14   8 3
+    |    |
+    13--1-2
+    |   | |
+    |  12 9
+    |     |
+    15-16 10
+    |     |
+ 19-17-18 11
+
+1 Hull breach
+2 Kitchen (escape pod)
+3 Gift wrapping center (wreath)
+4 Observatory (giant electromagnet)
+5 Hallway (dehydrated water)
+6 Warp Drive Maintenance (photons)
+7 Security Checkpoint
+8 Corridor
+9 Sick Bay
+10 Crew Quarters (space heater)
+11 Holodeck (astrolable)
+12 Passages (festive hat)
+13 Arcade
+14 Stables (infinite loop)
+15 Storage (pointer)
+16 Navigation (molten lava)
+17 Hot Chocolate Fountain (prime number)
+18 Engineering
+19 Science Lab (coin)
+20 Pressure-Sensitive Floor
