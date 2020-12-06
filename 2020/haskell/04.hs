@@ -1,5 +1,6 @@
 import Data.Char
 import Data.Default
+import Data.List
 import Data.List.Split
 import Data.Maybe
 
@@ -10,7 +11,7 @@ instance Default Passport where
     def = Passport{byr=Absent, iyr=Absent, eyr=Absent, hgt=Absent, hcl=Absent, ecl=Absent, pid=Absent}
 
 parsePassport :: [String] -> Passport
-parsePassport = foldl update def
+parsePassport = foldl' update def
     where
         update p@Passport{byr = Absent} ('b':'y':'r':':': s) = p{byr = classify $ isValidByr s}
         update p@Passport{iyr = Absent} ('i':'y':'r':':': s) = p{iyr = classify $ isValidIyr s}

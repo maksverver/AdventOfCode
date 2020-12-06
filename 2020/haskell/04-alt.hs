@@ -1,11 +1,12 @@
 import Data.Char
+import Data.List
 import Data.List.Split
 import Data.Maybe
 
 data Passport a = Passport {byr :: a, iyr :: a, eyr :: a, hgt :: a, hcl :: a, ecl :: a, pid :: a} deriving Show
 
 parsePassport :: [String] -> Passport (Maybe String)
-parsePassport = foldl update emptyPassport
+parsePassport = foldl' update emptyPassport
     where
         emptyPassport = Passport{byr=Nothing, iyr=Nothing, eyr=Nothing, hgt=Nothing, hcl=Nothing, ecl=Nothing, pid=Nothing}
 

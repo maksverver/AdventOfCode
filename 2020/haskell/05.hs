@@ -3,7 +3,7 @@ import Data.List
 seatId :: String -> Int
 seatId s = 8*r + c
     where
-        (r, c, 1, 1) = foldl update (0, 0, 128, 8) s
+        (r, c, 1, 1) = foldl' update (0, 0, 128, 8) s
 
         update (r, c, h, w) 'F' = (r,      c,      h', w ) where h' = h `div` 2
         update (r, c, h, w) 'B' = (r + h', c,      h', w ) where h' = h `div` 2
