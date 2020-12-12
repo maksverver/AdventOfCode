@@ -12,9 +12,10 @@ all: $(ALL)
 06: 06.hs; $(GHC) $<
 06-alt: 06-alt.hs; $(GHC) $<
 07: 07.hs; $(GHC) $<
+08: 08.hs; $(GHC) $<
 
 test: $(ALL)
-	for case in $(ALL); do ./$$case < testdata/$${case%-*}.in | diff testdata/$${case%-*}.ref - ; done
+	for case in $(ALL); do ./$$case < ../testdata/$${case%-*}.in | diff ../testdata/$${case%-*}.ref - ; done
 
 clean:
 	rm -f $(ALL) ./*.hi ./*.o

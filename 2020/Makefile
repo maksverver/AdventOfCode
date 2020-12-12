@@ -6,3 +6,4 @@ all: 06
 
 clean:
 	rm -f 06
+	make -C haskell clean
