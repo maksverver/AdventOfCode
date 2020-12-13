@@ -1,4 +1,4 @@
-ALL=01 02 03 04 04-alt 05 06 06-alt 07 08 09 10
+ALL=01 02 03 04 04-alt 05 06 06-alt 07 08 09 10 11
 GHC=ghc -dynamic -O
 
 all: $(ALL)
@@ -15,9 +15,10 @@ all: $(ALL)
 08: 08.hs Deque.hs; $(GHC) $<
 09: 09.hs Deque.hs; $(GHC) $<
 10: 10.hs; $(GHC) $<
+11: 11.hs; $(GHC) $<
 
 test: $(ALL)
-	for case in $(ALL); do ./$$case < ../testdata/$${case%-*}.in | diff ../testdata/$${case%-*}.ref - ; done
+	for case in $(ALL); do echo -n "Testing $${case}... "; ./$$case < ../testdata/$${case%-*}.in | diff ../testdata/$${case%-*}.ref - && echo Passed || echo FAILED; done
 
 clean:
 	rm -f $(ALL) ./*.hi ./*.o
