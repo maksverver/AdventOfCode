@@ -1,4 +1,4 @@
-ALL=01 02 03 04 04-alt 05 06 06-alt 07 08 09
+ALL=01 02 03 04 04-alt 05 06 06-alt 07 08 09 10
 GHC=ghc -dynamic -O
 
 all: $(ALL)
@@ -14,6 +14,7 @@ all: $(ALL)
 07: 07.hs; $(GHC) $<
 08: 08.hs Deque.hs; $(GHC) $<
 09: 09.hs Deque.hs; $(GHC) $<
+10: 10.hs; $(GHC) $<
 
 test: $(ALL)
 	for case in $(ALL); do ./$$case < ../testdata/$${case%-*}.in | diff ../testdata/$${case%-*}.ref - ; done
