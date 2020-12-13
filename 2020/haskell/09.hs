@@ -1,6 +1,7 @@
 import qualified Data.IntSet as IntSet
 import Data.List
-import Queue
+import Deque (Deque)
+import qualified Deque
 
 -- Naive implementation which takes time O(N^2)
 --hasPairWithSum :: [Int] -> Int -> Bool
@@ -27,12 +28,12 @@ solvePart1 nums = head $ head $ filter (not . valid) lists
         valid (x:xs) = hasPairWithSum (take 25 xs) x
 
 solvePart2 :: [Int] -> Int -> [Int]
-solvePart2 nums target = toList $ solve nums (fromList []) 0 
+solvePart2 nums target = Deque.toList $ solve nums Deque.empty 0
     where
-        solve :: [Int] -> Queue Int -> Int -> Queue Int
+        solve :: [Int] -> Deque Int -> Int -> Deque Int
         solve nums kept total 
-            | total < target = let (x:xs) = nums in solve xs (push kept x) (total + x)
-            | total > target = let (x, kept') = pop kept in solve nums kept' (total - x)
+            | total < target = let (x:xs) = nums in solve xs (Deque.addBack x kept) (total + x)
+            | total > target = let (x, kept') = Deque.removeFront kept in solve nums kept' (total - x)
             | otherwise      = kept
 
 main = do
