@@ -17,7 +17,6 @@ class Machine1:
         self.mem = {}
         self.mask = None
         self.ones = None
-        self.floating = None
 
     def set_mask(self, mask):
         self.mask = interpret(mask, 'X')
