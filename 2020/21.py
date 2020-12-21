@@ -12,6 +12,14 @@ class Product:
 
 products = [Product.parse(line) for line in sys.stdin]
 
+# To calculcate which ingredient contains which allergen (if any), we repeatedly
+# loop over all unidentified allergens and calculcate the intersection of
+# ingredients of products that contain that allergen. If there is a unique
+# ingredient, we have identified an allergen.
+#
+# This algorithm does some unnecessary work, recalculating sets of possible
+# ingredients on each iteration of the outer loop, but it doesn't matter much
+# for the given testdata. See 21-alt.py for a more efficient implementation.
 unidentified_ingredients = set(i for p in products for i in p.ingredients)
 unidentified_allergens = set(a for p in products for a in p.allergens)
 allergen_by_ingredient = {}
