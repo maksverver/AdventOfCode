@@ -23,8 +23,9 @@ def Iterate(active, neighbours):
 
     inactive = set(q for p in active for q in neighbours(p) if q not in active)
 
-    return set(p for p in active if CountActiveNeighbors(p) in (2, 3)).union(
-        p for p in inactive if CountActiveNeighbors(p) == 3)
+    return set(
+        [p for p in active if CountActiveNeighbors(p) in (2, 3)] +
+        [p for p in inactive if CountActiveNeighbors(p) == 3])
 
 def Solve(active, neighbours):
     for _ in range(6):
