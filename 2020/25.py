@@ -22,4 +22,4 @@ def ModPow(s, n):
     return x
 
 a, b = map(int, sys.stdin)
-print(ModPow(7, ModLog(7, a) * ModLog(7, b)))
+print(ModPow(a, ModLog(7, b)))
