@@ -1,4 +1,4 @@
-ALL=01 02 03 04 04-alt 05 06 06-alt 07 08 09 10 11 12 12-alt 13 15 18
+ALL=01 02 03 04 04-alt 05 06 06-alt 07 08 09 10 11 12 12-alt 13 15 16 18
 GHC=ghc -dynamic -O
 
 all: $(ALL)
@@ -21,6 +21,7 @@ all: $(ALL)
 13: 13.hs; $(GHC) $<
 15: 15.hs; $(GHC) $<
 15-alt: 15-alt.hs; $(GHC) $<
+16: 16.hs; $(GHC) $<
 18: 18.hs; $(GHC) $<
 
 test: $(ALL)
