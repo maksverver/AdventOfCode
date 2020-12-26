@@ -1,5 +1,8 @@
-ALL=01 02 03 04 04-alt 05 06 06-alt 07 08 09 10 11 12 12-alt 13 15 16 18
 GHC=ghc -dynamic -O
+
+FAST=01 02 03 04 04-alt 05 06 06-alt 07 08 09 10 11 12 12-alt 13 16 18
+SLOW=15
+ALL=$(FAST) $(SLOW)
 
 all: $(ALL)
 
@@ -24,8 +27,11 @@ all: $(ALL)
 16: 16.hs; $(GHC) $<
 18: 18.hs; $(GHC) $<
 
-test: $(ALL)
-	for case in $(ALL); do echo -n "Testing $${case}... "; ./$$case < ../testdata/$${case%-*}.in | diff ../testdata/$${case%-*}.ref - && echo Passed || echo FAILED; done
+test: $(FAST)
+	for case in $(FAST); do echo -n "Testing $${case}... "; ./$$case < ../testdata/$${case%-*}.in | diff ../testdata/$${case%-*}.ref - && echo Passed || echo FAILED; done
+
+test-slow: $(SLOW)
+	for case in $(SLOW); do echo -n "Testing $${case}... "; ./$$case < ../testdata/$${case%-*}.in | diff ../testdata/$${case%-*}.ref* - && echo Passed || echo FAILED; done
 
 clean:
 	rm -f $(ALL) ./*.hi ./*.o
