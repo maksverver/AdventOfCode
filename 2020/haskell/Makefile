@@ -1,7 +1,7 @@
 GHC=ghc -dynamic -O
 
-TODO=14 15 17 19 20 21 22 23 24
-FAST=01 02 03 04 04-alt 05 06 06-alt 07 08 09 10 11 12 12-alt 13 16 18 25
+TODO=14 15 19 20 21 22 23 24
+FAST=01 02 03 04 04-alt 05 06 06-alt 07 08 09 10 11 12 12-alt 13 16 17 18 25
 SLOW=15
 ALL=$(FAST) $(SLOW)
 
@@ -26,6 +26,7 @@ all: $(ALL)
 15: 15.hs; $(GHC) $<
 15-alt: 15-alt.hs; $(GHC) $<
 16: 16.hs; $(GHC) $<
+17: 17.hs CA.hs; $(GHC) $<
 18: 18.hs; $(GHC) $<
 25: 25.hs; $(GHC) $<
 

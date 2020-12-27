@@ -54,6 +54,10 @@ solve adjacencyLists maxNeighbors
         fix :: Eq a => (a -> a) -> a -> a
         fix f x = let x' = f x in if x == x' then x else fix f x'
 
+-- This problem could also be solved the with the generic Cellular Automaton
+-- library (see CA.hs) but the current implementation using boolean arrays is
+-- more efficient.
+
 main = do
     input <- getContents
     let rcs = findCoords 'L' (lines input)
