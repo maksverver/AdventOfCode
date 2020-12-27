@@ -1,8 +1,8 @@
-GHC=ghc -dynamic -O
+GHC=ghc -dynamic -O2
 
-TODO=14 20 22 23 24
+TODO=14 20 22 23
 FAST=01 02 03 04 04-alt 05 06 06-alt 07 08 09 10 11 12 12-alt 13 16 18 19 21 25
-SLOW=15 17
+SLOW=15 17 24
 ALL=$(FAST) $(SLOW)
 
 all: $(ALL)
@@ -35,6 +35,7 @@ SortedList.o: SortedList.hs; $(GHC) $<
 18: 18.hs; $(GHC) $<
 19: 19.hs; $(GHC) $<
 21: 21.hs PairWiseAssociation.o SortedList.o; $(GHC) $<
+24: 24.hs CA.o; $(GHC) $<
 25: 25.hs; $(GHC) $<
 
 test: $(FAST)
