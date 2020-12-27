@@ -1,7 +1,6 @@
-import Data.Bifunctor
 import Data.List
 import Data.List.Split
-import Debug.Trace -- TODO remove
+import PairWiseAssociation
 
 data Range = Range Int Int deriving Show
 
@@ -52,27 +51,18 @@ isValidTicket fields = null . invalidValues fields
 --
 -- In the solution below, we'll directly associate fields with ticket values,
 -- bypassing the need to index lists by positions.
+--
+-- (We assume all field positions can be uniquely determined, which is true for
+-- the given test data, but not strictly necessary for the problem, since we
+-- only need to identify a subset of fields.)
 associateFields :: [Field] -> [Ticket] -> [a] -> [(Field, a)]
 associateFields fields tickets xs
-    = solve $ zip (map possibilities $ transpose tickets) xs
+    = solvePairs $ zip (map possibilities $ transpose tickets) xs
     where
         -- Returns a list of possible fields based on initial ticket values.
         possibilities :: [Int] -> [Field]
         possibilities values = filter possible fields
             where possible field = all (`inAnyRange` (fieldRanges field)) values
-
-        -- This assumes all field positions can be uniquely determined, which is
-        -- true for the given test data, but not strictly necessary for the
-        -- problem, since we only need to identify a subset of fields.
-        solve :: [([Field], a)] -> [(Field, a)]
-        solve [] = []
-        solve fields = (field, x) : solve (map (first (delete field)) rest)
-            where ((field, x), rest) = isolateSingle fields
-
-        isolateSingle :: [([Field], a)] -> ((Field, a), [([Field], a)])
-        isolateSingle (([field], x):rest) = ((field, x), rest)
-        isolateSingle (first:rest) = (single, first:rest')
-            where (single, rest') = isolateSingle rest
 
 main = do
     input <- getContents

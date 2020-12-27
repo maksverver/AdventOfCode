@@ -4,6 +4,7 @@ module CA (CA, fromList, toList, evolve) where
 import Data.List
 import Data.Set (Set)
 import qualified Data.Set as Set
+import SortedList
 
 -- A cellular automaton with coordinates of type `a`.
 --
@@ -37,32 +38,6 @@ evolve neighbors birth survive (CA active)
         activeSet = Set.fromList active
 
         countActiveNeighbors coords = length $ filter (`Set.member` activeSet) $ neighbors coords
-
--- Given a list, returns a sorted list of unique elements.
---
--- For example:
---
---  distinct [3, 1, 4, 1, 5, 9, 2] == [1, 2, 3, 4, 5, 9]
---
-distinct :: Ord a => [a] -> [a]
-distinct = nub . sort
-
--- Given two sorted lists, a and b, returns a list with the elements of `a`
--- (in their original order) without the elements of `b`. This also works
--- correctly with duplicates, although that's not used in this module.
---
--- For example:
---
---  difference [1, 2, 3] [2, 4, 6] == [1, 3]
---  difference [1, 2, 2, 3, 3, 3] [1, 1, 2, 2, 3, 3] == [3]
---
-difference :: Ord a => [a] -> [a] -> [a]
-difference xs [] = xs
-difference [] _  = []
-difference a@(x:xs) b@(y:ys)
-    | x < y     = x:difference xs b
-    | y < x     = difference a ys
-    | otherwise = difference xs ys
 
 -- Given two sorted lists, returns a merged sorted list.
 merge :: Ord a => [a] -> [a] -> [a]
