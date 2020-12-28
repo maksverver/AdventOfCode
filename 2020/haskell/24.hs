@@ -35,7 +35,7 @@ main = do
     input <- getContents
     let inputCoords = map parsePath $ lines input :: [(Int, Int)]
     -- Initially, tiles are flipped if they occur in the input an odd number of times.
-    let initialCoords = [head ps | ps <- group $ sort $ inputCoords, length ps `mod` 2 == 1]
+    let initialCoords = [head ps | ps <- group $ sort inputCoords, odd (length ps)]
     print $ length initialCoords -- part 1
     let generations = iterate (CA.evolve neighbors [2] [1,2]) (CA.fromList initialCoords)
     print $ length $ CA.toList $ generations !! 100 -- part 2
