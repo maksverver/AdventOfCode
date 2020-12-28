@@ -26,6 +26,7 @@ addBack v (xs, ys) = (xs, v:ys)
 
 removeFront :: Deque a -> (a, Deque a)
 removeFront (x:xs, ys) = (x, (xs, ys))
+removeFront ([], []) = error "empty Deque"
 removeFront ([], ys) = let x:xs = Prelude.reverse ys in (x, (xs, []))
 
 addFront :: a -> Deque a -> Deque a

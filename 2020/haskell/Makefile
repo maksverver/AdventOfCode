@@ -1,7 +1,7 @@
 GHC=ghc -dynamic -O2
 
-TODO=20 22
-FAST=01 02 03 04 04-alt 05 06 06-alt 07 08 09 10 11 12 12-alt 13 14 16 18 19 21 23 25
+TODO=20
+FAST=01 02 03 04 04-alt 05 06 06-alt 07 08 09 10 11 12 12-alt 13 14 16 18 19 21 22 23 25
 SLOW=15 17 24
 ALL=$(FAST) $(SLOW)
 
@@ -36,12 +36,13 @@ SortedList.o: SortedList.hs; $(GHC) $<
 18: 18.hs; $(GHC) $<
 19: 19.hs; $(GHC) $<
 21: 21.hs PairWiseAssociation.o SortedList.o; $(GHC) $<
+22: 22.hs Deque.o; $(GHC) $<
 23: 23.hs; $(GHC) $<
 24: 24.hs CA.o; $(GHC) $<
 25: 25.hs; $(GHC) $<
 
 test: $(FAST)
-	@for case in $(FAST); do echo -n "Testing $${case}... "; ./$$case < ../testdata/$${case%-*}.in | diff ../testdata/$${case%-*}.ref - && echo Passed || echo FAILED; done
+	@for case in $(FAST); do echo -n "Testing $${case}... "; ./$$case < ../testdata/$${case%-*}.in | diff ../testdata/$${case%-*}.ref* - && echo Passed || echo FAILED; done
 
 test-slow: $(SLOW)
 	@for case in $(SLOW); do echo -n "Testing $${case}... "; ./$$case < ../testdata/$${case%-*}.in | diff ../testdata/$${case%-*}.ref* - && echo Passed || echo FAILED; done
