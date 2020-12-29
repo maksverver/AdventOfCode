@@ -1,6 +1,6 @@
 module SortedList where
 
-import Data.List (nub, sort, foldl')
+import Data.List (sort, foldl')
 
 -- Given a list, returns a sorted list of unique elements.
 --
@@ -9,7 +9,10 @@ import Data.List (nub, sort, foldl')
 --  distinct [3, 1, 4, 1, 5, 9, 2] == [1, 2, 3, 4, 5, 9]
 --
 distinct :: Ord a => [a] -> [a]
-distinct = nub . sort
+distinct = uniq . sort
+    where
+        uniq []     = []
+        uniq (x:xs) = x : uniq (dropWhile ((==) x) xs)
 
 -- Returns the union of two sorted lists.
 union :: Ord a => [a] -> [a] -> [a]
