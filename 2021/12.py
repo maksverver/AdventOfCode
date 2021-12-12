@@ -9,21 +9,29 @@ for line in sys.stdin:
 
 def Solve(allow_extra_visit):
     paths = 0
-    visited = defaultdict(int)
+    visited = set(['start'])
 
-    def Dfs(v, allow_extra_visit):
+    def Dfs(v):
+        nonlocal allow_extra_visit, paths
         if v == 'end':
-            nonlocal paths
             paths += 1
-        visited[v] += 1
+            return
         for w in adj[v]:
-            use_extra_visit = (allow_extra_visit and w.islower() and
-                    visited[w] == 1 and w not in ('start', 'end'))
-            if use_extra_visit or w.isupper() or visited[w] == 0:
-                Dfs(w, allow_extra_visit and not use_extra_visit)
-        visited[v] -= 1
+            if w.isupper():
+                # Large cave, can be visited multiple times
+                Dfs(w)
+            elif w not in visited:
+                # Small cave, not visited before
+                visited.add(w)
+                Dfs(w)
+                visited.remove(w)
+            elif allow_extra_visit and w != 'start':
+                # Small cave, one extra visit allowed
+                allow_extra_visit = False
+                Dfs(w)
+                allow_extra_visit = True
 
-    Dfs('start', allow_extra_visit)
+    Dfs('start')
     return paths
 
 print(Solve(False))  # part 1
