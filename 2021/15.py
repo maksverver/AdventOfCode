@@ -18,12 +18,13 @@ def Search(danger, H, W):
     TryPush(0, 0, 0)
     while todo:
         d, r, c = heappop(todo)
-        if min_dist[r][c] == d:
-            for rr, cc in [(r - 1, c), (r, c - 1), (r + 1, c), (r, c + 1)]:
-                if 0 <= rr < H and 0 <= cc < W:
-                    TryPush(d + danger[rr][cc], rr, cc)
         if r == H - 1 and c == W - 1:
             return d
+        if min_dist[r][c] != d:
+            continue
+        for rr, cc in [(r - 1, c), (r, c - 1), (r + 1, c), (r, c + 1)]:
+            if 0 <= rr < H and 0 <= cc < W:
+                TryPush(d + danger[rr][cc], rr, cc)
 
 print(Search(danger, H, W))
 
