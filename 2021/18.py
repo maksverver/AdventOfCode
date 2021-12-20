@@ -193,4 +193,4 @@ numbers = [Construct(Parse(line)) for line in sys.stdin]
 print(reduce(Add, numbers).Magnitude())
 
 # Part 2
-print(max(Add(a, b).Magnitude() for a in numbers for b in numbers))
+print(max(Add(a, b).Magnitude() for a in numbers for b in numbers if a != b))
