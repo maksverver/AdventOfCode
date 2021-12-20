@@ -123,28 +123,23 @@ def Reduce(t):
 
 
 def Add(a, b):
-    def Copy(node, depth):
+    def Copy(node, depth, last_leaf):
         if node.IsLeaf():
-            return Node(depth, value=node.value)
+            leaf = Node(depth, value=node.value)
+            if last_leaf:
+                last_leaf.Connect(leaf)
+            return leaf, leaf
         else:
-            return Node(depth, left=Copy(node.left, depth + 1), right=Copy(node.right, depth + 1))
+            left,  last_leaf = Copy(node.left,  depth + 1, last_leaf)
+            right, last_leaf = Copy(node.right, depth + 1, last_leaf)
+            return Node(depth, left=left, right=right), last_leaf
 
-    root = Node(0, left=Copy(a, 1), right=Copy(b, 1))
-
-    leaves = []
-    def FindLeaves(t):
-        if t.IsLeaf():
-            leaves.append(t)
-        else:
-            FindLeaves(t.left)
-            FindLeaves(t.right)
-    FindLeaves(root)
-
-    last = None
-    for next in leaves:
-        if last is not None:
-            last.Connect(next)
-        last = next
+    # Create combined tree with copied subtrees
+    last_leaf = None
+    left,  last_leaf = Copy(a, 1, last_leaf)
+    right, last_leaf = Copy(b, 1, last_leaf)
+    root = Node(0, left=left, right=right)
+    assert last_leaf == root.RightMost()
 
     Reduce(root)
     return root
