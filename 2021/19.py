@@ -54,8 +54,8 @@ def TryAlign(points1, points2):
        and a point representing the translation.'''
     for rotate in rotations:
         points3 = [TransformPoint(p, rotate) for p in points2]  # rotated
-        for p1 in points1:
-            for p2 in points3:
+        for p1 in points1[:-11]:
+            for p2 in points3[:-11]:
                 translate = SubtractPoint(p1, p2)
                 points4 = [AddPoint(p, translate) for p in points3]  # rotated + translated
                 overlap_size = len(points1) + len(points4) - len(set(points1 + points4))
