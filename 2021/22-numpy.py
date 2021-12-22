@@ -41,7 +41,7 @@ def Solve(steps):
     zsi = dict((z, i) for (i, z) in enumerate(zs))
 
     cubes = np.zeros((len(xs) - 1, len(ys) - 1, len(zs) - 1), dtype=np.bool_)
-    for n, ((x1, x2, y1, y2, z1, z2), bit) in enumerate(steps):
+    for (x1, x2, y1, y2, z1, z2), bit in steps:
         cubes[
             xsi[x1] : xsi[x2 + 1],
             ysi[y1] : ysi[y2 + 1],
