@@ -33,24 +33,19 @@ def PathLen(r1, c1, r2, c2):
     return abs(r2 - r1) + abs(c2 - c1)
 
 
-def IsPathFree(grid, r1, c1, r2, c2):
-    '''Checks if the path from (r1, c1) or (r2, c2) is unblocked.
-       Assumes the shape of the level.'''
-    r, c = r1, c1
-    while r != r2 or c != c2:
-        if r > r2:
-            r -= 1
-        elif c > c2:
-            c -= 1
-        elif c < c2:
-            c += 1
-        elif r < r2:
-            r += 1
-        else:
-            assert False
-        if grid[r][c] != '.':
-            return False
-    return True
+def IsTopRowFree(grid, c1, c2):
+    if c1 <= c2:
+        while c1 != c2:
+            c1 += 1
+            if grid[1][c1] != '.':
+                return False
+        return True
+    else:
+        while c1 != c2:
+            c1 -= 1
+            if grid[1][c1] != '.':
+                return False
+        return True
 
 
 def IsSolved(grid):
@@ -84,13 +79,13 @@ def Successors(grid):
                 # Move out of column c
                 assert grid[s][c] in 'ABCD'
                 for d, dh in enumerate(grid[1]):
-                    if dh == '.' and d not in type_by_column and IsPathFree(grid, s, c, 1, d):
+                    if dh == '.' and d not in type_by_column and IsTopRowFree(grid, c, d):
                         successors.append(Move(grid, s, c, 1, d))
             else:
                 # Move into column c
                 assert grid[r][c] == '.'
                 for d, dh in enumerate(grid[1]):
-                    if ch == dh and IsPathFree(grid, 1, d, r, c):
+                    if ch == dh and IsTopRowFree(grid, d, c):
                         # If we can move a piece to its destination, it is always
                         # optimal to do so, so don't consider other options:
                         return [Move(grid, 1, d, r, c)]
