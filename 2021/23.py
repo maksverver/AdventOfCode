@@ -64,11 +64,10 @@ def Move(grid, r1, c1, r2, c2):
     assert grid[r2][c2] == '.'
     sch = grid[r1][c1]
     cost = PathLen(r1, c1, r2, c2) * move_cost[sch]
-    new_grid = tuple(
-            ''.join('.' if c == c1 else ch for c, ch in enumerate(row)) if r == r1 else
-            ''.join(sch if c == c2 else ch for c, ch in enumerate(row)) if r == r2 else row
-            for r, row in enumerate(grid))
-    return (cost, new_grid)
+    new_grid = list(grid)
+    new_grid[r2] = new_grid[r2][:c2] + sch + new_grid[r2][c2+1:]
+    new_grid[r1] = new_grid[r1][:c1] + '.' + new_grid[r1][c1+1:]
+    return (cost, tuple(new_grid))
 
 
 def Successors(grid):
