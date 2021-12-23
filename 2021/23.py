@@ -62,24 +62,17 @@ def IsSolved(grid):
 def Move(grid, r1, c1, r2, c2):
     assert grid[r1][c1] != '.'
     assert grid[r2][c2] == '.'
-    return tuple(
-        ''.join(
-            grid[r2][c2] if r == r1 and c == c1 else
-            grid[r1][c1] if r == r2 and c == c2 else
-            grid[r][c]
-            for c in range(len(grid[r]))
-        ) for r in range(len(grid)))
+    sch = grid[r1][c1]
+    cost = PathLen(r1, c1, r2, c2) * move_cost[sch]
+    new_grid = tuple(
+            ''.join('.' if c == c1 else ch for c, ch in enumerate(row)) if r == r1 else
+            ''.join(sch if c == c2 else ch for c, ch in enumerate(row)) if r == r2 else row
+            for r, row in enumerate(grid))
+    return (cost, new_grid)
 
 
 def Successors(grid):
     successors = []
-
-    def ConsiderMove(r1, c1, r2, c2):
-        if IsPathFree(grid, r1, c1, r2, c2):
-            cost = PathLen(r1, c1, r2, c2) * move_cost[grid[r1][c1]]
-            new_grid = Move(grid, r1, c1, r2, c2)
-            successors.append((cost, new_grid))
-
     for ch, c in column_by_type.items():
         r = len(grid) - 2
         while r > 1 and grid[r][c] == ch:
@@ -89,17 +82,19 @@ def Successors(grid):
             while s <= r and grid[s][c] == '.':
                 s += 1
             if s <= r:
-                # Source
+                # Move out of column c
                 assert grid[s][c] in 'ABCD'
                 for d, dh in enumerate(grid[1]):
-                    if dh == '.' and d not in type_by_column:
-                        ConsiderMove(s, c, 1, d)
+                    if dh == '.' and d not in type_by_column and IsPathFree(grid, s, c, 1, d):
+                        successors.append(Move(grid, s, c, 1, d))
             else:
-                # Destination
+                # Move into column c
                 assert grid[r][c] == '.'
                 for d, dh in enumerate(grid[1]):
-                    if ch == dh:
-                        ConsiderMove(1, d, r, c)
+                    if ch == dh and IsPathFree(grid, 1, d, r, c):
+                        # If we can move a piece to its destination, it is always
+                        # optimal to do so, so don't consider other options:
+                        return [Move(grid, 1, d, r, c)]
     return successors
 
 
