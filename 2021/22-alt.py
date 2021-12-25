@@ -24,17 +24,12 @@ def Subtract(o, p):
         return
 
     for i, ((a, b), (c, d)) in enumerate(zip(o, p)):
-        if a < c < b:
-            v = c
-        elif a < d < b:
-            v = d
-        else:
-            continue
-
-        # Split on the i-th dimension
-        yield from Subtract(o[:i] + ((a, v),) + o[i + 1:], p)
-        yield from Subtract(o[:i] + ((v, b),) + o[i + 1:], p)
-        return
+        for v in c, d:
+            if a < v < b:
+                # Split on the i-th dimension
+                yield from Subtract(o[:i] + ((a, v),) + o[i + 1:], p)
+                yield from Subtract(o[:i] + ((v, b),) + o[i + 1:], p)
+                return
 
     # o is completely covered by p, so drop o.
     assert all(c <= a <= b <= d for (a, b), (c, d) in zip(o, p))
