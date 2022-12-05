@@ -84,19 +84,20 @@ def WriteTestInput(stacks, instructions):
   """Outputs a test data file to stdout. Used by the generators."""
   # Print stack boxes
   for r in range(max(map(len, stacks)) - 1, -1, -1):
-    line = ''
+    parts = []
     for s in stacks:
       if r < len(s):
-        line += '[' + s[r] + '] '
+        parts.append('[' + s[r] + ']')
       else:
-        line += '    '
-    print(line)
+        parts.append('   ')
+    print(' '.join(parts))
 
   # Print stack labels
   if len(stacks) < 10:
-    print(''.join(' ' + str(col + 1) + '  ' for col in range(len(stacks))))
+    parts = [' ' + str(col + 1) + ' ' for col in range(len(stacks))]
   else:
-    print(' 0  ' * len(stacks))
+    parts = [' 0 ']*len(stacks)
+  print(' '.join(parts))
 
   # Blank separator
   print()
