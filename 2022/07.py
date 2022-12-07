@@ -30,9 +30,8 @@ class Directory:
 
 
 def ParseInput(lines):
-  root = Directory()
+  cwd = root = Directory()
   all_directories = [root]
-  cwd = root  # current working directory
   for line in lines:
     if re.match('^[$] cd /\n$', line):
       cwd = root
