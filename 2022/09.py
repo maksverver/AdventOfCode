@@ -18,7 +18,7 @@ def Clamp(x, lo, hi):
 
 def Solve(knots):
   rope = [[0, 0] for _ in range(knots)]
-  visited = set((0, 0))
+  visited = set([(0, 0)])
 
   def Step(dr, dc):
     rope[0][0] += dr
