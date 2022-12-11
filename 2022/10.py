@@ -18,7 +18,6 @@ t = 0
 x = 1
 for op in map(ParseOp, sys.stdin):
   for delay in range(1 if op == 0 else 2):
-    assert t < H * W
     r, c = t // W, t % W
     if x - 1 <= c <= x + 1:
       picture[r][c] = '#'
