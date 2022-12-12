@@ -94,7 +94,7 @@ def Solve(rounds, mod):
     for i, m in enumerate(monkeys):
       inspected[i] += len(m.items)
       m.Play()
-    #PrintMonkeys()
+    #PrintMonkeys(monkeys)
   return mul(*sorted(inspected)[-2:])
 
 
