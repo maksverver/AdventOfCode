@@ -49,6 +49,10 @@ def Compare(a, b):
 
 
 def SolvePart1():
+  # For debugging:
+#  for i, (a, b) in enumerate(pairs, 1):
+#    if Compare(a, b) < 0:
+#      print(i, file=sys.stderr)
   return sum(i for i, (a, b) in enumerate(pairs, 1) if Compare(a, b) < 0)
 
 

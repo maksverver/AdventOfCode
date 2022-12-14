@@ -1,3 +1,4 @@
+from math import *
 from random import *
 import json
 import sys
@@ -5,9 +6,23 @@ import sys
 min_value = 0
 max_value = 100
 
-num_lists  = 100
-num_values = 100
-num_pairs  = 30000    # must be a multiple of 3
+# Large 1
+#num_lists  = 10000
+#num_values = 10000
+#num_pairs  = 300    # must be a multiple of 3
+#max_extra_parens = 0
+
+# Large 2
+#num_lists  = 100
+#num_values = 100
+#num_pairs  = 30000    # must be a multiple of 3
+#max_extra_parens = 0
+
+# Large 3
+num_lists  = 30
+num_values = 10
+num_pairs  = 90    # must be a multiple of 3
+max_extra_parens = 10
 
 def GenTree(num_lists, num_values, first_value):
   stack = [[]]
@@ -42,7 +57,11 @@ def Depth(t):
 
 def Str(t):
   if isinstance(t, int):
-    return str(t)
+    s = str(t)
+    if max_extra_parens:
+      x = floor(2**(uniform(0, 1)*log(max_extra_parens + 2, 2))) - 1
+      s = '['*x + s + ']'*x
+    return s
   return '[' + ','.join(map(Str, t)) + ']'
 
 def MutationOf(t):

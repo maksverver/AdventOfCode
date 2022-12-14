@@ -68,11 +68,10 @@ int Compare(const char *&p_in, int i) {
     res = 10*res + (*p++ - '0');
   }
   if (res != i) return res - i;
-  if (*p == ',') return 1;
-  while (depth > 0) {
-    assert(*p == ']');
-    ++p;
-    --depth;
+  while (depth > 0 && *p == ']') ++p, --depth;
+  if (depth > 0) {
+    assert(*p == ',');
+    return 1;
   }
   p_in = p;
   return 0;
@@ -163,7 +162,10 @@ int main() {
 
     // For part 1: add up indices of correctly ordered pairs.
     ++index;
-    if (Compare(p, q) < 0) answer1 += index;
+    if (Compare(p, q) < 0) {
+      //std::cerr << index << '\n';  // for debugging
+      answer1 += index;
+    }
 
     // For part 2: count which strings are less than [[2]] and [[6]] respectively.
     int i1 = FirstNumber(p);
