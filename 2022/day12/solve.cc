@@ -158,8 +158,8 @@ int main(int argc, char *argv[]) {
   std::cout << answer1 << std::endl;
   std::cout << answer2 << std::endl;
 
-  std::cerr << "Total time:  " << std::setw(10) << DelayMicros(time_start, time_finish) << " ms\n";
-  std::cerr << "  Parsing:   " << std::setw(10) << DelayMicros(time_start, time_part1_start) << " ms\n";
-  std::cerr << "  Solving 1: " << std::setw(10) << DelayMicros(time_part1_start, time_part2_start) << " ms\n";
-  std::cerr << "  Solving 2: " << std::setw(10) << DelayMicros(time_part2_start, time_finish) << " ms\n";
+  std::cerr << "Total time:  " << std::setw(10) << DelayMicros(time_start, time_finish) << " us\n";
+  std::cerr << "  Parsing:   " << std::setw(10) << DelayMicros(time_start, time_part1_start) << " us\n";
+  std::cerr << "  Solving 1: " << std::setw(10) << DelayMicros(time_part1_start, time_part2_start) << " us\n";
+  std::cerr << "  Solving 2: " << std::setw(10) << DelayMicros(time_part2_start, time_finish) << " us\n";
 }
