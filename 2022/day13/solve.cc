@@ -81,18 +81,18 @@ int Compare(const char *&p_in, int i) {
 // Compares to strings representing nested structures.
 //
 // Technically this can still be optimized somewhat since we know that
-// certain characters can't follow others. For example, if we just compared two
-// numbers, we know that the next character cannot be a digit for either p or q,
-// but we still do a check here on the next loop iteration.
+// certain characters can't follow others.
 int Compare(const char *p, const char *q) {
   for (;;) {
     if (isdigit(*p) && isdigit(*q)) {
       int v = NextNumber(p);
       int w = NextNumber(q);
       if (v != w) return v - w;
-    } else if (*p == *q) {
-      ++p;
-      ++q;
+      // no "else" clause below to skip the isdigit() check,
+      // because we know *p and *q are nondigits here.
+    }
+    if (*p == *q) {
+      ++p, ++q;
     } else if (*p == ',' || *q == ']') {
       return 1;
     } else if (*p == ']' || *q == ',') {
