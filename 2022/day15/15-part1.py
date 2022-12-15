@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 from math import inf
 import re
 import sys
