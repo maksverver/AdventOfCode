@@ -44,8 +44,6 @@ M = [[M[v][w] for w in valves_with_flow] for v in valves_with_flow]
 F = [valve_rates[v] for v in valves_with_flow]
 
 def CalculateMemo(T):
-  # In principle, we only need to keep memo[26] and memo[30] to solve the
-  # problem, but it's easier to keep them all in memory.
   memo = [[[0 for _ in range(1 << V)] for _ in range(V)] for _ in range(T + 1)]
   unopened = [[i for i in range(V) if (o & (1 << i)) == 0] for o in range(1 << V)]
   for t in range(1, T + 1):
