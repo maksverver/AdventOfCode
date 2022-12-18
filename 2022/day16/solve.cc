@@ -1,6 +1,5 @@
-// Advent of Code 2022 Day 14: Regolith Reservoir
-// https://adventofcode.com/2022/day/14
-//
+// Advent of Code 2022 Day 16: Proboscidea Volcanium
+// https://adventofcode.com/2022/day/16
 
 #include <algorithm>
 #include <cassert>
