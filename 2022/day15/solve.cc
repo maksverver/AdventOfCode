@@ -1,6 +1,5 @@
-// Advent of Code 2022 Day 14: Regolith Reservoir
-// https://adventofcode.com/2022/day/14
-//
+// Advent of Code 2022 Day 15: Beacon Exclusion Zone
+// https://adventofcode.com/2022/day/15
 
 #include <algorithm>
 #include <cassert>
