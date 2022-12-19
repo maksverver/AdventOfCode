@@ -141,7 +141,7 @@ int main() {
     for (int v = 0; v < V; ++v) {
       for (unsigned o = 0; o < (1u << V); ++o) {
         if (o & (1 << v)) {
-          int max_value = memo(t - 1, v, o);
+          int max_value = 0;
           for (int w = 0; w < V; ++w) {
             if ((o & (1 << w)) == 0) {
               int d = dists[v*V + w];
