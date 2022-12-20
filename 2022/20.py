@@ -16,16 +16,6 @@ class Node:
     return 'Node(%d)' % self.value
 
 
-def SwapNodes(a, b, c, d):
-  '''Swaps nodes b and c in the sequence a, b, c, d.'''
-  a.right = c
-  c.right = b
-  b.right = d
-  d.left = b
-  b.left = c
-  c.left = a
-
-
 def Sequence(start_node):
   '''Generates the sequence of node moving right from the giving start node.'''
   node = start_node
