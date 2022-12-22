@@ -124,15 +124,20 @@ def BuildWrappingGraph(grid):
   return next(node for row in nodes for node in row if node is not None)
 
 
+def GetStartCol(grid):
+  i = 0
+  while grid[0][i].isspace(): i += 1
+  return i
+
+
 def MarkCubeGraph(grid, start):
   # Do a flood fill to paint the cube with the walls of the grid (which we need
   # for the simulation), and to mark the source grid coordinates (which we need
   # to compute the final answer). We start with the leftmost nonblank character
   # on the top row.
-  i = 0
-  while grid[0][i].isspace(): i += 1
-  seen = set([(0, i)])
-  todo = [(0, i, start, 0)]
+  c = GetStartCol(grid)
+  seen = set([(0, c)])
+  todo = [(0, c, start, 0)]
   for r, c, f, d in todo:
     # r, c are coordinates in the grid; f, d are the current node and the
     # direction on the node that corresponds with "right" on the grid.
@@ -191,6 +196,7 @@ def CalculateCubeSize(grid):
   assert size == int(size)
   return int(size)
 
+
 class TestCase:
   def __init__(self, input):
     self.grid, self.instructions = ParseInput(input)
@@ -210,10 +216,12 @@ class TestCase:
     # which is different from the start if the topleft nonspace character is #.
     # This doesn't happen in the sample or real test data, but let's implement
     # it anyway out of principle.
-    # start_col = max(0, self.grid[0].index('#') - self.grid[0].index('.'))
-    # for _ in range(start_col):
-    #   f, d = f.Step(RIGHT)
-    #   assert d == RIGHT
+    c = GetStartCol(self.grid)
+    while self.grid[0][c] == '#':
+      f, d = f.Step(RIGHT)
+      assert d == RIGHT
+      c += 1
+    assert self.grid[0][c] == '.'
 
     # OK, now we're at the start, just follow the instructions one by one.
     for instr in self.instructions:
