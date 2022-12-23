@@ -22,23 +22,19 @@ def Rotate(a, dr, dc):
   return a
 
 def NextStep(old_elves, round):
-  elves = np.pad(old_elves, (1, 1))
-
   # nn[r][c] == True if there is an elf due north of (r, c), etc.
-  nn = np.pad(old_elves, ((2, 0), (1, 1)))
-  ss = np.pad(old_elves, ((0, 2), (1, 1)))
-  ww = np.pad(old_elves, ((1, 1), (2, 0)))
-  ee = np.pad(old_elves, ((1, 1), (0, 2)))
-  nw = np.pad(old_elves, ((2, 0), (2, 0)))
-  ne = np.pad(old_elves, ((2, 0), (0, 2)))
-  sw = np.pad(old_elves, ((0, 2), (2, 0)))
-  se = np.pad(old_elves, ((0, 2), (0, 2)))
+  # pe == padded elves: the original elves with 1 line of padding
+  (nw, nn, ne,
+   ww, pe, ee,
+   sw, ss, se) = (
+    np.pad(old_elves, ((1 - dr, 1 + dr), (1 - dc, 1 + dc)))
+    for dr in (-1, 0, +1) for dc in (-1, 0, +1))
 
   neighbor_count = np.add.reduce([nn, ss, ee, ww, ne, nw, se, sw])
 
   # Elves without neighbors stay put.
-  next_elves = elves & (neighbor_count == 0)
-  undecided = elves ^ next_elves
+  next_elves = pe & (neighbor_count == 0)
+  undecided = pe ^ next_elves
 
   # Find the direction each of the undecided elves wants to move in.
   want_move = 4*[None]
