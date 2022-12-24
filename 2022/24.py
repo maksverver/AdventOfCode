@@ -3,9 +3,9 @@
 
 import sys
 
-# Assume the grid is bordered by walls (except 2 openings for start and finish)
+# Assume the grid is bordered by walls (except 2 openings for start and finish).
 # Conveniently, there are no vertical blizzards in the starting/finishing column,
-# avoiding abiguity about whether a blizzard can move into the opening or not.
+# avoiding ambiguity about whether a blizzard can move into the opening or not.
 full_grid = sys.stdin.read().splitlines()
 grid = [row[1:-1] for row in full_grid[1:-1]]
 H, W = len(grid), len(grid[0])
