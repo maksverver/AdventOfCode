@@ -17,38 +17,51 @@ def ParseMapping(part):
   return list(sorted(ParseMapEntry(line) for line in lines))
 
 
-def Translate(mapping, ranges):
-  '''Uses `mapping` to translate `ranges` (a list of (begin, end) pairs) to new ranges.'''
-  results = []
-  for a, b in ranges:
-    for begin, end, delta in mapping:
-      assert a < b
-
-      if a < begin <= b:
-        results.append((a, begin))
-        a = begin
-        if a == b:
-          break
-
-      if begin <= a < end:
-        if b <= end:
-          results.append((a + delta, b + delta))
+def Translate(mapping, old_ranges):
+  '''Uses `mapping` to translate `old_ranges` (a list of (begin, end) pairs) to new ranges.
+     Both `mapping` and `old_ranges` must be sorted.'''
+  new_ranges = []
+  i = 0
+  for a, b in old_ranges:
+    while i < len(mapping):
+      c, d, x = mapping[i]
+      if b < c:
+        break
+      if a < c:
+        new_ranges.append((a, c))
+        a = c
+      if a < d:
+        if b < d:
+          new_ranges.append((a + x, b + x))
           a = b
           break
-        else:
-          results.append((a + delta, end + delta))
-          a = end
-          assert a < b
-
+        new_ranges.append((a + x, d + x))
+        a = d
+      i += 1
     if a < b:
-      results.append((a, b))
+      new_ranges.append((a, b))
+  return new_ranges
 
-  return results
+
+def MergeAndSort(old_ranges):
+  new_ranges = []
+  a = b = 0
+  for c, d in sorted(old_ranges):
+    if b < c:
+      if a < b:
+        new_ranges.append((a, b))
+      a, b = c, d
+    else:
+      b = max(b, d)
+  if a < b:
+    new_ranges.append((a, b))
+  return new_ranges
 
 
 def Solve(mappings, ranges):
+  ranges = MergeAndSort(ranges)
   for mapping in mappings:
-    ranges = Translate(mapping, ranges)
+    ranges = MergeAndSort(Translate(mapping, ranges))
   return min(begin for (begin, end) in ranges)
 
 
