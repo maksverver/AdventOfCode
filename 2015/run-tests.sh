@@ -1,6 +1,6 @@
 #!/bin/sh
 
-export PYTHON=${PYTHON:-/usr/bin/python}
+export PYTHON=${PYTHON:-/usr/bin/python2}
 export TESTDIR=${TESTDIR:-testdata}
 
 run_test() {
