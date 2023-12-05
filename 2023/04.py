@@ -1,5 +1,3 @@
-from collections import Counter, defaultdict
-from math import *
 import sys
 
 def ParseCard(line):

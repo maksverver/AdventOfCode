@@ -1,5 +1,3 @@
-from collections import Counter, defaultdict
-from math import *
 import sys
 
 def ParseSeeds(line):
@@ -49,7 +47,6 @@ def Translate(mapping, ranges):
 
 
 def Solve(mappings, ranges):
-  answer = inf
   for mapping in mappings:
     ranges = Translate(mapping, ranges)
   return min(begin for (begin, end) in ranges)
