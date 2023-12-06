@@ -57,7 +57,7 @@ void MergeAndSort(std::vector<Range> &ranges) {
     if (ranges[i].begin < ranges[j].end) {
       ranges[j].end = std::max(ranges[j].end, ranges[i].end);
     } else {
-      ++j;
+      ranges[++j] = ranges[i];
     }
   }
   ranges.resize(j + 1);
