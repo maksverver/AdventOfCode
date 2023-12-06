@@ -14,7 +14,7 @@ def CountWinning(t, d):
     return (t - hold)*hold > d
 
   x = t // 2
-  assert IsWinning(x)
+  if not IsWinning(x): return 0
 
   def LowerBound():
     lo, hi = 0, x
