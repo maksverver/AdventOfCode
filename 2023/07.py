@@ -51,13 +51,13 @@ def ParseLine(chars, line):
   return (hand, bid)
 
 
-def Solve(data, chars, rank_func):
+def Solve(lines, chars, rank_func):
   assert len(chars) == NUM_CARDS
-  hands = [ParseLine(chars, line) for line in data.splitlines()]
+  hands = [ParseLine(chars, line) for line in lines]
   hands.sort(key=lambda a: (rank_func(a[0]), a[0]))
   return sum(rank * bid for rank, (hand, bid) in enumerate(hands, 1))
 
 
-data = sys.stdin.read()
-print(Solve(data, '23456789TJQKA', GetRank))
-print(Solve(data, 'J23456789TQKA', MaxRank))
+lines = sys.stdin.readlines()
+print(Solve(lines, '23456789TJQKA', GetRank))
+print(Solve(lines, 'J23456789TQKA', MaxRank))
