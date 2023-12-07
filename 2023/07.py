@@ -8,28 +8,20 @@ def GetRank(hand):
   cards = sorted(hand)
 
   if cards[0] == cards[4]:
-    return 7  # five of a kind
+    return 6  # five of a kind
 
   if cards[0] == cards[3] or cards[1] == cards[4]:
-    return 6  # four or a kind
+    return 5  # four or a kind
 
   if ((cards[0] == cards[2] and cards[3] == cards[4]) or
       (cards[0] == cards[1] and cards[2] == cards[4])):
-    return 5  # full house
+    return 4  # full house
 
   if cards[0] == cards[2] or cards[1] == cards[3] or cards[2] == cards[4]:
-    return 4  # three of a kind
+    return 3  # three of a kind
 
   pairs = sum(cards[i] == cards[j] for i in range(5) for j in range(i + 1, 5))
-
-  if pairs == 2:
-    return 3  # two pair
-
-  if pairs == 1:
-    return 2  # one pair
-
-  assert pairs == 0
-  return 1  # high card
+  return pairs
 
 
 def MaxRank(input_hand):
