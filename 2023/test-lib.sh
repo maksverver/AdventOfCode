@@ -15,13 +15,16 @@ run_test() {
 	if [ ! -e "$input" ]; then
 		input=${input%?.in}.in
 	fi
-	received=$(${PYTHON} "${base}.py" <"$input")
-	expected=$(cat "${TESTDIR}/$1")
-	if [ "$expected" = "$received" ]; then
-		echo "$1 passed"
-	else
-		echo "$1 FAILED: expected $expected, received $received"
-	fi
+  for solver in ${base}*.py; do
+    id=${solver%.py}
+    received=$(${PYTHON} "${base}.py" <"$input")
+    expected=$(cat "${TESTDIR}/$1")
+    if [ "$expected" = "$received" ]; then
+      echo "$id passed"
+    else
+      echo "$id FAILED: expected $expected, received $received"
+    fi
+  done
 }
 
 run_tests() {
