@@ -1,0 +1,50 @@
+Fast solution for Advent of Code 2023 Day 9: Mirage Maintenance.
+https://adventofcode.com/2023/day/9
+
+It's clear that the answer for a given row is some linear combination of the
+values in the row, and the coefficients of the row only depend on the length of
+the input row. This can be derived by simply writing down the equations of the
+rows of differences without evaluating them.
+
+For example, for a row of length 4:
+
+  Given row:           a, b, c, d
+  First differences:   (b-a), (c-b), (d-c)
+  Second differences:  (c-b)-(b-a),  (d-c)-(c-b)
+                       = a - 2b + c  = b - 2c + d
+  Third differences:   (b - 2c + d) - (a - 2b + c) = -a + 3b - 3c + d
+
+Then calculating missing values as instructed:
+
+  Third row:   0 + (-a + 3b -3c + d) =
+                -a + 3b - 3c + d
+  Second row:  (-a + 3b - 3c + d) + (b - 2c + d) =
+                -a + 4b - 5c + 2d
+  First row:   (-a + 4b - 5c + 2d) + (d - c) =
+                -a + 4b - 6c + 3d
+  Answer:      (-a + 4b - 6c + 3d) + d =
+                -a + 4b - 6c + 4d
+
+It turns out that the coefficients are simply binomial coefficients nCr(n, k)
+for 1 ≤ k < n where n is the length of the input, with alternating signs that
+start at -1 if n is even, and +1 if n is odd.
+
+The answer for a sequence [a, b, c, d, e] (length 5) is 1*a - 5*b + 10*c - 10*d + 5*e.
+The answer for a sequence [a, b, c, d, e, f] of (length 6) is -1a + 6b - 15c + 20d - 15e + 6f.
+
+For example, for [2, 3, 4, 5, 6], 1*2 - 5*3 + 10*4 - 10*5 + 5*6 = 7.
+
+To evaluate the answer we need the binomial coefficients nCr(n, k) for a given
+value of n. We can calculate them incrementally, given the definition:
+
+  nCr(n, k) = n! / k! / (n - k)!
+
+We can calculate the ratio:
+
+  nCr(n, k) / nCr(n, k - 1)
+      = n! / k! / (n - k)! / (n! / (k - 1)! / (n - (k - 1))!)
+      = (k - 1)! × (n - (k - 1))! / k! / (n - k)!
+      = (n - k + 1) / k
+
+So we can calculate nCr(n, k) from nCr(n, k - 1) by multiplying by (n - k + 1)
+and then dividing by k.
