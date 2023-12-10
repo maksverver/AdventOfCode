@@ -123,3 +123,13 @@ print(answer1)
 
 answer2 = CountInterior()
 print(answer2)
+
+
+# Alternative: walk through the grid diagonally, only counting
+#  '|', '-', 'F' and 'J' as walls, but not 'L' or '7'.
+def CountInterior2():
+  return sum(
+    sum(grid[r - i][c - i] in '|-FJ' for i in range(1, min(r, c) + 1)) % 2
+    for r in range(1, H - 1) for c in range(1, W - 1) if grid[r][c] == '.')
+
+assert answer2 == CountInterior2()
