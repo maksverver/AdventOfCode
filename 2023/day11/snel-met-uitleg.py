@@ -85,8 +85,8 @@
 #                  o-o             8 - 7 + 1
 #
 # Het interval 1..5 van lengte 4 wordt 3 keer geteld.
-# Het interval 5..6 van lengte 2 wordt 4 keer geteld.
-# Het interval 6..7 van lengte 1 wordt 3 keer geteld.
+# Het interval 5..7 van lengte 2 wordt 4 keer geteld.
+# Het interval 7..8 van lengte 1 wordt 3 keer geteld.
 #
 # We kunnen de som dus ook schrijven als: 4×3 + 2×4 + 1×3 = 23.
 #
@@ -124,7 +124,7 @@ for expand in (2, 1_000_000):
   ys = [new_y[y] for y in range(H) for x in range(W) if grid[y][x] == '#']
 
   # Stap 2: bereken voor x- en y-coordinaten afzonderlijk de som van de
-  # verschillen (bservatie 2 en 3). `xs` en `ys` moeten gesorteerd zijn!
+  # verschillen (observatie 2 en 3). `xs` en `ys` moeten gesorteerd zijn!
   print(
     sum((xs[i] - xs[i - 1]) * i * (len(xs) - i) for i in range(1, len(xs))) +
     sum((ys[i] - ys[i - 1]) * i * (len(ys) - i) for i in range(1, len(ys))))
