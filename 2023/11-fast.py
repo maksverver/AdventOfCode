@@ -8,7 +8,8 @@
 #   - day11/fast.py for a slightly different fast solution that combines
 #     translating coordinates with summing distances.
 #
-#   - day11/fast-numpy.py for the fastest version
+#   - day11/fast-numpy.py: for the fastest version which uses numpy to speed up
+#     parsing.
 #
 
 from itertools import accumulate

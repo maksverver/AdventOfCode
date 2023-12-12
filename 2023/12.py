@@ -1,33 +1,33 @@
 from functools import cache
 import sys
 
-def CountCombinations(s, nums):
-  '''Returns the number of question marks in `s` (which must have a terminating
-    '.' appended), can be filled in consistent with `nums`.`'''
 
-  @cache
-  def CanExtend(i, n):
-    if i == len(s): return False
-    if n == 0: return s[i] in '.?'
-    return s[i] in '#?' and CanExtend(i + 1, n - 1)
+def CountCombinations(s, runs):
+  '''Returns the number of ways question marks in `s` can be filled in
+     consistent with `runs`. `s` must have an extra '.' appended.'''
 
   @cache
   def Calc(i, j):
-    if i == len(s): return j == len(nums)
+    '''Returns number of solutions to s[i:] using runs[j:].'''
+    if j == len(runs):
+      return '#' not in s[i:]
+
+    n = runs[j]
+    if len(s) - i < n + 1:
+      return 0
+
     res = 0
-    if s[i] in '.?':
+    if s[i] != '#':
       res += Calc(i + 1, j)
-    if s[i] in '#?' and j < len(nums):
-      n = nums[j]
-      if CanExtend(i, n):
-        res += Calc(i + n + 1, j + 1)
+    if '.' not in s[i:i + n] and s[i + n] != '#':
+      res += Calc(i + n + 1, j + 1)
     return res
 
   return Calc(0, 0)
 
 
 def Solve(records):
-  return sum(CountCombinations(s + '.', nums) for s, nums in records)
+  return sum(CountCombinations(s + '.', runs) for s, runs in records)
 
 
 def ParseLine(line):
@@ -35,10 +35,11 @@ def ParseLine(line):
   a, b = line.split()
   return a, list(map(int, b.split(',')))
 
+
 # Part 1
 records1 = [ParseLine(line) for line in sys.stdin]
 print(Solve(records1))
 
 # Part 2
-records2 = [('?'.join([s]*5), nums*5) for (s, nums) in records1]
+records2 = [('?'.join([s]*5), runs*5) for (s, runs) in records1]
 print(Solve(records2))
