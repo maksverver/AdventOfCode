@@ -1,5 +1,11 @@
+# This is a variant of fast.py that uses numpy to speed up input parsing,
+# which is the slowest part. It uses regular Python integers for calculations
+# to prevent integer overflow that would otherwise occur for very large inputs.
+# This is not an issue with the official test data.
+
 import numpy as np
 import sys
+
 
 def ReadInput():
   data = np.fromfile(sys.stdin, dtype=np.byte)
@@ -11,6 +17,7 @@ def ReadInput():
   matrix = np.delete(data, newlines) == ord('#')
   matrix.resize((height, width))
   return matrix
+
 
 def SolveAxis(counts):
   total_dist = 0
