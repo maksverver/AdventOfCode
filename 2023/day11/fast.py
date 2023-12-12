@@ -4,9 +4,6 @@ grid = [s.strip() for s in sys.stdin]
 H = len(grid)
 W = len(grid[0])
 
-galaxies = [(r, c) for r in range(H) for c in range(W) if grid[r][c] == '#']
-N = len(galaxies)
-
 def SolveAxis(counts):
   total_dist = 0
   acc_dist   = 0
