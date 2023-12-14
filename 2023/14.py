@@ -7,9 +7,9 @@ def Solve(lines, part2):
 
   directions = [
     [[(r, c) for r in range(H)]           for c in range(W)],  # north: columns
-    [[(r, c) for c in range(W)]           for r in range(W)],  # west:  rows
+    [[(r, c) for c in range(W)]           for r in range(H)],  # west:  rows
     [[(r, c) for r in reversed(range(H))] for c in range(W)],  # south: reverse columns
-    [[(r, c) for c in reversed(range(W))] for r in range(W)],  # east:  reverse rows
+    [[(r, c) for c in reversed(range(W))] for r in range(H)],  # east:  reverse rows
   ]
 
   # Moves all boulders towards the front in a single line. For example,'.O.O#O.O'
