@@ -1,4 +1,3 @@
-from collections import deque
 import sys
 
 grid = [s.strip() for s in sys.stdin]
@@ -22,13 +21,13 @@ convert = { #right   down    left    up
   '/':      [[3],    [2],    [1],    [0]   ],
 }
 
-# Uses breadth-first search to calculate the number of positions visited
+# Uses depth-first search to calculate the number of positions visited
 # (regardless of light direction). There are 4×H×W possible states.
 def Search(r, c, dir):
-  todo = deque([(r, c, dir)])
+  todo = [(r, c, dir)]
   seen = set(todo)
   while todo:
-    r, c, dir = todo.popleft()
+    r, c, dir = todo.pop()
     for dir2 in convert[grid[r][c]][dir]:
       dr, dc = dirs[dir2]
       r2 = r + dr
