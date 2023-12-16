@@ -21,32 +21,41 @@ convert = { #right   down    left    up
   '/':      [[3],    [2],    [1],    [0]   ],
 }
 
+def NextStates(state):
+  r, c, dir = state
+  states = []
+  for dir2 in convert[grid[r][c]][dir]:
+    dr, dc = dirs[dir2]
+    r2 = r + dr
+    c2 = c + dc
+    if 0 <= r2 < H and 0 <= c2 < W:
+      states.append((r2, c2, dir2))
+  return states
+
 # Uses depth-first search to calculate the number of positions visited
 # (regardless of light direction). There are 4×H×W possible states.
-def Search(r, c, dir):
-  todo = [(r, c, dir)]
-  seen = set(todo)
+def FindReachable(start_state):
+  todo = [start_state]
+  seen = {start_state}
   while todo:
-    r, c, dir = todo.pop()
-    for dir2 in convert[grid[r][c]][dir]:
-      dr, dc = dirs[dir2]
-      r2 = r + dr
-      c2 = c + dc
-      if 0 <= r2 < H and 0 <= c2 < W and (state := (r2, c2, dir2)) not in seen:
+    for state in NextStates(todo.pop()):
+      if state not in seen:
         seen.add(state)
         todo.append(state)
-  return len(set((r, c) for (r, c, dir) in seen))
+  return seen
+
+def Solve(start_state):
+  return len(set((r, c) for (r, c, dir) in FindReachable(start_state)))
 
 def Part1():
-  return Search(0, 0, 0)
+  return Solve((0, 0, 0))
 
 def Part2():
-  answer = 0
-  for r in range(H): answer = max(answer, Search(r,     0,     0))
-  for c in range(W): answer = max(answer, Search(0,     c,     1))
-  for r in range(H): answer = max(answer, Search(r,     W - 1, 2))
-  for c in range(W): answer = max(answer, Search(H - 1, c,     3))
-  return answer
+  return max(Solve(state) for state in
+    [(r,     0,     0) for r in range(H)] +
+    [(0,     c,     1) for c in range(W)] +
+    [(r,     W - 1, 2) for r in range(H)] +
+    [(H - 1, c,     3) for c in range(W)])
 
 print(Part1())
 print(Part2())
