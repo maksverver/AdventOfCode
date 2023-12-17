@@ -13,7 +13,8 @@ W = len(grid[0])
 def Solve(min_repeat, max_repeat):
   # Find the shortest path using Dijkstra's algorithm.
   #
-  # States are of the form: (row, column, direction).
+  # States are of the form: (row, column, last direction % 2)
+  # with a direction -1 as a special case for the start state.
   start_state = (0, 0, -1)
 
   # Given a (state, loss) pair, calculates the next (state, loss) pairs.
@@ -28,7 +29,7 @@ def Solve(min_repeat, max_repeat):
         c2 += dc
         if r2 < 0 or r2 >= H or c2 < 0 or c2 >= W: break
         loss2 += grid[r2][c2]
-        if i + 1 >= min_repeat: yield ((r2, c2, dir2), loss2)
+        if i + 1 >= min_repeat: yield ((r2, c2, dir2 % 2), loss2)
 
   # Core of Dijkstra's algorithm: find minimum loss per state.
   dist = defaultdict(lambda: inf)
