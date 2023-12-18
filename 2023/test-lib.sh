@@ -17,7 +17,7 @@ run_test() {
 	fi
   for solver in ${base}*.py; do
     id=${solver%.py}
-    received=$(${PYTHON} "${base}.py" <"$input")
+    received=$(${PYTHON} "${solver}" <"$input")
     expected=$(cat "${TESTDIR}/$1")
     if [ "$expected" = "$received" ]; then
       echo "$id passed"
