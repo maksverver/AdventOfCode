@@ -47,9 +47,9 @@ def DrawDebugImage(grid):
   im = Image.new('RGB', (len(grid[0]), len(grid)), (0, 0, 0))
   draw = ImageDraw.Draw(im, 'RGB')
   colors = {
-    'o': (128, 128, 128),
-    '#': (255, 255, 255),
-    '.': (  0,   0,   0),
+    'o': (  0,   0,   0),
+    '#': (  0, 255,   0),
+    '.': (128, 128, 128),
   }
   for r, row in enumerate(grid):
     for c, ch in enumerate(row):
@@ -74,6 +74,7 @@ def Solve(part2):
   grid = [['.']*W for _ in range(H)]
   for segment in segments:
     for r, c in Points(segment):
+      assert grid[r + 1][c + 1] == '.'
       grid[r + 1][c + 1] = '#'
 
   # Flood fill from the outside.
