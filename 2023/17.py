@@ -17,6 +17,8 @@ def Solve(min_repeat, max_repeat):
   # with a direction -1 as a special case for the start state.
   start_state = (0, 0, -1)
 
+  end_states = {(H-1, W-1, dir) for dir in (0, 1)}
+
   # Given a (state, loss) pair, calculates the next (state, loss) pairs.
   def NextStates(state, loss):
     r, c, dir = state
@@ -38,13 +40,11 @@ def Solve(min_repeat, max_repeat):
   while todo:
     d, v = heappop(todo)
     if d > dist[v]: continue
+    if v in end_states: return d
     for w, e in NextStates(v, d):
       if e < dist[w]:
         dist[w] = e
         heappush(todo, (e, w))
-
-  # Retrieve the solution.
-  return min(loss for (r, c, _), loss in dist.items() if r == H - 1 and c == W - 1)
 
 print(Solve(0,  3))  # Part 1
 print(Solve(4, 10))  # Part 2
