@@ -1,0 +1,40 @@
+Okee, het is technisch avond, dus voor mensen die het interessant vinden post ik een aantal hints/uitleg voor deel 2 van dag 18. Ja, je kunt het antwoord ook gewoon van Wikipedia halen, maar het is leuker als je ook begrijpt waarom het werkt. Ik heb meerdere spoilers gemaakt zodat je kunt stoppen met lezen als je het vanaf een bepaald punt verder zelf wil oplossen.
+
+[spoiler]
+Als je de instructies in de invoer vertaalt naar een polygoon, dan kun je het antwoord berekenen met een simpele formule. Ik illustreer het aan de hand van een voorbeeld: R 3, D 1, R 1, D 2, L 4, U 3.
+Zie de afbeelding hier:
+
+[img]https://i.imgur.com/Z2X6BBK.png[/img]
+
+Bij deel 1 kun je het pad tekenen in een pixel grid en dan eenvoudig tellen: er liggen 14 pixels op de rand (donkergrijs) en 5 pixels binnenin (lichtgrijs), dus het antwoord is 14 + 5 = 19. Maar pixels tellen is niet zo efficiënt als de coördinaten groot zijn, zoals bij deel 2.
+[/spoiler]
+
+[spoiler]
+In plaats van te kijken naar pixels, kun je het pad ook zien als een polygoon, waarvan de hoekpunten in het midden van de pixels liggen.
+[img]https://i.imgur.com/CqZpmHE.png[/img]
+Het voordeel van deze representatie is dat het voor het berekenen van het oppervlak niet uitmaakt hoe groot de coördinaten zijn; alleen hoeveel hoekpunten er zijn, en dat aantal is redelijk beperkt: het aantal regels in de invoer.
+
+De rode polygoon heeft een oppervlak van precies 11 vakjes, wat je in dit voorbeeld makkelijk met de hand kunt tellen, en in je code o.a. met de [url=https://en.wikipedia.org/wiki/Shoelace_formula]shoelace formula[/url] kunt berekenen. 11 is minder dan het werkelijke antwoord (19), en dat komt natuurlijk omdat je het deel van de rand dat buiten de polygoon valt niet hebt meegeteld. Iets preciezer: je hebt ongeveer de helft van de rand niet meegeteld (maar niet exact!) Daar moet je dus nog wat op verzinnen.
+[/spoiler]
+
+[spoiler]Om te compenseren voor de rand, kun je de helft van de lengte van elk lijnstuk bij het antwoord optellen (de helft, omdat je alleen het deel van de rand buiten de polygoon telt). Dat zijn de groene gebieden in het plaatje hieronder:
+
+[img]https://i.imgur.com/vHWJDTN.png[/img]
+
+De omtrek is 14, de helft is 7. 11 + 7 = 18, en dat is nog net geen 19. Dat komt doordat je hier de zwarte vierkantjes (a, b, d, e, f) die ook op de rand liggen nog niet meegeteld hebt, en het gele vierkantje (c) juist dubbel geteld hebt (als onderdeel van lijnstuk (4,1)-(4,2) én (4,2)-(5,2)). Daar moet je ook nog voor compenseren.[/spoiler]
+
+[spoiler]
+Voor elk convex (naar binnen klappend) hoekpunt mis je een stukje van de rand met oppervlak 0,5 × 0,5 = 0,25, en voor elk concaaf (naar buiten klappend) hoekpunt tel je een gebied van 0,25 dubbel.
+[/spoiler]
+
+[spoiler]Dat kun je compenseren met een factor 0,25×(aantal convexe hoekpunten) - 0,25×(aantal concave hoekpunten). Je kunt die expliciet tellen, maar dat is niet eens nodig.[/spoiler]
+
+[spoiler]Het aantal convexe hoekpunten is altijd 4 meer dan het aantal concave hoekpunten. Dat kun je zo inzien: als je met de klok mee rond de polygoon loopt, sla je precies vier keer vaker rechtsaf dan linksaf. Dat komt omdat je in dezelfde oriëntatie eindigt als je begint, dus de totale rotatie moet sowieso een veelvoud van 360 zijn, en aangezien het hier om een simpele polygoon gaat (i.e., zonder zelf-intersectie) is het precies 360, niet meer of minder. Kortom, je moet netto precies 4 hoeken van 90 graden maken. 4×0,25 = 1.[/spoiler]
+
+Conclusie:
+[spoiler]
+Als je bovenstaande informatie combineert is het antwoord simpelweg: oppervlak van de polygoon + (omtrek van de polygoon)/2 + 1.
+
+En ja, dat is inderdaad precies dezelfde formule als in [url=https://en.wikipedia.org/wiki/Pick%27s_theorem]Pick's theorem[/url] maar die hóef je dus niet te kennen om het antwoord af te leiden voor dit probleem.[/spoiler]
+
+Wie z'n algoritme wil testen verwijs ik door naar [url=https://gathering.tweakers.net/forum/list_message/77533886#77533886]mijn extra testinvoer voor dit probleem[/url].
