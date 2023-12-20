@@ -130,6 +130,7 @@ def Part1():
   lo, hi = signal_counts
   return lo * hi
 
+
 # Solve part 2, using some assumptions about how the input is constructed and
 # how it behaves: the `rx` module has a single conjunction module as its source,
 # which itself has four sources. Each of those sources sends a 1 periodically
@@ -139,25 +140,28 @@ def Part1():
 def Part2():
   def OnSend(source, dest, signal):
     if dest == conj and signal:
-      if source in last_high:
-        if source in periods:
-          # Partial check that signal is periodic
-          assert press_count == last_high[source] + periods[source]
-        else:
-          assert press_count == 2 * last_high[source]  # offset is 0
-          periods[source] = press_count - last_high[source]
-      last_high[source] = press_count
+      times_by_source[source].append(time)
 
   orchestrator = Orchestrator(module_defs, OnSend)
+
   conj, = orchestrator.modules['rx'].sources
   assert isinstance(conj, Conjunction)
-  press_count = 0
-  last_high = {}
-  periods   = {}
-  while len(periods) < len(conj.sources):
-    press_count += 1
+  times_by_source = dict((source, []) for source in conj.sources)
+
+  # Simulate until we have at least two times per source.
+  time = 0
+  while any(len(times) < 2 for times in times_by_source.values()):
+    time += 1
     orchestrator.PressButton()
-  return lcm(*periods.values())
+
+  # Verify that times are periodic, as far as we can tell from the limited data
+  # available:
+  for times in times_by_source.values():
+    for i, t in enumerate(times, 1):
+      assert t == i*times[0]
+
+  # Calculate the combined period as the LCM of the individual periods.
+  return lcm(*[times[0] for times in times_by_source.values()])
 
 
 module_defs = [ParseModuleDef(line) for line in sys.stdin]
