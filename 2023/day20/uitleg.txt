@@ -1,0 +1,56 @@
+[h3]Gedetailleerde uitleg voor dag 20 deel 2.[/h3]
+
+Eerst even de componenten samenvatten:
+
+Een flip-flop-module begint op 0. Als 'ie 0 ontvangt, dan inverteert de toestand (0 wordt 1, 1 wordt 0) en wordt de nieuwe toestand uitgevoerd. Als 'ie 1 ontvangt doet 'ie niets.
+
+Een conjunction-module voert 0 uit als alle invoer 1 wordt, en anders 0. Een conjunction is dus eigenlijk een [url=https://en.wikipedia.org/wiki/NAND_logic]NAND gate[/url]. Logisch gevolg is dat als een conjunction-module precies 1 invoer heeft, dat 'ie zich als inverter gedraagt: 0 wordt 1, en 1 wordt 0.
+
+[spoiler]Nu kun je de invoer als graaf representeren, zoals bijvoorbeeld mijn invoer:
+
+[img]https://i.imgur.com/dp8HcEg.png[/img]
+
+In het plaatje is de volgorde van de uitgaande pijlen niet zichtbaar, maar die is gelukkig niet heel belangrijk voor de uitleg. In dit plaatje zijn rechthoeken flipflops, en ruiten conjunctions. Het is duidelijk te zien dat het systeem uit vier componenten bestaat, die worden aangestuurd door de broadcaster, en die hun uitvoer uiteindelijk naar de rx-module sturen.
+
+We kunnen nu proberen van rx terug te redeneren. We willen weten wanneer rx 0 ontvangt. Dat is wanneer de nand-module erboven op alle vier de invoeren 1 ontvangt. Die invoer komt van een inverter: ainv geeft 1 als de a-module 0 geeft, enzovoorts.
+
+We moeten dus bepalen waneer de a-module, b-module, c-module en d-module 0 uitvoeren. Gelukkig zijn de vier componenten soortgelijk in constructie, dus we kunnen ze los bekijken. Laten we het nog verder versimpelen, en beginnen met alleen de flipflops, bijvoorbeeld a0 t/m a11:
+
+[img]https://i.imgur.com/6Xvkldl.png[/img]
+
+Dit ziet er simpel uit. Alle flipflops beginnen op 0. Als je op de knop drukt, krijgt a0 een 0 als invoer. Daardoor flipt 'ie zijn toestand naar 1. Daardoor ontvangt a1 een 1, die hij negeert (onthoud: flipflops reageren alleen op 0). Je kunt makkelijk bepalen wat de interne toestand is van de flipflops na een aantal knopdrukken:
+
+Na 1 keer drukken: broadcaster => 1 -> 0 -> 0 -> 0
+
+Na 2 keer drukken: broadcaster => 0 => 1 -> 0 -> 0
+
+Na 3 keer drukken: broadcaster => 1 -> 1 -> 0 -> 0
+
+Na 4 keer drukken: broadcaster => 0 => 0 => 1 -> 0
+
+Enzovoorts. Het is duidelijk dat je hier gewoon in het binair aan het tellen bent: a0 is bit 0, a1 is bit 1, enzovoorts. Het is ook logisch als je bedenkt dat een flipflop exact flipt wanneer zijn voorganger net 0 geworden is: dat is wanneer de vorige bit overflowde en je dus een carry op moet tellen bij de volgende bit.
+
+Conclusie: op zichzelf doen de flipflops niets meer dan het aantal knopdrukken tellen. Laten we de a-conjunction erbij halen.
+
+[img]https://i.imgur.com/Dg1fwAF.png[/img]
+
+Sommige van de edges gaan van de flipflops naar [b]a[/] (0, 4, 6, 7, 8, 9, 10, 11) en anderen juist van [b]a[/] naar de flipflop (0, 1, 2, 3, 5). Voor elke flipflop is er precies één edge in de ene of de andere richting, met uitzondering van flipflop 0, die edges voor beide richtingen heeft. Dit is niet toevallig zo: de andere componenten hebben dezelfde constructie.
+
+We kunnen nu zien wanneer de a-module in het midden 0 uitvoert: precies wanneer bits 0, 4, 6, 7, 8, 9, 10, 11 tegelijk 1 worden. Dat is voor het eerst na 1 + 2[sup]4[/sup] + 2[sup]6[/sup] + 2[sup]7[/sup] + 2[sup]8[/sup] + 2[sup]9[/sup] + 2[sup]10[/sup] + 2[sup]11[/sup] = 4049 knopdrukken. (Je kunt het ook gewoon in binair schrijven: 0b111111010001 = 4049.)
+
+Merk op dat tot die tijd de uitvoer van [b]a[/] 1 is en dus geen invloed heeft op de flipflops, die alleen reageren op 0. Maar wanneer [b]a[/] 0 uitvoert gebeuren er twee dingen. Ten eerste zorgt het ervoor dat [b]ainv[/]  1 uitvoert naar [b]nand[/] wat relevant is voor [b]rx[/] (zie eerste plaatje). Ten tweede flipt [b]a[/] nu alle bits die op nul stonden én bit 0 (die zelf nog op 1 staat). Het effect hiervan is dat alle bits op 0 komen te staan, volgens de rekensom:
+
+[pre]
+   111111010001
+   000000101111+
+   ------------
+(1)000000000000
+[/pre]
+(Grr, waarom werken plaatjes wel en pre-tags niet binnen een spoiler tag?)
+
+Samenvattend: de a-module telt to 4049, voert dan een 0 uit (die door ainv wordt geïnverteerd naar een 1) en reset zichzelf dan meteen. Deze component geeft dus een 1 elke 4049 knopdrukken.
+
+(Saillant detail: het uitvoeren van 1 en het resetten gebeurt tijdens het afhandelen van dezelfde knopdruk! Als je alleen kijkt naar de toestand van b.v. [b]nand[/b] tussen knopdrukken door, dan zal je altijd zien dat de laatste invoerwaarden allemaal 0 waren!)
+
+De rest van de oplossing is dan niet zo ingewikkeld. Je kunt voor elk van de vier componenten de periode uitrekenen op basis van de richting van de edges zoals ik hierboven deed. Daarvan kun je dan het grootste gemene veelvoud nemen [url=https://adventofcode.com/2023/day/8]net als op dag 8[/url]. In mijn geval zijn die perioden: 4049, 3761, 3931, 4079. Nu zijn dat “toevallig” priemgetallen dus kun je ze simpelweg vermenigvuldigen en klaar is kees.
+[/spoiler]
