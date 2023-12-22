@@ -17,17 +17,14 @@ bricks.sort(key=lambda brick: brick[0][2])
 # Calculate where all bricks will drop
 #
 supported_by = [None for _ in range(len(bricks))]
-supporting   = [[] for _ in range(len(bricks))]
 height = {}  # (x, y) -> (h, i)
 for i, ((x1, y1, z1), (x2, y2, z2)) in enumerate(bricks):
   coords = [(x, y) for x in range(x1, x2 + 1) for y in range(y1, y2 + 1)]
   below = [height[p] for p in coords if p in height]
   max_h = max((h for h, j in below), default=0)
   supported_by[i] = set(j for h, j in below if h == max_h)
-  for j in supported_by[i]: supporting[j].append(i)
   new_h = max_h + (z2 - z1 + 1)
   height.update((p, (new_h, i)) for p in coords)
-
 
 def Part1():
   # Count the number of blocks that are safe to remove, where a block is safe to
