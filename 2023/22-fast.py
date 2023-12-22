@@ -34,7 +34,10 @@ for i, ((x1, y1, z1), (x2, y2, z2)) in enumerate(bricks):
 def Part1():
   # Count the number of blocks that are safe to remove, where a block is safe to
   # remove if all the blocks it support are supported by at least one other block.
-  return sum(all(len(supported_by[j]) > 1 for j in s) for i, s in enumerate(supporting))
+  safe_to_remove = [True]*len(bricks)
+  for s in supported_by:
+    if len(s) == 1: safe_to_remove[min(s)] = False
+  return sum(safe_to_remove)
 
 
 # More efficient solution of part 2 using Lowest Common Ancestors.
