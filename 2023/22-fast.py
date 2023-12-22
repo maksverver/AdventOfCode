@@ -1,3 +1,4 @@
+from functools import reduce
 import sys
 
 # Parses a brick into a tuple ((x1, y1, x1), (x2, y2, x2)) and normalizes the
@@ -11,25 +12,38 @@ def ParseBrick(line):
   return ((x1, y1, z1), (x2, y2, z2))
 
 
-bricks = [ParseBrick(line.strip()) for line in sys.stdin]
-bricks.sort(key=lambda brick: brick[0][2])
-
-# Calculate where all bricks will drop
+# Calculates where all bricks will drop, and returns an array `supported_by`
+# where `supported_by[i]` is a set of indices of bricks that the i-th brick
+# rests upon. Bricks use indices 1 through N, while index 0 is reserved for the
+# floor.
 #
-supported_by = [None for _ in range(len(bricks))]
-height = {}  # (x, y) -> (h, i)
-for i, ((x1, y1, z1), (x2, y2, z2)) in enumerate(bricks):
-  coords = [(x, y) for x in range(x1, x2 + 1) for y in range(y1, y2 + 1)]
-  below = [height[p] for p in coords if p in height]
-  max_h = max((h for h, j in below), default=0)
-  supported_by[i] = set(j for h, j in below if h == max_h)
-  new_h = max_h + (z2 - z1 + 1)
-  height.update((p, (new_h, i)) for p in coords)
+def CalculateSupport(bricks):
+  supported_by = [set()]
+  height = {}  # (x, y) -> (h, i)
+  for i, ((x1, y1, z1), (x2, y2, z2)) in enumerate(bricks, 1):
+    s = set()
+    max_h = 0
+    for x in range(x1, x2 + 1):
+      for y in range(y1, y2 + 1):
+        h, j = height.get((x, y), (0, 0))
+        if h > max_h:
+          max_h = h
+          s.clear()
+        if h == max_h:
+          s.add(j)
+    new_h = max_h + (z2 - z1 + 1)
+    for x in range(x1, x2 + 1):
+      for y in range(y1, y2 + 1):
+        height[x, y] = new_h, i
+    supported_by.append(s)
+  return supported_by
 
-def Part1():
+
+def Part1(supported_by):
   # Count the number of blocks that are safe to remove, where a block is safe to
   # remove if all the blocks it support are supported by at least one other block.
-  safe_to_remove = [True]*len(bricks)
+  safe_to_remove = [True]*len(supported_by)
+  safe_to_remove[0] = False  # never remove the floor
   for s in supported_by:
     if len(s) == 1: safe_to_remove[min(s)] = False
   return sum(safe_to_remove)
@@ -38,10 +52,10 @@ def Part1():
 # More efficient solution of part 2 using Lowest Common Ancestors.
 #
 # Define the parent of a brick i as the highest brick j whose removal would
-# cause j to fall, or 0 if there is none. Then if j is not 0, j's parent would
-# cause j to fall and therefore i too, and so on. The total number of bricks
-# that would cause j to fall is exactly the number of ancestors of i (i.e, j,
-# j's parent, j's parent's parent, etc.)
+# cause j to fall, or 0 if there is none. Then if j is not 0, removing j's
+# parent would cause j to fall and therefore i too, and so on. The total number
+# of bricks that would cause j to fall is exactly the number of ancestors of i
+# (i.e, j itself, j's parent, j's parent's parent, etc.)
 #
 # How do we calculate the parents? If brick i is supported by only a single
 # brick j, then j is the parent of i. Otherwise, consider the tree defined by
@@ -51,9 +65,7 @@ def Part1():
 #
 # The current algorithm runs in O(N log^2 N) time. This can be optimized to
 # O(N log N) by reduction to range minimum query but I'm too lazy to do it.
-def Part2():
-  # Reserve index 0 for the root. Note this means we need to add 1 to all
-  # brick indices (i, j, k) below, which is slightly tricky.
+def Part2(supported_by):
   depth  = [0]
   answer = 0
   ancestors = {(0, 0): 0}
@@ -87,19 +99,19 @@ def Part2():
           lo == 0 or NthAncestor(x, lo - 1) != NthAncestor(y, lo - 1))
     return NthAncestor(x, lo)
 
-  for i, s in enumerate(supported_by):
-    if not s:
-      lca = 0  # Resting directly on the floor
-    else:
-      j, *rest = s
-      lca = j + 1
-      for k in rest:
-        lca = LowestCommonAncestor(lca, k + 1)
-
-    ancestors[i + 1, 0] = lca
-    depth.append(depth[lca] + 1)
-    answer += depth[lca]
+  for i, s in enumerate(supported_by[1:], 1):
+    ancestors[i, 0] = lca = reduce(LowestCommonAncestor, s)
+    depth.append((d := depth[lca]) + 1)
+    answer += d
   return answer
 
-print(Part1())
-print(Part2())
+
+def Main():
+  bricks = [ParseBrick(line.strip()) for line in sys.stdin]
+  bricks.sort(key=lambda brick: brick[0][2])
+  supported_by = CalculateSupport(bricks)
+  print(Part1(supported_by))
+  print(Part2(supported_by))
+
+
+if __name__ == '__main__': Main()
