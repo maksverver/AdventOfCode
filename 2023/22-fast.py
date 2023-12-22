@@ -1,5 +1,3 @@
-from functools import cache
-from collections import deque
 import sys
 
 # Parses a brick into a tuple ((x1, y1, x1), (x2, y2, x2)) and normalizes the
@@ -60,13 +58,14 @@ def Part2():
   # Reserve index 0 for the root. Note this means we need to add 1 to all
   # brick indices (i, j, k) below, which is slightly tricky.
   depth  = [0]
-  parent = [0]
   answer = 0
+  ancestors = {(0, 0): 0}
 
-  @cache
   def NthAncestorPowerOf2(x, k):
-    if k == 0: return parent[x]
-    return NthAncestorPowerOf2(NthAncestorPowerOf2(x, k - 1), k - 1)
+    res = ancestors.get((x, k))
+    if res is None:
+      ancestors[x, k] = res = NthAncestorPowerOf2(NthAncestorPowerOf2(x, k - 1), k - 1)
+    return res
 
   def NthAncestor(x, n):
     k = 0
@@ -100,7 +99,7 @@ def Part2():
       for k in rest:
         lca = LowestCommonAncestor(lca, k + 1)
 
-    parent.append(lca)
+    ancestors[i + 1, 0] = lca
     depth.append(depth[lca] + 1)
     answer += depth[lca]
   return answer
