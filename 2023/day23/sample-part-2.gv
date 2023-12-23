@@ -1,0 +1,14 @@
+graph {
+	START -- r5c3 [label="15"]
+	r5c3 -- r3c11 [label="22"]
+	r5c3 -- r13c5 [label="22"]
+	r3c11 -- r11c21 [label="30"]
+	r3c11 -- r13c13 [label="24"]
+	r13c5 -- r13c13 [label="12"]
+	r13c5 -- r19c13 [label="38"]
+	r11c21 -- r13c13 [label="18"]
+	r11c21 -- r19c19 [label="10"]
+	r13c13 -- r19c13 [label="10"]
+	r19c13 -- r19c19 [label="10"]
+	r19c19 -- FINISH [label="5"]
+}

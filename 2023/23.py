@@ -16,6 +16,30 @@ SLOPES = {
   'v': (1, 0),
 }
 
+def DebugDumpGraphViz(filename, coords, graph, digraph):
+  def NodeId(i):
+    if i == 0: return 'FINISH'
+    if i == 1: return 'START'
+    r, c = coords[i]
+    return f'r{r}c{c}'
+
+  with open(filename, 'wt') as f:
+    if digraph:
+      print('digraph {', file=f)
+      edge = '->'
+    else:
+      print('graph {', file=f)
+      edge = '--'
+    edges = set()
+    for v, adj in enumerate(graph):
+      for l, w in adj:
+        edge_id = (v, w) if digraph else (min(v, w), max(v, w))
+        if edge_id not in edges:
+          edges.add(edge_id)
+          print(f'\t{NodeId(v)} {edge} {NodeId(w)} [label="{l}"]', file=f)
+    print('}', file=f)
+
+
 def Solve(respect_slopes):
 
   # Returns the accessible neighbors of v, excluding u
@@ -30,7 +54,8 @@ def Solve(respect_slopes):
 
     return [(r2, c2)
         for (r2, c2) in [(r1 - 1, c1), (r1, c1 - 1), (r1, c1 + 1), (r1 + 1, c1)]
-        if 0 <= r2 < H and 0 <= c2 < W and grid[r2][c2] != '#' and (r2, c2) != u]
+        if 0 <= r2 < H and 0 <= c2 < W and grid[r2][c2] != '#' and (r2, c2) != u and
+        (not respect_slopes or grid[r2][c2] == '.' or SLOPES[grid[r2][c2]] != (r1 - r2, c1 - c2))]
 
   # Finds the next junction w starting from v. Returns a pair (length, w).
   def FindNextJunction(v, u):
@@ -64,6 +89,14 @@ def Solve(respect_slopes):
           coords.append(w)
         adj.append((l + 1, j))
       graph.append(adj)
+
+    if False:
+      # For debugging. Save computed graph in GraphViz format.
+      if respect_slopes:
+        DebugDumpGraphViz('part-1.gv', coords, graph, respect_slopes)
+      else:
+        DebugDumpGraphViz('part-2.gv', coords, graph, respect_slopes)
+
     return graph
 
   graph = CalculateGraph()

@@ -1,0 +1,10 @@
+digraph {
+	START -> r5c3 [label="15"]
+	r5c3 -> r3c11 [label="22"]
+	r5c3 -> r13c5 [label="22"]
+	r3c11 -> FINISH [label="45"]
+	r3c11 -> r13c13 [label="24"]
+	r13c5 -> r13c13 [label="12"]
+	r13c5 -> FINISH [label="53"]
+	r13c13 -> FINISH [label="33"]
+}
