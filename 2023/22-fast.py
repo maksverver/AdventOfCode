@@ -50,6 +50,7 @@ def Part1(supported_by):
 
 
 # More efficient solution of part 2 using Lowest Common Ancestors.
+# Runs in O(N log N) time.
 #
 # Define the parent of a brick i as the highest brick j whose removal would
 # cause j to fall, or 0 if there is none. Then if j is not 0, removing j's
@@ -63,8 +64,6 @@ def Part1(supported_by):
 # lowest common ancestor of the bricks that support i (i.e., it is the highest
 # single brick that would cause all those bricks to fall).
 #
-# The current algorithm runs in O(N log^2 N) time. This can be optimized to
-# O(N log N) by reduction to range minimum query but I'm too lazy to do it.
 def Part2(supported_by):
   depth  = [0]
   answer = 0
@@ -83,21 +82,25 @@ def Part2(supported_by):
       k += 1
     return x
 
+  def Parent(x):
+    return ancestors[x, 0]
+
   def LowestCommonAncestor(x, y):
     n = depth[x]
     m = depth[y]
     if n > m: x = NthAncestor(x, n - m)
     if m > n: y = NthAncestor(y, m - n)
-    lo, hi = 0, min(n, m)
-    while lo < hi:
-      mid = (lo + hi) // 2
-      if NthAncestor(x, mid) != NthAncestor(y, mid):
-        lo = mid + 1
-      else:
-        hi = mid
-    assert NthAncestor(x, lo) == NthAncestor(y, lo) and (
-          lo == 0 or NthAncestor(x, lo - 1) != NthAncestor(y, lo - 1))
-    return NthAncestor(x, lo)
+    if x == y: return x
+    k = 0
+    while NthAncestorPowerOf2(x, k) != NthAncestorPowerOf2(y, k):
+      k += 1
+    while k > 0:
+      k -= 1
+      a = NthAncestorPowerOf2(x, k)
+      b = NthAncestorPowerOf2(y, k)
+      if a != b: x, y = a, b
+    assert x != y and Parent(x) == Parent(y)
+    return Parent(x)
 
   for i, s in enumerate(supported_by[1:], 1):
     ancestors[i, 0] = lca = reduce(LowestCommonAncestor, s)
