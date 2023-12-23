@@ -19,7 +19,9 @@ for i in range(N):
   kind = randrange(0, 3)
   if kind == 0: x2 += randint(-50, 50)
   if kind == 1: y2 += randint(-50, 50)
-  if kind == 2: z2 += randint(-50, 50)
+  if kind == 2:
+    z2 += randint(0, 9)
+    if randint(0, 1): z1, z2 = z2, z1
   beams.append((x1, y1, z1, x2, y2, z2))
   z = z2 + 1
 
