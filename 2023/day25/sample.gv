@@ -1,0 +1,35 @@
+graph {
+rhn -- xhk
+jqt -- rhn
+jqt -- xhk
+jqt -- nvd
+jqt -- ntq
+nvd -- pzl
+nvd -- qnr
+frs -- rsh
+frs -- qnr
+frs -- lhk
+frs -- lsr
+rsh -- rzs
+pzl -- rsh
+lsr -- rsh
+lsr -- pzl
+lsr -- rzs
+hfx -- xhk
+hfx -- rhn
+hfx -- pzl
+hfx -- ntq
+qnr -- rzs
+cmg -- qnr
+cmg -- nvd
+cmg -- lhk
+cmg -- rzs
+lhk -- nvd
+lhk -- lsr
+bvb -- cmg
+bvb -- rhn
+bvb -- xhk
+bvb -- hfx
+bvb -- ntq
+ntq -- xhk
+}
