@@ -10,11 +10,12 @@ from math import inf
 import sys
 
 # Read input
-N, M = map(int, sys.stdin.readline().split())
-adj = defaultdict(list)
-for _ in range(M):
-  v, w, c = map(int, sys.stdin.readline().split())
-  adj[v].append((w, c))
+with open('dijkstra.in', 'rt') as f:
+  N, M = map(int, f.readline().split())
+  adj = defaultdict(list)
+  for _ in range(M):
+    v, w, c = map(int, f.readline().split())
+    adj[v].append((w, c))
 
 # Dijkstra's algorithm
 start = 1
