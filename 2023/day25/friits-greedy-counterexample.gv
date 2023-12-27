@@ -1,0 +1,22 @@
+graph {
+a -- b
+a -- c
+a -- d
+a -- g
+b -- c
+b -- d
+b -- g
+c -- d
+c -- e
+d -- f
+e -- f
+e -- g
+e -- h
+f -- g
+f -- h
+g -- h
+e [style=filled, fillcolor=lightblue]
+f [style=filled, fillcolor=lightblue]
+g [style=filled, fillcolor=lightblue]
+h [style=filled, fillcolor=green]
+}
