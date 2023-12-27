@@ -3,7 +3,7 @@
 
 from collections import defaultdict
 import sys
-from random import sample
+from random import shuffle
 
 adj = defaultdict(set)
 for line in sys.stdin:
@@ -14,8 +14,10 @@ for line in sys.stdin:
 
 sys.setrecursionlimit(len(adj) + 100)
 
-while True:
-  start, finish = sample(list(adj), k=2)
+vertices = list(adj)
+shuffle(vertices)
+start, *rest = vertices
+for finish in rest:
   edges_used = set()
 
   def Augment():
@@ -34,7 +36,8 @@ while True:
     return Dfs(start)
 
   min_cut = 0
-  while Augment(): min_cut += 1
+  while Augment() and min_cut <= 3:
+    min_cut += 1
 
   if min_cut == 3: break
 

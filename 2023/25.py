@@ -1,15 +1,6 @@
 from collections import defaultdict
+from random import shuffle
 import sys
-from random import sample
-
-def DebugDumpGraphViz(filename):
-  with open(filename,'wt') as f:
-    print('graph {', file=f)
-    for v in adj:
-      for w in adj[v]:
-        if v <= w:
-          print(v, '--', w, file=f)
-    print('}', file=f)
 
 def ParseGraph(file):
   adj = defaultdict(set)
@@ -22,14 +13,9 @@ def ParseGraph(file):
       adj[w].add(v)
   return adj
 
-# Read input
-adj = ParseGraph(sys.stdin)
-
-sys.setrecursionlimit(len(adj) + 100)
-
-# DebugDumpGraphViz('out.gv')
-
-def MinCut(start, finish):
+# Finds a cut of size 3 between the vertices `start` and `finish`, or returns
+# None if the minimum cut is greater than 3. Runs in O(E) worst-case.
+def MinCut(adj, start, finish):
   edges_used = set()
 
   def Augment():
@@ -51,6 +37,9 @@ def MinCut(start, finish):
   min_cut = 0
   while Augment():
     min_cut += 1
+    if min_cut > 3: return None
+
+  assert min_cut == 3
 
   def GetMinCutEdges():
     visited = set()
@@ -68,7 +57,7 @@ def MinCut(start, finish):
   return edges
 
 
-def FindComponents(omit_edges):
+def FindComponents(adj, omit_edges):
   components = []
   visited = set()
   todo = []
@@ -89,11 +78,35 @@ def FindComponents(omit_edges):
   assert sum(map(len, components)) == len(adj)
   return components
 
-# Solve
-while True:
-  edges = MinCut(*sample(list(adj), k=2))
-  if len(edges) == 3:
-    break
-  assert len(edges) > 3
-a, b = FindComponents(edges)
-print(len(a) * len(b))
+# From the problem statement, we know that the graph can be partitioned into two
+# parts, A and B, that are connected by only 3 edges.
+#
+# This funciton finds a cut of size 3 between part A and B by first picking a
+# random start and finish vertex and then calculating the minimum cut between
+# those two vertices. If the size of the minimum cut is greater than 3, then
+# start and finish must lie in the same part (A or B) and we retry with a
+# different vertex. This takes an expected |A|/|B| + |B|/|A| attempts, or
+# max(|A|, |B|) attempts in the worst-case.
+#
+# Since the runtime of MinCut() is O(E) this gives a time complexity of O(VE)
+# worst-case, and O((A/B + B/A)×E) expected, which means the solution is most
+# efficient when A and B are approximately the same size, so that A/B + B/A is
+# close to 2, and performs worse when e.g. A=1 and B is very large.
+#
+def FindCut(adj):
+  vertices = list(adj)
+  shuffle(vertices)
+  start, *rest = vertices
+  for finish in rest:
+    edges = MinCut(adj, start, finish)
+    if edges is not None: return edges
+  assert False  # no solution found!
+
+def Solve():
+  adj = ParseGraph(sys.stdin)
+  sys.setrecursionlimit(len(adj) + 100)
+  a, b = FindComponents(adj, FindCut(adj))
+  return len(a) * len(b)
+
+if __name__ == '__main__':
+  print(Solve())
