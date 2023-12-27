@@ -17,6 +17,9 @@ def ParseBrick(line):
 # rests upon. Bricks use indices 1 through N, while index 0 is reserved for the
 # floor.
 #
+# This runs in O(N × L) time and produces at most N × L edges, where L is the
+# average length of a brick.
+#
 def CalculateSupport(bricks):
   supported_by = [set()]
   height = {}  # (x, y) -> (h, i)
@@ -41,7 +44,12 @@ def CalculateSupport(bricks):
 
 def Part1(supported_by):
   # Count the number of blocks that are safe to remove, where a block is safe to
-  # remove if all the blocks it support are supported by at least one other block.
+  # remove if all the blocks it supports are supported by at least one other
+  # block.
+  #
+  # This runs in O(N + E) time, where E is the number of edges, i.e., the sum
+  # of the sizes of the elements of `supported_by`.
+  #
   safe_to_remove = [True]*len(supported_by)
   safe_to_remove[0] = False  # never remove the floor
   for s in supported_by:
@@ -50,7 +58,8 @@ def Part1(supported_by):
 
 
 # More efficient solution of part 2 using Lowest Common Ancestors.
-# Runs in O(N log N) time.
+#
+# Runs in O(V + E log V) time.
 #
 # Define the parent of a brick i as the highest brick j whose removal would
 # cause j to fall, or 0 if there is none. Then if j is not 0, removing j's
