@@ -67,11 +67,15 @@ N, = map(int, sys.argv[1:])
 
 beams = []
 
+y = 42
+
+# Extra floor beam to make it harder to detect when one side rests on the floor.
+beams.append((1, y, 1, 5, y, 1))
+
 for i in range(N):
   x = i + 1
-  y = 42
-  #z1, z2, z3 = 3*i + 1, 3*i + 2, 3*i + 3     # compact z's
-  z1, z2, z3 = 10*i + 1, 10*i + 4, 10*i + 7  # sparse z's
+  #z1, z2, z3 = 3*i + 2, 3*i + 3, 3*i + 4     # compact z's
+  z1, z2, z3 = 10*i + 3, 10*i + 6, 10*i + 9  # sparse z's
 
   beams.append(((x + 1, y, z1, x + 2, y, z1)))  # a
   beams.append(((x + 3, y, z1, x + 4, y, z1)))  # b
@@ -81,5 +85,6 @@ for i in range(N):
   beams.append(((x + 4, y, z3, x + 4, y, z3)))  # d
 
 shuffle(beams)
+
 for beam in beams:
   print('%d,%d,%d~%d,%d,%d' % beam)
