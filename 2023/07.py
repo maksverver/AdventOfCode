@@ -1,3 +1,6 @@
+# Advent of Code 2023 Day 7: Camel Cards
+# https://adventofcode.com/2023/day/7
+
 import sys
 
 NUM_CARDS = 13

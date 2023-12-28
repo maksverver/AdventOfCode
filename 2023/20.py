@@ -1,3 +1,6 @@
+# Advent of Code 2023 Day 20: Pulse Propagation
+# https://adventofcode.com/2023/day/20
+
 from collections import deque
 from math import lcm
 import sys

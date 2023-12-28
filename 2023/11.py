@@ -1,3 +1,6 @@
+# Advent of Code 2023 Day 11: Mirage Maintenance
+# https://adventofcode.com/2023/day/11
+
 from itertools import accumulate
 import sys
 

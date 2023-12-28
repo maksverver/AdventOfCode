@@ -1,5 +1,7 @@
-import sys
+# Advent of Code 2023 Day 13: Point of Incidence
+# https://adventofcode.com/2023/day/13
 
+import sys
 
 def CheckReflection(a, j, max_errors):
   '''Returns the number of errors we see when reflecting matrix `a` vertically,

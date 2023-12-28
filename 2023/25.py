@@ -1,3 +1,6 @@
+# Advent of Code 2023 Day 25: Snowverload
+# https://adventofcode.com/2023/day/25
+
 from collections import defaultdict
 from random import shuffle
 import sys
@@ -81,7 +84,7 @@ def FindComponents(adj, omit_edges):
 # From the problem statement, we know that the graph can be partitioned into two
 # parts, A and B, that are connected by only 3 edges.
 #
-# This funciton finds a cut of size 3 between part A and B by first picking a
+# This function finds a cut of size 3 between part A and B by first picking a
 # random start and finish vertex and then calculating the minimum cut between
 # those two vertices. If the size of the minimum cut is greater than 3, then
 # start and finish must lie in the same part (A or B) and we retry with a

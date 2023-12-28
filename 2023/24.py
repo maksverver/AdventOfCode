@@ -1,3 +1,6 @@
+# Advent of Code 2023 Day 24: Never Tell Me The Odds
+# https://adventofcode.com/2023/day/24
+
 from math import inf, gcd, lcm
 import sys
 

@@ -1,3 +1,6 @@
+# Advent of Code 2023 Day 21: Step Counter
+# https://adventofcode.com/2023/day/21
+
 from collections import deque
 import sys
 
