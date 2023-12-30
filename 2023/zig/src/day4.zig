@@ -50,7 +50,7 @@ fn parseCards(allocator: std.mem.Allocator, input: []const u8) ![]Card {
     return cardsList.toOwnedSlice();
 }
 
-pub fn solve(allocator: std.mem.Allocator, input: []const u8) anyerror!void {
+pub fn solve(allocator: std.mem.Allocator, input: []const u8) !void {
     const cards = try parseCards(allocator, input);
     defer allocator.free(cards);
     var answer1: isize = 0;

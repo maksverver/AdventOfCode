@@ -1,7 +1,7 @@
 const Scanner = @import("parsing/scanning.zig").Scanner;
 const std = @import("std");
 
-pub fn solve(_: std.mem.Allocator, input: []const u8) anyerror!void {
+pub fn solve(_: std.mem.Allocator, input: []const u8) !void {
     var scanner = Scanner{ .text = input };
     var answer1: isize = 0;
     var answer2: isize = 0;

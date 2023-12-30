@@ -32,9 +32,10 @@ const DayConfig = struct { input: []const u8, solve: SolveFunction };
 const solvers = [_]?SolveFunction{
     @import("day1.zig").solve,
     @import("day2.zig").solve,
-    null, // TODO: day 3
+    @import("day3.zig").solve,
     @import("day4.zig").solve,
     // TODO: days 5-25
+    null, // null is allowed to skip days I haven't solved yet
 };
 
 pub fn main() !void {
@@ -43,6 +44,8 @@ pub fn main() !void {
             const input_path = defaultInputPath(day);
             std.debug.print("Solving day {d} (input: {s})\n", .{ day, input_path });
             try solveDay(input_path, solve);
+        } else {
+            std.debug.print("Skipping day {d}\n", .{day});
         }
     }
 }

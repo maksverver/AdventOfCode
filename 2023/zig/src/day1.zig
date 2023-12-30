@@ -48,7 +48,7 @@ fn solvePart(lines: []const []const u8, comptime part2: bool) !u64 {
     return answer;
 }
 
-pub fn solve(allocator: std.mem.Allocator, input: []const u8) anyerror!void {
+pub fn solve(allocator: std.mem.Allocator, input: []const u8) !void {
     const lines = try splitLines(allocator, input);
     defer allocator.free(lines);
     std.debug.print("{}\n{}\n", .{ try solvePart(lines, false), try solvePart(lines, true) });
