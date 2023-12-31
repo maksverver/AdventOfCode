@@ -22,8 +22,8 @@ const Environment = @This();
 
 /// Answers to both parts, converted to strings.
 pub const Answers = struct {
-    part1: ?[]u8 = null,
-    part2: ?[]u8 = null,
+    part1: ?[]const u8 = null,
+    part2: ?[]const u8 = null,
 };
 
 /// Times taken by the solver, in nanoseconds.
@@ -41,53 +41,54 @@ pub const Times = struct {
     }
 };
 
-input: []const u8,
-allocator: std.mem.Allocator,
-arena: ?std.heap.ArenaAllocator = null,
-answers: Answers = .{},
-timer: std.time.Timer,
-times: Times = .{},
+// Member fields. These should not be accessed directly even though Zig allows it.
+_input: []const u8,
+_allocator: std.mem.Allocator,
+_arena: ?std.heap.ArenaAllocator = null,
+_answers: Answers = .{},
+_timer: std.time.Timer,
+_times: Times = .{},
 
 pub fn init(allocator: std.mem.Allocator, input: []const u8) !Environment {
     return Environment{
-        .allocator = allocator,
-        .input = input,
-        .timer = try std.time.Timer.start(),
+        ._allocator = allocator,
+        ._input = input,
+        ._timer = try std.time.Timer.start(),
     };
 }
 
 pub fn deinit(self: *Environment) void {
-    if (self.arena) |a| a.deinit();
-    if (self.answers.part1) |p| self.allocator.free(p);
-    if (self.answers.part2) |p| self.allocator.free(p);
+    if (self._arena) |a| a.deinit();
+    if (self._answers.part1) |p| self._allocator.free(p);
+    if (self._answers.part2) |p| self._allocator.free(p);
 }
 
 pub fn getHeapAllocator(self: *Environment) std.mem.Allocator {
-    return self.allocator;
+    return self._allocator;
 }
 
 pub fn getArenaAllocator(self: *Environment) std.mem.Allocator {
-    if (self.arena == null) {
-        self.arena = std.heap.ArenaAllocator.init(self.getHeapAllocator());
+    if (self._arena == null) {
+        self._arena = std.heap.ArenaAllocator.init(self.getHeapAllocator());
     }
-    return self.arena.?.allocator();
+    return self._arena.?.allocator();
 }
 
 pub fn getInput(self: *Environment) []const u8 {
-    return self.input;
+    return self._input;
 }
 
 pub fn getAnswers(self: *const Environment) *const Answers {
-    return &self.answers;
+    return &self._answers;
 }
 
 pub fn getTimes(self: *Environment) *const Times {
-    return &self.times;
+    return &self._times;
 }
 
 /// Total time in nanoseconds, since calling init().
 pub fn getTotalTime(self: *Environment) u64 {
-    return self.times.total() + self.timer.read();
+    return self._times.total() + self._timer.read();
 }
 
 /// Solver calls this method to notify the environment that parsing is done,
@@ -96,8 +97,8 @@ pub fn getTotalTime(self: *Environment) u64 {
 /// Calling this is optional. If it is called, it should be called only once,
 /// before reporting any answers.
 pub fn parsingDone(self: *Environment) !void {
-    if (self.times.parsing != null) @panic("parsing already done");
-    self.times.parsing = self.timer.lap();
+    if (self._times.parsing != null) @panic("parsing already done");
+    self._times.parsing = self._timer.lap();
 }
 
 /// Convenience method that wraps getInput() and parsingDone(). This may be
@@ -111,12 +112,12 @@ pub fn parseInput(self: *Environment, comptime T: type, parse: *const fn ([]cons
 /// Convenience method that wraps getInput(), getArenaAllocator() and
 /// parsingDone(). This may be called instead of parsingDone().
 pub fn parseInputArena(self: *Environment, comptime T: type, parse: *const fn (std.mem.Allocator, []const u8) anyerror!T) !T {
-    const res = try parse(self.getArenaAllocator(), self.input);
+    const res = try parse(self.getArenaAllocator(), self._input);
     try self.parsingDone();
     return res;
 }
 
-fn storeAnswer(self: *Environment, answer: *?[]u8, value: anytype) !void {
+fn storeAnswer(self: *Environment, answer: *?[]const u8, value: anytype) !void {
     if (answer.* != null) @panic("answer already set");
     var list = std.ArrayList(u8).init(self.getHeapAllocator());
     // FIXME: "{}"" only works for ints, not slices of strings etc.
@@ -126,14 +127,14 @@ fn storeAnswer(self: *Environment, answer: *?[]u8, value: anytype) !void {
 
 /// Records the answer to part 1. This should be called only once.
 pub fn setAnswer1(self: *Environment, value: anytype) !void {
-    try self.storeAnswer(&self.answers.part1, value);
-    self.times.solving1 = self.timer.lap();
+    try self.storeAnswer(&self._answers.part1, value);
+    self._times.solving1 = self._timer.lap();
 }
 
 /// Records the answer to part 2. This should be called only once.
 pub fn setAnswer2(self: *Environment, value: anytype) !void {
-    try self.storeAnswer(&self.answers.part2, value);
-    self.times.solving2 = self.timer.lap();
+    try self.storeAnswer(&self._answers.part2, value);
+    self._times.solving2 = self._timer.lap();
 }
 
 /// Records the answers to part 1 and part 2. This may be called only once,
@@ -142,15 +143,12 @@ pub fn setAnswer2(self: *Environment, value: anytype) !void {
 /// This method is meant for solvers that solve both parts together, so
 /// recording solving times for part 1 and 2 separately does not make sense.
 pub fn setAnswers(self: *Environment, value1: anytype, value2: anytype) !void {
-    try self.storeAnswer(&self.answers.part1, value1);
-    try self.storeAnswer(&self.answers.part2, value2);
-    self.times.solving = self.timer.lap();
+    try self.storeAnswer(&self._answers.part1, value1);
+    try self.storeAnswer(&self._answers.part2, value2);
+    self._times.solving = self._timer.lap();
 }
 
 /// Prints the answers to stderr for debugging.
 pub fn debugPrintAnswers(self: *const Environment) void {
-    std.debug.print("{s}\n{s}\n", .{
-        self.answers.part1 orelse "(no answer)",
-        self.answers.part2 orelse "(no answer)",
-    });
+    std.debug.print("{?s}\n{?s}\n", .{ self._answers.part1, self._answers.part2 });
 }
