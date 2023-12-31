@@ -97,3 +97,19 @@ pub fn solve(env: *Environment) !void {
     try env.setAnswer1(try solvePart1(&grid, &symbols));
     try env.setAnswer2(solvePart2(symbols.items));
 }
+
+test "example" {
+    try @import("framework/testing.zig").testSolver(solve,
+        \\467..114..
+        \\...*......
+        \\..35..633.
+        \\......#...
+        \\617*......
+        \\.....+.58.
+        \\..592.....
+        \\......755.
+        \\...$.*....
+        \\.664.598..
+        \\
+    , "4361", "467835");
+}

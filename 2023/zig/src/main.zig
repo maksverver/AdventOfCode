@@ -81,3 +81,8 @@ pub fn main() !void {
         }
     }
 }
+
+test {
+    // This causes tests in all packages this package depends on to run:
+    std.testing.refAllDecls(@This());
+}

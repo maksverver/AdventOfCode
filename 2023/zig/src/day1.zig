@@ -54,3 +54,30 @@ pub fn solve(env: *Environment) !void {
     try env.setAnswer1(try solvePart(lines, false));
     try env.setAnswer2(try solvePart(lines, true));
 }
+
+test "example 1" {
+    const lines = try splitLines(std.testing.allocator,
+        \\1abc2
+        \\pqr3stu8vwx
+        \\a1b2c3d4e5f
+        \\treb7uchet
+        \\
+    );
+    defer std.testing.allocator.free(lines);
+    try std.testing.expectEqual(try solvePart(lines, false), 142);
+}
+
+test "example 2" {
+    const lines = try splitLines(std.testing.allocator,
+        \\two1nine
+        \\eightwothree
+        \\abcone2threexyz
+        \\xtwone3four
+        \\4nineeightseven2
+        \\zoneight234
+        \\7pqrstsixteen
+        \\
+    );
+    defer std.testing.allocator.free(lines);
+    try std.testing.expectEqual(try solvePart(lines, true), 281);
+}
