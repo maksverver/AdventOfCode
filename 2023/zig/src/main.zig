@@ -1,6 +1,7 @@
 const std = @import("std");
+const Environment = @import("framework/Environment.zig");
 
-const SolveFunction = *const fn (allocator: std.mem.Allocator, input: []const u8) anyerror!void;
+const SolveFunction = *const fn (*Environment) anyerror!void;
 
 // Silly logic to calculate default input paths at compile time.
 const defaultInputPathFmt = "../testdata/{d:0>2}.in";
@@ -10,7 +11,30 @@ inline fn defaultInputPath(comptime day: isize) *const [std.fmt.count(defaultInp
     comptime return std.fmt.comptimePrint(defaultInputPathFmt, DefaultInputPathArgs{@as(usize, day)});
 }
 
-pub fn solveDay(input_path: []const u8, solveFunction: SolveFunction) !void {
+fn nanosToMillis(nanos: u64) f64 {
+    return @as(f64, @floatFromInt(nanos)) / 1e6;
+}
+
+fn writeTimes(writer: anytype, times: *const Environment.Times, totalNanos: u64) !void {
+    // Report solution times
+    try std.fmt.format(writer, "{d:.3} ms", .{nanosToMillis(totalNanos)});
+    if (times.parsing) |ns| {
+        try std.fmt.format(writer, " (parsing: {d:.3} ms)", .{nanosToMillis(ns)});
+    }
+    if (times.solving) |ns| {
+        try std.fmt.format(writer, " (solving: {d:.3} ms)", .{nanosToMillis(ns)});
+    } else {
+        if (times.solving1) |ns| {
+            try std.fmt.format(writer, " (part 1: {d:.3} ms)", .{nanosToMillis(ns)});
+        }
+        if (times.solving2) |ns| {
+            try std.fmt.format(writer, " (part 2: {d:.3} ms)", .{nanosToMillis(ns)});
+        }
+    }
+    try std.fmt.format(writer, "\n", .{});
+}
+
+fn solveDay(input_path: []const u8, solveFunction: SolveFunction) !void {
     // Set up memory allocator, which detects leaks and other errors in debug mode.
     var general_purpose_allocator = std.heap.GeneralPurposeAllocator(.{}){};
     defer std.debug.assert(general_purpose_allocator.deinit() == .ok);
@@ -23,8 +47,16 @@ pub fn solveDay(input_path: []const u8, solveFunction: SolveFunction) !void {
     // const input = try std.io.getStdIn().readToEndAlloc(allocator, max_input_size);
     defer allocator.free(input);
 
-    // Solve
-    try solveFunction(allocator, input);
+    var env = try Environment.init(allocator, input);
+    defer env.deinit();
+    try solveFunction(&env);
+    const times = env.getTimes();
+    const totalNanos = env.getTotalTime();
+
+    // TODO: verify output!
+    env.debugPrintAnswers();
+
+    try writeTimes(std.io.getStdOut().writer(), times, totalNanos);
 }
 
 const DayConfig = struct { input: []const u8, solve: SolveFunction };

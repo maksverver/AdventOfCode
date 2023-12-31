@@ -1,4 +1,5 @@
-const Scanner = @import("parsing/scanning.zig").Scanner;
+const Environment = @import("framework/Environment.zig");
+const Scanner = @import("parsing/Scanner.zig");
 const std = @import("std");
 
 const numbers = 100;
@@ -50,9 +51,8 @@ fn parseCards(allocator: std.mem.Allocator, input: []const u8) ![]Card {
     return cardsList.toOwnedSlice();
 }
 
-pub fn solve(allocator: std.mem.Allocator, input: []const u8) !void {
-    const cards = try parseCards(allocator, input);
-    defer allocator.free(cards);
+pub fn solve(env: *Environment) !void {
+    const cards = try env.parseInputArena([]Card, parseCards);
     var answer1: isize = 0;
     var answer2: isize = 0;
     for (cards, 0..) |*card, i| {
@@ -66,5 +66,5 @@ pub fn solve(allocator: std.mem.Allocator, input: []const u8) !void {
         }
         answer2 += card.copies;
     }
-    std.debug.print("{}\n{}\n", .{ answer1, answer2 });
+    return env.setAnswers(answer1, answer2);
 }

@@ -1,3 +1,4 @@
+const Environment = @import("framework/Environment.zig");
 const splitLines = @import("parsing/lines.zig").splitLines;
 const std = @import("std");
 
@@ -48,8 +49,8 @@ fn solvePart(lines: []const []const u8, comptime part2: bool) !u64 {
     return answer;
 }
 
-pub fn solve(allocator: std.mem.Allocator, input: []const u8) !void {
-    const lines = try splitLines(allocator, input);
-    defer allocator.free(lines);
-    std.debug.print("{}\n{}\n", .{ try solvePart(lines, false), try solvePart(lines, true) });
+pub fn solve(env: *Environment) !void {
+    const lines = try env.parseInputArena([]const []const u8, splitLines);
+    try env.setAnswer1(try solvePart(lines, false));
+    try env.setAnswer2(try solvePart(lines, true));
 }

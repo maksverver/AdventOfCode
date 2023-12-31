@@ -1,5 +1,6 @@
-const Scanner = @import("parsing/scanning.zig").Scanner;
-const Grid = @import("parsing/grid.zig").Grid;
+const Environment = @import("framework/Environment.zig");
+const Scanner = @import("parsing/Scanner.zig");
+const Grid = @import("parsing/Grid.zig");
 const std = @import("std");
 
 // Represents a symbol adjacent to a number. (row, col) is the location of
@@ -87,15 +88,12 @@ fn solvePart2(symbols: []Symbol) isize {
     return answer;
 }
 
-pub fn solve(allocator: std.mem.Allocator, input: []const u8) !void {
-    const grid = try Grid.init(input);
+pub fn solve(env: *Environment) !void {
+    const grid = try env.parseInput(Grid, Grid.init);
 
-    var symbols = std.ArrayList(Symbol).init(allocator);
+    var symbols = std.ArrayList(Symbol).init(env.getHeapAllocator());
     defer symbols.deinit();
 
-    const answer1: isize = try solvePart1(&grid, &symbols);
-    std.debug.print("{}\n", .{answer1});
-
-    const answer2: isize = solvePart2(symbols.items);
-    std.debug.print("{}\n", .{answer2});
+    try env.setAnswer1(try solvePart1(&grid, &symbols));
+    try env.setAnswer2(solvePart2(symbols.items));
 }

@@ -1,8 +1,9 @@
-const Scanner = @import("parsing/scanning.zig").Scanner;
+const Environment = @import("framework/Environment.zig");
+const Scanner = @import("parsing/Scanner.zig");
 const std = @import("std");
 
-pub fn solve(_: std.mem.Allocator, input: []const u8) !void {
-    var scanner = Scanner{ .text = input };
+pub fn solve(env: *Environment) !void {
+    var scanner = Scanner{ .text = env.getInput() };
     var answer1: isize = 0;
     var answer2: isize = 0;
     while (!scanner.isEmpty()) {
@@ -44,5 +45,5 @@ pub fn solve(_: std.mem.Allocator, input: []const u8) !void {
         if (max_r <= 12 and max_g <= 13 and max_b <= 14) answer1 += gameNumber;
         answer2 += max_r * max_g * max_b;
     }
-    std.debug.print("{}\n{}\n", .{ answer1, answer2 });
+    return env.setAnswers(answer1, answer2);
 }
