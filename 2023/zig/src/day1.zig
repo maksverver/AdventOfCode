@@ -1,5 +1,5 @@
 const Environment = @import("framework/Environment.zig");
-const splitLines = @import("parsing/text.zig").splitLines;
+const text = @import("parsing/text.zig");
 const std = @import("std");
 
 const words = .{ "one", "two", "three", "four", "five", "six", "seven", "eight", "nine" };
@@ -50,13 +50,13 @@ fn solvePart(lines: []const []const u8, comptime part2: bool) !u64 {
 }
 
 pub fn solve(env: *Environment) !void {
-    const lines = try env.parseInputArena([]const []const u8, splitLines);
+    const lines = try env.parseInputArena([]const []const u8, text.splitLinesAlloc);
     try env.setAnswer1(try solvePart(lines, false));
     try env.setAnswer2(try solvePart(lines, true));
 }
 
 test "example 1" {
-    const lines = try splitLines(std.testing.allocator,
+    const lines = try text.splitLinesAlloc(std.testing.allocator,
         \\1abc2
         \\pqr3stu8vwx
         \\a1b2c3d4e5f
@@ -68,7 +68,7 @@ test "example 1" {
 }
 
 test "example 2" {
-    const lines = try splitLines(std.testing.allocator,
+    const lines = try text.splitLinesAlloc(std.testing.allocator,
         \\two1nine
         \\eightwothree
         \\abcone2threexyz

@@ -10,13 +10,6 @@ const Number = u64;
 // enough to hold the product of winning counts for part 1.
 const Answer = u64;
 
-// Parses the given line as a list of numbers.
-fn parseNumbers(allocator: std.mem.Allocator, line: []const u8) ![]Number {
-    const words = try text.splitWords(allocator, line);
-    defer allocator.free(words);
-    return try text.parseNumbers(Number, allocator, words);
-}
-
 /// Concatenates the given nonnegative numbers. For example, {1, 0, 23} => 1023.
 fn Concatenate(numbers: []const Number) Number {
     var res: Number = 0;
@@ -62,14 +55,23 @@ const Input = struct {
     }
 };
 
+// Parses a line of the form: "Prefix:  123  456  789\n" into a slice of numbers.
+fn parseInputLine(comptime prefix: []const u8, allocator: std.mem.Allocator, remaining: *[]const u8) ![]Number {
+    if (text.splitLine(remaining)) |line| {
+        if (text.removePrefix(line, prefix)) |rest| {
+            return text.parseNumbers(Number, allocator, rest);
+        }
+    }
+    return error.InvalidInput;
+}
+
 fn parseInput(allocator: std.mem.Allocator, input: []const u8) !Input {
-    const lines = try text.splitLines(allocator, input);
-    defer allocator.free(lines);
-    if (lines.len != 2) return error.InvalidInput;
-    const times = try parseNumbers(allocator, try text.removePrefix(lines[0], "Time:"));
+    var remaining = input;
+    const times = try parseInputLine("Time:", allocator, &remaining);
     defer allocator.free(times);
-    const dists = try parseNumbers(allocator, try text.removePrefix(lines[1], "Distance:"));
+    const dists = try parseInputLine("Distance:", allocator, &remaining);
     defer allocator.free(dists);
+    std.debug.assert(remaining.len == 0);
     return Input.init(allocator, times, dists);
 }
 
