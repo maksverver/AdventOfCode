@@ -128,5 +128,8 @@ pub fn main() !void {
 
 test {
     // This causes tests in all packages this package depends on to run:
-    std.testing.refAllDecls(@This());
+    std.testing.refAllDeclsRecursive(@This());
+
+    // And also some stuff nothing depends on:
+    std.testing.refAllDeclsRecursive(@import("day_example.zig"));
 }
