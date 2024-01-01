@@ -69,6 +69,10 @@ pub fn solve(env: *Environment) !void {
     return env.setAnswers(answer1, answer2);
 }
 
+pub fn main() !void {
+    try @import("framework/running.zig").runSolutionStdIO(solve);
+}
+
 test "example" {
     try @import("framework/testing.zig").testSolver(solve,
         \\Card 1: 41 48 83 86 17 | 83 86  6 31 17  9 48 53

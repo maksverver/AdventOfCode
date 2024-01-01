@@ -98,6 +98,10 @@ pub fn solve(env: *Environment) !void {
     try env.setAnswer2(solvePart2(symbols.items));
 }
 
+pub fn main() !void {
+    try @import("framework/running.zig").runSolutionStdIO(solve);
+}
+
 test "example" {
     try @import("framework/testing.zig").testSolver(solve,
         \\467..114..

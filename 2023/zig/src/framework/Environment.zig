@@ -86,7 +86,7 @@ pub fn getTimes(self: *Environment) *const Times {
     return &self._times;
 }
 
-/// Total time in nanoseconds, since calling init().
+/// Total time elapsed since calling init(), in nanoseconds.
 pub fn getTotalTime(self: *Environment) u64 {
     return self._times.total() + self._timer.read();
 }

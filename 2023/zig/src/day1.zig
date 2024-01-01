@@ -55,6 +55,10 @@ pub fn solve(env: *Environment) !void {
     try env.setAnswer2(try solvePart(lines, true));
 }
 
+pub fn main() !void {
+    try @import("framework/running.zig").runSolutionStdIO(solve);
+}
+
 test "example 1" {
     const lines = try text.splitLinesAlloc(std.testing.allocator,
         \\1abc2

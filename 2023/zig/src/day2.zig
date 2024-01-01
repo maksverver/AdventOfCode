@@ -48,6 +48,10 @@ pub fn solve(env: *Environment) !void {
     return env.setAnswers(answer1, answer2);
 }
 
+pub fn main() !void {
+    try @import("framework/running.zig").runSolutionStdIO(solve);
+}
+
 test "example" {
     try (@import("framework/testing.zig").testSolver(solve,
         \\Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green

@@ -147,6 +147,10 @@ fn expectEqual(actual: anytype, expected: @TypeOf(actual)) !void {
     return std.testing.expectEqual(expected, actual);
 }
 
+pub fn main() !void {
+    try @import("framework/running.zig").runSolutionStdIO(solve);
+}
+
 test "Record.countWinning()" {
     const record1 = Record{ .time = 7, .dist = 9 };
     try expectEqual(record1.countWinning(), 4);

@@ -1,4 +1,7 @@
+///! Runs all the solvers on the official test data, and reports time taken.
+///!
 const std = @import("std");
+const running = @import("framework/running.zig");
 const Environment = @import("framework/Environment.zig");
 
 const SolveFunction = *const fn (*Environment) anyerror!void;
@@ -11,27 +14,6 @@ inline fn defaultInputPath(comptime day: isize) *const [std.fmt.count(defaultInp
     comptime return std.fmt.comptimePrint(defaultInputPathFmt, DefaultInputPathArgs{@as(usize, day)});
 }
 
-fn nanosToMillis(nanos: u64) f64 {
-    return @as(f64, @floatFromInt(nanos)) / 1e6;
-}
-
-fn writeTimes(writer: anytype, times: *const Environment.Times, totalNanos: u64) !void {
-    // Report solution times
-    try std.fmt.format(writer, "{d:.3} ms", .{nanosToMillis(totalNanos)});
-    if (times.parsing) |ns| {
-        try std.fmt.format(writer, " (parsing: {d:.3} ms)", .{nanosToMillis(ns)});
-    }
-    if (times.solving) |ns| {
-        try std.fmt.format(writer, " (solving: {d:.3} ms)", .{nanosToMillis(ns)});
-    } else {
-        if (times.solving1) |ns| {
-            try std.fmt.format(writer, " (part 1: {d:.3} ms)", .{nanosToMillis(ns)});
-        }
-        if (times.solving2) |ns| {
-            try std.fmt.format(writer, " (part 2: {d:.3} ms)", .{nanosToMillis(ns)});
-        }
-    }
-    try std.fmt.format(writer, "\n", .{});
 }
 
 fn solveDay(input_path: []const u8, solveFunction: SolveFunction) !void {
@@ -56,7 +38,7 @@ fn solveDay(input_path: []const u8, solveFunction: SolveFunction) !void {
     // TODO: verify output!
     env.debugPrintAnswers();
 
-    try writeTimes(std.io.getStdOut().writer(), times, totalNanos);
+    try running.writeTimes(std.io.getStdOut().writer(), times, totalNanos);
 }
 
 const DayConfig = struct { input: []const u8, solve: SolveFunction };
