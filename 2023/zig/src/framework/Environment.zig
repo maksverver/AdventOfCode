@@ -87,6 +87,9 @@ pub fn getTimes(self: *Environment) *const Times {
 }
 
 /// Total time elapsed since calling init(), in nanoseconds.
+///
+/// This must be called immediately after the solver returns to ensure that the
+/// time measured is accurate.
 pub fn getTotalTime(self: *Environment) u64 {
     return self._times.total() + self._timer.read();
 }

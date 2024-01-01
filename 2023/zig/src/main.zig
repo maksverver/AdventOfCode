@@ -1,22 +1,62 @@
 ///! Runs all the solvers on the official test data, and reports time taken.
 ///!
 const std = @import("std");
+const text = @import("parsing/text.zig");
 const running = @import("framework/running.zig");
 const Environment = @import("framework/Environment.zig");
 
 const SolveFunction = *const fn (*Environment) anyerror!void;
 
-// Silly logic to calculate default input paths at compile time.
+// Silly logic to calculate default input and answer paths at compile time.
 const defaultInputPathFmt = "../testdata/{d:0>2}.in";
 const DefaultInputPathArgs = struct { usize };
+
+const defaultAnswerPathFmt = "../testdata/{d:0>2}.ref";
+const DefaultAnswerPathArgs = struct { usize };
+
+var stdout = std.io.bufferedWriter(std.io.getStdOut().writer());
 
 inline fn defaultInputPath(comptime day: isize) *const [std.fmt.count(defaultInputPathFmt, DefaultInputPathArgs{@as(usize, day)}):0]u8 {
     comptime return std.fmt.comptimePrint(defaultInputPathFmt, DefaultInputPathArgs{@as(usize, day)});
 }
 
+inline fn defaultAnswerPath(comptime day: isize) *const [std.fmt.count(defaultAnswerPathFmt, DefaultAnswerPathArgs{@as(usize, day)}):0]u8 {
+    comptime return std.fmt.comptimePrint(defaultAnswerPathFmt, DefaultAnswerPathArgs{@as(usize, day)});
 }
 
-fn solveDay(input_path: []const u8, solveFunction: SolveFunction) !void {
+fn parseAnswers(data: []const u8) !Environment.Answers {
+    var result = Environment.Answers{};
+    var remaining = data;
+    if (text.splitLine(&remaining)) |part1| {
+        result.part1 = part1;
+        if (text.splitLine(&remaining)) |part2| {
+            result.part2 = part2;
+            if (remaining.len != 0) {
+                return error.TooManyAnswers;
+            }
+        }
+        return result;
+    } else {
+        return error.TooFewAnswers;
+    }
+}
+
+fn compareAnswers(actual: ?[]const u8, expected: ?[]const u8) bool {
+    if (actual) |a| {
+        if (expected) |e| {
+            // Both values are present. Verify contents are the same.
+            return std.mem.eql(u8, a, e);
+        }
+    }
+    // Verify both values are absent.
+    return (actual == null) and (expected == null);
+}
+
+fn solveDay(
+    solve: SolveFunction,
+    input_path: []const u8,
+    answer_path: []const u8,
+) !bool {
     // Set up memory allocator, which detects leaks and other errors in debug mode.
     var general_purpose_allocator = std.heap.GeneralPurposeAllocator(.{}){};
     defer std.debug.assert(general_purpose_allocator.deinit() == .ok);
@@ -24,21 +64,43 @@ fn solveDay(input_path: []const u8, solveFunction: SolveFunction) !void {
 
     // Read input file.
     const max_input_size = std.math.maxInt(usize);
-    const input = try std.fs.cwd().readFileAlloc(allocator, input_path, max_input_size);
-    // To read from stdin instead:
-    // const input = try std.io.getStdIn().readToEndAlloc(allocator, max_input_size);
-    defer allocator.free(input);
+    const inputData = try std.fs.cwd().readFileAlloc(allocator, input_path, max_input_size);
+    defer allocator.free(inputData);
 
-    var env = try Environment.init(allocator, input);
+    // Read answers file.
+    const answerData = try std.fs.cwd().readFileAlloc(allocator, answer_path, max_input_size);
+    defer allocator.free(answerData);
+    const expectedAnswers = try parseAnswers(answerData);
+
+    var env = try Environment.init(allocator, inputData);
     defer env.deinit();
-    try solveFunction(&env);
-    const times = env.getTimes();
-    const totalNanos = env.getTotalTime();
+    if (solve(&env)) {
+        // Solver finished succesfully!
 
-    // TODO: verify output!
-    env.debugPrintAnswers();
+        // Capture times. This must be done immediately after the solver returns.
+        const totalNanos = env.getTotalTime();
+        const times = env.getTimes();
 
-    try running.writeTimes(std.io.getStdOut().writer(), times, totalNanos);
+        // Verify answers.
+        const actualAnswers = env.getAnswers();
+        const correct1 = compareAnswers(actualAnswers.part1, expectedAnswers.part1);
+        const correct2 = compareAnswers(actualAnswers.part2, expectedAnswers.part2);
+
+        if (correct1 and correct2) {
+            try stdout.writer().print("OK\n", .{});
+        } else {
+            if (!correct1) try stdout.writer().print("Wrong answer on part 1!\n", .{});
+            if (!correct2) try stdout.writer().print("Wrong answer on part 2!\n", .{});
+        }
+
+        try running.writeTimes(stdout.writer(), times, totalNanos);
+
+        return true;
+    } else |err| {
+        // Solver failed. Report failure.
+        try stdout.writer().print("FAILED! {}\n", .{err});
+        return false;
+    }
 }
 
 const DayConfig = struct { input: []const u8, solve: SolveFunction };
@@ -55,14 +117,21 @@ const solvers = [_]?SolveFunction{
 };
 
 pub fn main() !void {
+    var failures: isize = 0;
     inline for (solvers, 1..) |opt_solve, day| {
         if (opt_solve) |solve| {
             const input_path = defaultInputPath(day);
-            std.debug.print("Solving day {d} (input: {s})\n", .{ day, input_path });
-            try solveDay(input_path, solve);
+            const answer_path = defaultAnswerPath(day);
+            try stdout.writer().print("Solving day {d} (input: {s}, answer: {s})\n", .{ day, input_path, answer_path });
+            if (!try solveDay(solve, input_path, answer_path)) failures += 1;
         } else {
-            std.debug.print("Skipping day {d}\n", .{day});
+            try stdout.writer().print("Skipping day {d}\n", .{day});
         }
+        try stdout.flush();
+    }
+    if (failures > 0) {
+        std.debug.print("{} solutions failed!\n", .{failures});
+        return error.Failures;
     }
 }
 
