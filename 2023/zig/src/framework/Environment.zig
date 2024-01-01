@@ -109,7 +109,15 @@ pub fn parseInput(self: *Environment, comptime T: type, parse: *const fn ([]cons
     return res;
 }
 
-/// Convenience method that wraps getInput(), getArenaAllocator() and
+/// Convenience method that wraps getInput(), getHeapAllocator() and
+/// parsingDone(). This may be called instead of parsingDone().
+pub fn parseInputHeap(self: *Environment, comptime T: type, parse: *const fn (std.mem.Allocator, []const u8) anyerror!T) !T {
+    const res = try parse(self.getHeapAllocator(), self._input);
+    try self.parsingDone();
+    return res;
+}
+
+/// Convenience method that wraps getInput(), getHeapAllocator() and
 /// parsingDone(). This may be called instead of parsingDone().
 pub fn parseInputArena(self: *Environment, comptime T: type, parse: *const fn (std.mem.Allocator, []const u8) anyerror!T) !T {
     const res = try parse(self.getArenaAllocator(), self._input);

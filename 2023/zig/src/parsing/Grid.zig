@@ -1,4 +1,4 @@
-const findNewline = @import("./lines.zig").findNewline;
+const findNewline = @import("./text.zig").findNewline;
 const std = @import("std");
 
 height: usize,

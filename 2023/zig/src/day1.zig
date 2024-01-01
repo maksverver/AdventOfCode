@@ -1,5 +1,5 @@
 const Environment = @import("framework/Environment.zig");
-const splitLines = @import("parsing/lines.zig").splitLines;
+const splitLines = @import("parsing/text.zig").splitLines;
 const std = @import("std");
 
 const words = .{ "one", "two", "three", "four", "five", "six", "seven", "eight", "nine" };
