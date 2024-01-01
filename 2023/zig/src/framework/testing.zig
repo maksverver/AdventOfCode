@@ -5,19 +5,17 @@ const std = @import("std");
 /// One of `answer1` or `answer2` may be omitted; in that case, the answer for
 /// that part is not verified.
 pub fn testSolver(
-    solve: *const fn (*Environment) anyerror!void,
+    solve: Environment.SolveFn,
     input: []const u8,
     answer1: ?[]const u8,
     answer2: ?[]const u8,
 ) !void {
     try std.testing.expect(answer1 != null or answer2 != null);
 
-    var env = try Environment.init(std.testing.allocator, input);
-    defer env.deinit();
-    try solve(&env);
-    const received = env.getAnswers();
+    const result = try Environment.run(std.testing.allocator, input, solve);
+    defer result.deinit();
     if (answer1) |e| {
-        if (received.part1) |r| {
+        if (result.answers.part1) |r| {
             try std.testing.expectEqualStrings(e, r);
         } else {
             std.debug.print("Received no answer for part 1, expected: {s}\n", .{e});
@@ -25,7 +23,7 @@ pub fn testSolver(
         }
     }
     if (answer2) |e| {
-        if (received.part2) |r| {
+        if (result.answers.part2) |r| {
             try std.testing.expectEqualStrings(e, r);
         } else {
             std.debug.print("Received no answer for part 2, expected: {s}\n", .{e});

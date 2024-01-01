@@ -4,8 +4,7 @@ const std = @import("std");
 const text = @import("parsing/text.zig");
 const running = @import("framework/running.zig");
 const Environment = @import("framework/Environment.zig");
-
-const SolveFunction = *const fn (*Environment) anyerror!void;
+const SolveFn = Environment.SolveFn;
 
 // Silly logic to calculate default input and answer paths at compile time.
 const defaultInputPathFmt = "../testdata/{d:0>2}.in";
@@ -53,7 +52,7 @@ fn compareAnswers(actual: ?[]const u8, expected: ?[]const u8) bool {
 }
 
 fn solveDay(
-    solve: SolveFunction,
+    solve: SolveFn,
     input_path: []const u8,
     answer_path: []const u8,
 ) !bool {
@@ -72,19 +71,11 @@ fn solveDay(
     defer allocator.free(answerData);
     const expectedAnswers = try parseAnswers(answerData);
 
-    var env = try Environment.init(allocator, inputData);
-    defer env.deinit();
-    if (solve(&env)) {
+    if (Environment.run(allocator, inputData, solve)) |*result| {
         // Solver finished succesfully!
-
-        // Capture times. This must be done immediately after the solver returns.
-        const totalNanos = env.getTotalTime();
-        const times = env.getTimes();
-
-        // Verify answers.
-        const actualAnswers = env.getAnswers();
-        const correct1 = compareAnswers(actualAnswers.part1, expectedAnswers.part1);
-        const correct2 = compareAnswers(actualAnswers.part2, expectedAnswers.part2);
+        defer result.deinit();
+        const correct1 = compareAnswers(result.answers.part1, expectedAnswers.part1);
+        const correct2 = compareAnswers(result.answers.part2, expectedAnswers.part2);
 
         if (correct1 and correct2) {
             try stdout.writer().print("OK\n", .{});
@@ -93,7 +84,7 @@ fn solveDay(
             if (!correct2) try stdout.writer().print("Wrong answer on part 2!\n", .{});
         }
 
-        try running.writeTimes(stdout.writer(), times, totalNanos);
+        try running.writeTimes(stdout.writer(), result.totalTime, &result.subTimes);
 
         return true;
     } else |err| {
@@ -103,9 +94,9 @@ fn solveDay(
     }
 }
 
-const DayConfig = struct { input: []const u8, solve: SolveFunction };
+const DayConfig = struct { input: []const u8, solve: SolveFn };
 
-const solvers = [_]?SolveFunction{
+const solvers = [_]?SolveFn{
     @import("day1.zig").solve,
     @import("day2.zig").solve,
     @import("day3.zig").solve,

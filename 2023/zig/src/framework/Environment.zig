@@ -15,7 +15,6 @@
 //! as the time spent on parsing and solving the separate parts, if they are
 //! reported separately.
 //!
-
 const std = @import("std");
 
 const Environment = @This();
@@ -24,6 +23,12 @@ const Environment = @This();
 pub const Answers = struct {
     part1: ?[]const u8 = null,
     part2: ?[]const u8 = null,
+
+    pub fn move(self: *Answers) Answers {
+        defer self.part1 = null;
+        defer self.part2 = null;
+        return self.*;
+    }
 };
 
 /// Times taken by the solver, in nanoseconds.
@@ -41,6 +46,40 @@ pub const Times = struct {
     }
 };
 
+const RunResult = struct {
+    /// Answers produced by the solver.
+    answers: Answers,
+
+    /// Total time taken (in nanoseconds).
+    totalTime: u64,
+
+    /// Time spent on parts of the problem.
+    subTimes: Times,
+
+    /// The allocator that was passed to run(). Used to free stuff in deinit().
+    allocator: std.mem.Allocator,
+
+    pub fn deinit(self: RunResult) void {
+        if (self.answers.part1) |ptr| self.allocator.free(ptr);
+        if (self.answers.part2) |ptr| self.allocator.free(ptr);
+    }
+};
+
+// Wrapper to create a solver environment, run the solver, and return both the
+// reported answers and the solution times. If this function succeeds, the
+// caller must call RunResult.deinit() to free the answers.
+pub fn run(allocator: std.mem.Allocator, input: []const u8, solve: SolveFn) !RunResult {
+    var env = try Environment.init(allocator, input);
+    defer env.deinit();
+    try solve(&env);
+    return RunResult{
+        .totalTime = env._times.total() + env._timer.read(),
+        .subTimes = env._times,
+        .answers = env._answers.move(),
+        .allocator = allocator,
+    };
+}
+
 // Member fields. These should not be accessed directly even though Zig allows it.
 _input: []const u8,
 _allocator: std.mem.Allocator,
@@ -49,7 +88,7 @@ _answers: Answers = .{},
 _timer: std.time.Timer,
 _times: Times = .{},
 
-pub fn init(allocator: std.mem.Allocator, input: []const u8) !Environment {
+fn init(allocator: std.mem.Allocator, input: []const u8) !Environment {
     return Environment{
         ._allocator = allocator,
         ._input = input,
@@ -57,7 +96,7 @@ pub fn init(allocator: std.mem.Allocator, input: []const u8) !Environment {
     };
 }
 
-pub fn deinit(self: *Environment) void {
+fn deinit(self: *Environment) void {
     if (self._arena) |a| a.deinit();
     if (self._answers.part1) |p| self._allocator.free(p);
     if (self._answers.part2) |p| self._allocator.free(p);
@@ -76,22 +115,6 @@ pub fn getArenaAllocator(self: *Environment) std.mem.Allocator {
 
 pub fn getInput(self: *Environment) []const u8 {
     return self._input;
-}
-
-pub fn getAnswers(self: *const Environment) *const Answers {
-    return &self._answers;
-}
-
-pub fn getTimes(self: *Environment) *const Times {
-    return &self._times;
-}
-
-/// Total time elapsed since calling init(), in nanoseconds.
-///
-/// This must be called immediately after the solver returns to ensure that the
-/// time measured is accurate.
-pub fn getTotalTime(self: *Environment) u64 {
-    return self._times.total() + self._timer.read();
 }
 
 /// Solver calls this method to notify the environment that parsing is done,
@@ -163,3 +186,5 @@ pub fn setAnswers(self: *Environment, value1: anytype, value2: anytype) !void {
 pub fn debugPrintAnswers(self: *const Environment) void {
     std.debug.print("{?s}\n{?s}\n", .{ self._answers.part1, self._answers.part2 });
 }
+
+pub const SolveFn = *const fn (*Environment) anyerror!void;

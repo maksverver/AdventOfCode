@@ -5,7 +5,7 @@ fn nanosToMillis(nanos: u64) f64 {
     return @as(f64, @floatFromInt(nanos)) / 1e6;
 }
 
-pub fn writeTimes(writer: anytype, times: *const Environment.Times, totalNanos: u64) !void {
+pub fn writeTimes(writer: anytype, totalNanos: u64, times: *const Environment.Times) !void {
     // Report solution times
     try std.fmt.format(writer, "{d:.3} ms", .{nanosToMillis(totalNanos)});
     if (times.parsing) |ns| {
@@ -36,23 +36,17 @@ pub fn runSolutionStdIO(solve: *const fn (*Environment) anyerror!void) !void {
     const input = try std.io.getStdIn().readToEndAlloc(allocator, max_input_size);
     defer allocator.free(input);
 
-    var env = try Environment.init(allocator, input);
-    defer env.deinit();
-    try solve(&env);
-    // Important to get the total time immediately after solving, even though
-    // we only print the times later.
-    const totalNanos = env.getTotalTime();
-    const times = env.getTimes();
+    const result = try Environment.run(allocator, input, solve);
+    defer result.deinit();
 
     var bufferedStdout = std.io.bufferedWriter(std.io.getStdOut().writer());
     var bufferedStderr = std.io.bufferedWriter(std.io.getStdErr().writer());
 
     // Print answers.
-    const answers = env.getAnswers();
-    try bufferedStdout.writer().print("{?s}\n{?s}\n", .{ answers.part1, answers.part2 });
+    try bufferedStdout.writer().print("{?s}\n{?s}\n", .{ result.answers.part1, result.answers.part2 });
     try bufferedStdout.flush();
 
     // Print solution times.
-    try writeTimes(bufferedStderr.writer(), times, totalNanos);
+    try writeTimes(bufferedStderr.writer(), result.totalTime, &result.subTimes);
     try bufferedStderr.flush();
 }
