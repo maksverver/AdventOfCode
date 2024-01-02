@@ -73,7 +73,7 @@ fn solvePart1(grid: *const Grid, symbols: *std.ArrayList(Symbol)) !isize {
 // Part 2: for all '*' symbols that are adjacent to exactly 2 numbers, calculate
 // the product of those 2 numbers, and finally the sum of those products.
 fn solvePart2(symbols: []Symbol) isize {
-    std.mem.sort(Symbol, symbols, {}, symbolLessThan);
+    std.mem.sortUnstable(Symbol, symbols, {}, symbolLessThan);
     var answer: isize = 0;
     var i: usize = 0;
     while (i < symbols.len) {
