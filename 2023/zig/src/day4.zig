@@ -43,7 +43,7 @@ fn scanCard(scanner: *Scanner) !Card {
 fn parseCards(allocator: std.mem.Allocator, input: []const u8) ![]Card {
     var cardsList = std.ArrayList(Card).init(allocator);
     errdefer cardsList.deinit();
-    var scanner = Scanner{ .text = input };
+    var scanner = Scanner.init(input);
     errdefer scanner.debugPrintRemainingInput(); // useful for debugging parse errors
     while (!scanner.isEmpty()) {
         try cardsList.append(try scanCard(&scanner));

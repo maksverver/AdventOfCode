@@ -3,7 +3,7 @@ const Scanner = @import("parsing/Scanner.zig");
 const std = @import("std");
 
 pub fn solve(env: *Environment) !void {
-    var scanner = Scanner{ .text = env.getInput() };
+    var scanner = Scanner.init(env.getInput());
     var answer1: isize = 0;
     var answer2: isize = 0;
     while (!scanner.isEmpty()) {

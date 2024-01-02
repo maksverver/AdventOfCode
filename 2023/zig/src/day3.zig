@@ -1,5 +1,4 @@
 const Environment = @import("framework/Environment.zig");
-const Scanner = @import("parsing/Scanner.zig");
 const Grid = @import("parsing/Grid.zig");
 const std = @import("std");
 

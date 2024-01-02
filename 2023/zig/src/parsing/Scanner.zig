@@ -10,6 +10,10 @@ const Scanner = @This();
 
 text: []const u8,
 
+pub fn init(text: []const u8) Scanner {
+    return Scanner{ .text = text };
+}
+
 pub fn isEmpty(self: *const Scanner) bool {
     return self.text.len == 0;
 }
