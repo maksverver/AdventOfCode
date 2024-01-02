@@ -67,22 +67,35 @@ pub fn splitLine(remaining: *[]const u8) ?[]const u8 {
     }
 }
 
+pub const LineIterator = struct {
+    remaining: []const u8,
+
+    pub fn init(text: []const u8) !LineIterator {
+        if (text.len > 0 and text[text.len - 1] != '\r' and text[text.len - 1] != '\n') {
+            return error.MissingNewline;
+        }
+        return LineIterator{ .remaining = text };
+    }
+
+    pub fn isEmpty(self: *const LineIterator) bool {
+        return self.remaining.len == 0;
+    }
+
+    pub fn next(self: *LineIterator) ?[]const u8 {
+        return splitLine(&self.remaining);
+    }
+};
+
 /// Splits the data into lines, stripping newline characters.
 ///
-/// Returns error.EndOfInput if `data` doesn't end with a newline character,
+/// Returns error.MissingNewline if `data` doesn't end with a newline character,
 /// or error.OutOfMemory if allocation fails. Otherwise, runs a slice of lines
 /// that must be freed by the caller.
-pub fn splitLinesAlloc(allocator: std.mem.Allocator, data: []const u8) error{ OutOfMemory, EndOfInput }![][]const u8 {
+pub fn splitLinesAlloc(allocator: std.mem.Allocator, data: []const u8) error{ OutOfMemory, MissingNewline }![][]const u8 {
+    var it = try LineIterator.init(data);
     var lines = std.ArrayList([]const u8).init(allocator);
     errdefer lines.deinit();
-    var remaining = data;
-    while (remaining.len > 0) {
-        if (splitLine(&remaining)) |line| {
-            try lines.append(line);
-        } else {
-            return error.EndOfInput;
-        }
-    }
+    while (it.next()) |line| try lines.append(line);
     return lines.toOwnedSlice();
 }
 
@@ -107,13 +120,13 @@ test "splitLinesAlloc() empty input" {
 
 test "splitLinesAlloc() missing newline" {
     const result = splitLinesAlloc(std.testing.allocator, "foo\nbar");
-    try expectEqual(result, error.EndOfInput);
+    try expectEqual(result, error.MissingNewline);
 }
 
 // Iterates over the words in the given string, where a word is a maximal
 // substring that does not contain whitespace, as defined by
 // std.ascii.isWhitespace().
-const WordIterator = struct {
+pub const WordIterator = struct {
     remaining: []const u8,
 
     fn init(text: []const u8) WordIterator {
@@ -183,8 +196,23 @@ test "joinWith() empty input" {
     try expectEqualString(received, "");
 }
 
+// Parses the given text into a slice of numbers. The length of the slice
+// determines how many numbers to parse. This function is useful to parse lines
+// when the number of numbers is exactly known.
+pub fn parseNumbersSlice(comptime T: type, numbers: []T, text: []const u8) !void {
+    var it = WordIterator.init(text);
+    for (numbers) |*number| {
+        if (it.next()) |word| {
+            number.* = try std.fmt.parseInt(T, word, 10);
+        } else {
+            return error.TooFewTokens;
+        }
+    }
+    if (it.next() != null) return error.TooManyTokens;
+}
+
 /// Parses the given text as a list of numbers in decimal notation.
-pub fn parseNumbers(comptime T: type, allocator: std.mem.Allocator, text: []const u8) ![]T {
+pub fn parseNumbersAlloc(comptime T: type, allocator: std.mem.Allocator, text: []const u8) ![]T {
     var numbers = std.ArrayList(T).init(allocator);
     errdefer numbers.deinit();
     var it = WordIterator.init(text);

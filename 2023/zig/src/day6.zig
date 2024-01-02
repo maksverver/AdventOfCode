@@ -59,7 +59,7 @@ const Input = struct {
 fn parseInputLine(comptime prefix: []const u8, allocator: std.mem.Allocator, remaining: *[]const u8) ![]Number {
     if (text.splitLine(remaining)) |line| {
         if (text.removePrefix(line, prefix)) |rest| {
-            return text.parseNumbers(Number, allocator, rest);
+            return text.parseNumbersAlloc(Number, allocator, rest);
         }
     }
     return error.InvalidInput;

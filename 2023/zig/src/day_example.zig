@@ -16,7 +16,7 @@ fn parseInput(allocator: std.mem.Allocator, input: []const u8) !Input {
     var remaining = input;
     const line = text.splitLine(&remaining) orelse return error.InvalidInput;
     std.debug.assert(remaining.len == 0);
-    return text.parseNumbers(i64, allocator, line);
+    return text.parseNumbersAlloc(i64, allocator, line);
 }
 
 fn solvePart1(input: Input) !i64 {
