@@ -108,6 +108,7 @@ const solvers = [_]?SolveFn{
 };
 
 pub fn main() !void {
+    var timer = try std.time.Timer.start();
     var failures: isize = 0;
     inline for (solvers, 1..) |opt_solve, day| {
         if (opt_solve) |solve| {
@@ -120,6 +121,7 @@ pub fn main() !void {
         }
         try stdout.flush();
     }
+    std.debug.print("Total time: {d:.3} ms\n", .{running.nanosToMillis(timer.read())});
     if (failures > 0) {
         std.debug.print("{} solutions failed!\n", .{failures});
         return error.Failures;

@@ -1,7 +1,7 @@
 const Environment = @import("Environment.zig");
 const std = @import("std");
 
-fn nanosToMillis(nanos: u64) f64 {
+pub fn nanosToMillis(nanos: u64) f64 {
     return @as(f64, @floatFromInt(nanos)) / 1e6;
 }
 
