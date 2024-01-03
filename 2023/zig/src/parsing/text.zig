@@ -129,11 +129,11 @@ test "splitLinesAlloc() missing newline" {
 pub const WordIterator = struct {
     remaining: []const u8,
 
-    fn init(text: []const u8) WordIterator {
+    pub fn init(text: []const u8) WordIterator {
         return WordIterator{ .remaining = text };
     }
 
-    fn next(self: *WordIterator) ?[]const u8 {
+    pub fn next(self: *WordIterator) ?[]const u8 {
         const text = self.remaining;
         var begin: usize = 0;
         while (begin < text.len and std.ascii.isWhitespace(text[begin])) begin += 1;
@@ -213,11 +213,15 @@ pub fn parseNumbersSlice(comptime T: type, numbers: []T, text: []const u8) !void
 
 /// Parses the given text as a list of numbers in decimal notation.
 pub fn parseNumbersAlloc(comptime T: type, allocator: std.mem.Allocator, text: []const u8) ![]T {
-    var numbers = std.ArrayList(T).init(allocator);
-    errdefer numbers.deinit();
+    var list = std.ArrayList(T).init(allocator);
+    errdefer list.deinit();
+    try parseNumbersToList(T, &list, text);
+    return list.toOwnedSlice();
+}
+
+pub fn parseNumbersToList(comptime T: type, list: *std.ArrayList(T), text: []const u8) !void {
     var it = WordIterator.init(text);
-    while (it.next()) |word| try numbers.append(try std.fmt.parseInt(T, word, 10));
-    return numbers.toOwnedSlice();
+    while (it.next()) |word| try list.append(try std.fmt.parseInt(T, word, 10));
 }
 
 pub fn removePrefix(data: []const u8, prefix: []const u8) ?[]const u8 {
