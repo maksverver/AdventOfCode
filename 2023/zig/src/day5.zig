@@ -38,10 +38,10 @@ fn parseInput(allocator: std.mem.Allocator, input: []const u8) !Input {
     errdefer allocator.free(seeds);
 
     // Skip blank separator line.
-    const separate = it.next() orelse return error.InvalidInput;
+    const separator = it.next() orelse return error.InvalidInput;
+    std.debug.assert(separator.len == 0);
 
     // Parse maps.
-    std.debug.assert(separate.len == 0);
     var mapsList = std.ArrayList([]const MapEntry).init(allocator);
     errdefer mapsList.deinit();
     errdefer for (mapsList.items) |item| allocator.free(item);
