@@ -104,7 +104,8 @@ const solvers = [_]?SolveFn{
     @import("day5.zig").solve,
     @import("day6.zig").solve,
     @import("day7.zig").solve,
-    // TODO: days 8-25
+    @import("day8.zig").solve,
+    // TODO: days 9-25
     null, // null is allowed to skip days I haven't solved yet
 };
 
