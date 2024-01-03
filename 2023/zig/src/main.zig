@@ -3,6 +3,7 @@
 const std = @import("std");
 const text = @import("parsing/text.zig");
 const running = @import("framework/running.zig");
+const nanosToMillis = running.nanosToMillis;
 const Environment = @import("framework/Environment.zig");
 const SolveFn = Environment.SolveFn;
 
@@ -14,6 +15,7 @@ const defaultAnswerPathFmt = "../testdata/{d:0>2}.ref";
 const DefaultAnswerPathArgs = struct { usize };
 
 var stdout = std.io.bufferedWriter(std.io.getStdOut().writer());
+var stdoutWriter = stdout.writer();
 
 inline fn defaultInputPath(comptime day: isize) *const [std.fmt.count(defaultInputPathFmt, DefaultInputPathArgs{@as(usize, day)}):0]u8 {
     comptime return std.fmt.comptimePrint(defaultInputPathFmt, DefaultInputPathArgs{@as(usize, day)});
@@ -51,6 +53,26 @@ fn compareAnswers(actual: ?[]const u8, expected: ?[]const u8) bool {
     return (actual == null) and (expected == null);
 }
 
+const tableHeader =
+    \\╔═════╤════════╤════════╤═════════╤═════════╤═════════╤═════════╤═════════╗
+    \\║ Day │ Part 1 │ Part 2 │Time (ms)│ Parsing │ Solve 1 │ Solve 2 │ Solving ║
+    \\╟─────┼────────┼────────┼─────────┼─────────┼─────────┼─────────┼─────────╢
+    \\
+;
+
+const tableFooter =
+    \\╚═════╧════════╧════════╧═════════╧═════════╧═════════╧═════════╧═════════╝
+    \\
+;
+
+fn printTime(opt_nanos: ?u64) !void {
+    if (opt_nanos) |nanos| {
+        try stdoutWriter.print("│{d: >8.3} ", .{nanosToMillis(nanos)});
+    } else {
+        try stdoutWriter.print("│{s: >8} ", .{"-"});
+    }
+}
+
 fn solveDay(
     solve: SolveFn,
     input_path: []const u8,
@@ -63,35 +85,36 @@ fn solveDay(
 
     // Read input file.
     const max_input_size = std.math.maxInt(usize);
-    const inputData = try std.fs.cwd().readFileAlloc(allocator, input_path, max_input_size);
+    const inputData = std.fs.cwd().readFileAlloc(allocator, input_path, max_input_size) catch {
+        // try stdoutWriter.print("Failed to read input from file: \"{s}\"\n", .{input_path});
+        return false;
+    };
     defer allocator.free(inputData);
 
     // Read answers file.
-    const answerData = try std.fs.cwd().readFileAlloc(allocator, answer_path, max_input_size);
+    const answerData = std.fs.cwd().readFileAlloc(allocator, answer_path, max_input_size) catch {
+        // try stdoutWriter.print("Failed to read answers from file: \"{s}\"\n", .{answer_path});
+        return false;
+    };
     defer allocator.free(answerData);
     const expectedAnswers = try parseAnswers(answerData);
 
-    if (Environment.run(allocator, inputData, solve)) |*result| {
-        // Solver finished succesfully!
-        defer result.deinit();
-        const correct1 = compareAnswers(result.answers.part1, expectedAnswers.part1);
-        const correct2 = compareAnswers(result.answers.part2, expectedAnswers.part2);
+    const result = try Environment.run(allocator, inputData, solve);
+    // Solver finished succesfully!
+    defer result.deinit();
+    const correct1 = compareAnswers(result.answers.part1, expectedAnswers.part1);
+    const correct2 = compareAnswers(result.answers.part2, expectedAnswers.part2);
 
-        if (correct1 and correct2) {
-            try stdout.writer().print("OK\n", .{});
-        } else {
-            if (!correct1) try stdout.writer().print("Wrong answer on part 1!\n", .{});
-            if (!correct2) try stdout.writer().print("Wrong answer on part 2!\n", .{});
-        }
+    try stdoutWriter.print("│ {s: <6} ", .{if (correct1) "OK" else "WRONG"});
+    try stdoutWriter.print("│ {s: <6} ", .{if (correct2) "OK" else "WRONG"});
 
-        try running.writeTimes(stdout.writer(), result.totalTime, &result.subTimes);
+    try printTime(result.totalTime);
+    try printTime(result.subTimes.parsing);
+    try printTime(result.subTimes.solving1);
+    try printTime(result.subTimes.solving2);
+    try printTime(result.subTimes.solving);
 
-        return true;
-    } else |err| {
-        // Solver failed. Report failure.
-        try stdout.writer().print("FAILED! {}\n", .{err});
-        return false;
-    }
+    return correct1 and correct2;
 }
 
 const DayConfig = struct { input: []const u8, solve: SolveFn };
@@ -113,21 +136,29 @@ const solvers = [_]?SolveFn{
 pub fn main() !void {
     var timer = try std.time.Timer.start();
     var failures: isize = 0;
+    try stdoutWriter.writeAll(tableHeader);
     inline for (solvers, 1..) |opt_solve, day| {
         if (opt_solve) |solve| {
+            try stdoutWriter.print("║{d: >4} ", .{day});
             const input_path = defaultInputPath(day);
             const answer_path = defaultAnswerPath(day);
-            try stdout.writer().print("Solving day {d} (input: {s}, answer: {s})\n", .{ day, input_path, answer_path });
-            if (!try solveDay(solve, input_path, answer_path)) failures += 1;
+            if (solveDay(solve, input_path, answer_path)) |ok| {
+                if (!ok) failures += 1;
+            } else |err| {
+                std.debug.print("Solver for day {} failed! {}\n", .{ day, err });
+            }
+            try stdoutWriter.writeAll("║\n");
         } else {
-            try stdout.writer().print("Skipping day {d}\n", .{day});
+            std.debug.print("Missing solver for day {}.\n", .{day});
         }
-        try stdout.flush();
     }
-    std.debug.print("Total time: {d:.3} ms\n", .{running.nanosToMillis(timer.read())});
+    const totalNanos = timer.read();
+    try stdoutWriter.writeAll(tableFooter);
+    try stdout.flush();
+    std.debug.print("Total time: {d:.3} ms\n", .{nanosToMillis(totalNanos)});
     if (failures > 0) {
-        std.debug.print("{} solutions failed!\n", .{failures});
-        return error.Failures;
+        std.debug.print("{} solution(s) failed!\n", .{failures});
+        std.process.exit(1);
     }
 }
 
