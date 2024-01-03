@@ -14,7 +14,7 @@ pub fn init(text: []const u8) Scanner {
     return Scanner{ .text = text };
 }
 
-pub fn isEmpty(self: *const Scanner) bool {
+pub fn isEmpty(self: Scanner) bool {
     return self.text.len == 0;
 }
 
@@ -26,7 +26,7 @@ pub fn skipHorizontalSpace(self: *Scanner) void {
     self.text = self.text[self.peekPredicate(isHorizontalSpace).len..];
 }
 
-pub fn peekNewline(self: *const Scanner) []const u8 {
+pub fn peekNewline(self: Scanner) []const u8 {
     var n: usize = 0;
     if (self.text[0] == '\r') {
         n = 1;
@@ -46,7 +46,7 @@ pub fn skipNewline(self: *Scanner) !void {
 }
 
 // Returns a maximal substring of consecutive characters matching `predicate`.
-pub fn peekPredicate(self: *const Scanner, comptime predicate: fn (c: u8) bool) []const u8 {
+pub fn peekPredicate(self: Scanner, comptime predicate: fn (c: u8) bool) []const u8 {
     var end: usize = 0;
     while (end < self.text.len and predicate(self.text[end])) {
         end += 1;
@@ -69,7 +69,7 @@ pub fn scanInt(self: *Scanner, comptime T: type) !T {
     return result;
 }
 
-pub fn peekText(self: *const Scanner, text: []const u8) bool {
+pub fn peekText(self: Scanner, text: []const u8) bool {
     if (std.mem.startsWith(u8, self.text, text)) {
         return true;
     }
@@ -97,7 +97,7 @@ pub fn skipText(self: *Scanner, text: []const u8) !void {
     self.text = self.text[text.len..];
 }
 
-pub fn debugPrintRemainingInput(self: *const Scanner) void {
+pub fn debugPrintRemainingInput(self: Scanner) void {
     const maxLen = 100;
     if (self.text.len <= maxLen) {
         std.debug.print("Remaining input: [{s}]\n", .{self.text});

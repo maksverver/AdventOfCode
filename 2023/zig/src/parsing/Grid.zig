@@ -30,19 +30,19 @@ pub fn init(data: []const u8) !Grid {
     };
 }
 
-pub fn inBounds(self: *const Grid, row: isize, col: isize) bool {
+pub fn inBounds(self: Grid, row: isize, col: isize) bool {
     return 0 <= row and row < self.height and 0 <= col and col < self.width;
 }
 
-pub fn charAt(self: *const Grid, row: isize, col: isize) u8 {
+pub fn charAt(self: Grid, row: isize, col: isize) u8 {
     return self.charPtrAt(row, col).*;
 }
 
-pub fn charPtrAt(self: *const Grid, row: isize, col: isize) *const u8 {
+pub fn charPtrAt(self: Grid, row: isize, col: isize) *const u8 {
     std.debug.assert(self.inBounds(row, col));
     return &self.data[@as(usize, @intCast(row)) * self.stride + @as(usize, @intCast(col))];
 }
 
-pub fn charAtOr(self: *const Grid, row: isize, col: isize, default: u8) u8 {
+pub fn charAtOr(self: Grid, row: isize, col: isize, default: u8) u8 {
     return if (self.inBounds(row, col)) self.charAt(row, col) else default;
 }

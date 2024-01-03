@@ -41,7 +41,7 @@ pub const Times = struct {
     solving2: ?u64 = null,
 
     /// Returns the total solving time, by summing the non-null fields.
-    fn total(self: *const Times) u64 {
+    fn total(self: Times) u64 {
         return (self.parsing orelse 0) + (self.solving orelse ((self.solving1 orelse 0) + (self.solving2 orelse 0)));
     }
 };
@@ -96,13 +96,13 @@ fn init(allocator: std.mem.Allocator, input: []const u8) !Environment {
     };
 }
 
-fn deinit(self: *Environment) void {
+fn deinit(self: Environment) void {
     if (self._arena) |a| a.deinit();
     if (self._answers.part1) |p| self._allocator.free(p);
     if (self._answers.part2) |p| self._allocator.free(p);
 }
 
-pub fn getHeapAllocator(self: *Environment) std.mem.Allocator {
+pub fn getHeapAllocator(self: Environment) std.mem.Allocator {
     return self._allocator;
 }
 
@@ -113,7 +113,7 @@ pub fn getArenaAllocator(self: *Environment) std.mem.Allocator {
     return self._arena.?.allocator();
 }
 
-pub fn getInput(self: *Environment) []const u8 {
+pub fn getInput(self: Environment) []const u8 {
     return self._input;
 }
 
@@ -183,7 +183,7 @@ pub fn setAnswers(self: *Environment, value1: anytype, value2: anytype) !void {
 }
 
 /// Prints the answers to stderr for debugging.
-pub fn debugPrintAnswers(self: *const Environment) void {
+pub fn debugPrintAnswers(self: Environment) void {
     std.debug.print("{?s}\n{?s}\n", .{ self._answers.part1, self._answers.part2 });
 }
 
