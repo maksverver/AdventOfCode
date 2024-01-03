@@ -7,6 +7,20 @@ const nanosToMillis = running.nanosToMillis;
 const Environment = @import("framework/Environment.zig");
 const SolveFn = Environment.SolveFn;
 
+const solvers = [_]?SolveFn{
+    @import("day1.zig").solve,
+    @import("day2.zig").solve,
+    @import("day3.zig").solve,
+    @import("day4.zig").solve,
+    @import("day5.zig").solve,
+    @import("day6.zig").solve,
+    @import("day7.zig").solve,
+    @import("day8.zig").solve,
+    @import("day9.zig").solve,
+    // TODO: days 10-25
+    null, // null is allowed to skip days I haven't solved yet
+};
+
 // Silly logic to calculate default input and answer paths at compile time.
 const defaultInputPathFmt = "../testdata/{d:0>2}.in";
 const DefaultInputPathArgs = struct { usize };
@@ -117,39 +131,57 @@ fn solveDay(
     return correct1 and correct2;
 }
 
-const DayConfig = struct { input: []const u8, solve: SolveFn };
-
-const solvers = [_]?SolveFn{
-    @import("day1.zig").solve,
-    @import("day2.zig").solve,
-    @import("day3.zig").solve,
-    @import("day4.zig").solve,
-    @import("day5.zig").solve,
-    @import("day6.zig").solve,
-    @import("day7.zig").solve,
-    @import("day8.zig").solve,
-    @import("day9.zig").solve,
-    // TODO: days 10-25
-    null, // null is allowed to skip days I haven't solved yet
+const DayConfig = struct {
+    day: usize,
+    solve: ?SolveFn,
+    input_path: []const u8,
+    answer_path: []const u8,
 };
 
-pub fn main() !void {
+const day_configs: []const DayConfig = getDayConfigs();
+
+fn getDayConfig(day: usize) DayConfig {
+    if (1 <= day and day <= day_configs.len) {
+        return day_configs[day - 1];
+    } else {
+        return DayConfig{
+            .day = day,
+            .solve = null,
+            .input_path = "",
+            .answer_path = "",
+        };
+    }
+}
+
+fn getDayConfigs() []const DayConfig {
+    comptime var res: []const DayConfig = &[0]DayConfig{};
+    inline for (solvers, 1..) |solve, day| {
+        const config = DayConfig{
+            .day = day,
+            .solve = solve,
+            .input_path = defaultInputPath(day),
+            .answer_path = defaultAnswerPath(day),
+        };
+        res = res ++ [1]DayConfig{config};
+    }
+    return res;
+}
+
+fn solveDays(configs: []const DayConfig) !void {
     var timer = try std.time.Timer.start();
     var failures: isize = 0;
     try stdoutWriter.writeAll(tableHeader);
-    inline for (solvers, 1..) |opt_solve, day| {
-        if (opt_solve) |solve| {
-            try stdoutWriter.print("║{d: >4} ", .{day});
-            const input_path = defaultInputPath(day);
-            const answer_path = defaultAnswerPath(day);
-            if (solveDay(solve, input_path, answer_path)) |ok| {
+    for (configs) |config| {
+        try stdoutWriter.print("║{d: >4} ", .{config.day});
+        if (config.solve) |solve| {
+            if (solveDay(solve, config.input_path, config.answer_path)) |ok| {
                 if (!ok) failures += 1;
+                try stdoutWriter.writeAll("║\n");
             } else |err| {
-                std.debug.print("Solver for day {} failed! {}\n", .{ day, err });
+                std.debug.print("Solver for day {} failed! {}\n", .{ config.day, err });
             }
-            try stdoutWriter.writeAll("║\n");
         } else {
-            std.debug.print("Missing solver for day {}.\n", .{day});
+            try stdoutWriter.print("│ Missing solver for day {}\n", .{config.day});
         }
     }
     const totalNanos = timer.read();
@@ -160,6 +192,31 @@ pub fn main() !void {
         std.debug.print("{} solution(s) failed!\n", .{failures});
         std.process.exit(1);
     }
+}
+
+const usage = "Usage: aoc [<days>]\n\n";
+
+pub fn main() !void {
+    var general_purpose_allocator = std.heap.GeneralPurposeAllocator(.{}){};
+    defer std.debug.assert(general_purpose_allocator.deinit() == .ok);
+    const allocator = general_purpose_allocator.allocator();
+
+    const args = try std.process.argsAlloc(allocator);
+    defer std.process.argsFree(allocator, args);
+    var config_list = std.ArrayList(DayConfig).init(allocator);
+    defer config_list.deinit();
+    for (args[1..]) |arg| {
+        const day = std.fmt.parseInt(usize, arg, 10) catch {
+            try stdoutWriter.print("Invalid argument: \"{s}\"\n\n", .{arg});
+            try stdoutWriter.writeAll(usage);
+            try stdout.flush();
+            std.process.exit(1);
+        };
+        try config_list.append(getDayConfig(day));
+    }
+
+    const solve_configs = if (config_list.items.len > 0) config_list.items else day_configs;
+    try solveDays(solve_configs);
 }
 
 test {
