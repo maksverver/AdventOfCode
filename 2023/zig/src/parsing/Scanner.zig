@@ -92,6 +92,18 @@ pub fn scanAlphanumeric(self: *Scanner) ![]const u8 {
     return self.scanPredicate(std.ascii.isAlphanumeric);
 }
 
+fn isTokenChar(c: u8) bool {
+    return !std.ascii.isWhitespace(c);
+}
+
+pub fn peekToken(self: *Scanner) ![]const u8 {
+    return self.peekPredicate(isTokenChar);
+}
+
+pub fn scanToken(self: *Scanner) ![]const u8 {
+    return self.scanPredicate(isTokenChar);
+}
+
 pub fn skipText(self: *Scanner, text: []const u8) !void {
     if (!std.mem.startsWith(u8, self.text, text)) return error.InvalidCharacter;
     self.text = self.text[text.len..];

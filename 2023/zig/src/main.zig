@@ -19,7 +19,8 @@ const solvers = [_]?SolveFn{
     @import("day9.zig").solve,
     @import("day10.zig").solve,
     @import("day11.zig").solve,
-    // TODO: days 12-25
+    @import("day12.zig").solve,
+    // TODO: days 13-25
     null, // null is allowed to skip days I haven't solved yet
 };
 
@@ -290,6 +291,7 @@ fn solveDays(configs: []const DayConfig) !void {
         } else {
             try stdoutWriter.print("│ Missing solver for day {}\n", .{config.day});
         }
+        try stdout.flush();
     }
     const totalNanos = timer.read();
 
