@@ -46,3 +46,14 @@ pub fn charPtrAt(self: Grid, row: isize, col: isize) *const u8 {
 pub fn charAtOr(self: Grid, row: isize, col: isize, default: u8) u8 {
     return if (self.inBounds(row, col)) self.charAt(row, col) else default;
 }
+
+// Like charAt(), but with unsigned coordinates.
+pub fn charAtU(self: Grid, row: usize, col: usize) u8 {
+    return self.charPtrAtU(row, col).*;
+}
+
+// Like charPtrAt(), but with unsigned coordinates.
+pub fn charPtrAtU(self: Grid, row: usize, col: usize) *const u8 {
+    std.debug.assert(row < self.height and col < self.width);
+    return &self.data[row * self.stride + col];
+}
