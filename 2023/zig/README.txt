@@ -42,3 +42,9 @@ Individual days can be run with:
 And tested with:
 
 % zig test src/day1.zig
+
+Days can also be compiled into seperate executables which read from stdin and
+write answers to stdout:
+
+% zig build-exe -O ReleaseFast src/day1.zig
+% time ./day1 < ../testdata/01.in
