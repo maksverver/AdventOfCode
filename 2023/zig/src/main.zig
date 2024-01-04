@@ -17,7 +17,8 @@ const solvers = [_]?SolveFn{
     @import("day7.zig").solve,
     @import("day8.zig").solve,
     @import("day9.zig").solve,
-    // TODO: days 10-25
+    @import("day10.zig").solve,
+    // TODO: days 11-25
     null, // null is allowed to skip days I haven't solved yet
 };
 
@@ -30,6 +31,70 @@ const DefaultAnswerPathArgs = struct { usize };
 
 var stdout = std.io.bufferedWriter(std.io.getStdOut().writer());
 var stdoutWriter = stdout.writer();
+var stdoutSupportsAnsi: ?bool = null;
+
+const AnsiStyle = enum(u8) {
+    reset,
+    bold,
+    dim,
+    fgBlack = 30,
+    fgRed,
+    fgGreen,
+    fgYellow,
+    fgBlue,
+    fgMagenta,
+    fgCyan,
+    fgWhite,
+    bgBlack = 40,
+    bgRed,
+    bgGreen,
+    bgYellow,
+    bgBlue,
+    bgMagenta,
+    bgCyan,
+    bgWhite,
+    fgBrightBlack = 90,
+    fgBrightRed,
+    fgBrightGreen,
+    fgBrightYellow,
+    fgBrightBlue,
+    fgBrightMagenta,
+    fgBrightCyan,
+    fgBrightWhite,
+    bgBrightBlack = 100,
+    bgBrightRed,
+    bgBrightGreen,
+    bgBrightYellow,
+    bgBrightBlue,
+    bgBrightMagenta,
+    bgBrightCyan,
+    bgBrightWhite,
+};
+
+fn useAnsi() bool {
+    if (stdoutSupportsAnsi) |val| {
+        return val;
+    } else {
+        const val = std.io.getStdOut().supportsAnsiEscapeCodes();
+        stdoutSupportsAnsi = val;
+        return val;
+    }
+}
+
+fn setAnsiStyle(style: AnsiStyle) !void {
+    if (!useAnsi()) return;
+    return try stdoutWriter.print("\x1b[{d}m", .{@intFromEnum(style)});
+}
+
+fn setAnsiStyles(styles: []const AnsiStyle) !void {
+    if (!useAnsi() or styles.len == 0) return;
+    try stdoutWriter.print("\x1b[", .{});
+    for (styles, 0..) |style, i| {
+        if (i > 0) try stdoutWriter.print(";", .{});
+        try stdoutWriter.print("{d}", .{@intFromEnum(style)});
+    }
+    try stdoutWriter.print("m", .{});
+}
 
 inline fn defaultInputPath(comptime day: isize) *const [std.fmt.count(defaultInputPathFmt, DefaultInputPathArgs{@as(usize, day)}):0]u8 {
     comptime return std.fmt.comptimePrint(defaultInputPathFmt, DefaultInputPathArgs{@as(usize, day)});
@@ -56,15 +121,28 @@ fn parseAnswers(data: []const u8) !Environment.Answers {
     }
 }
 
-fn compareAnswers(actual: ?[]const u8, expected: ?[]const u8) bool {
-    if (actual) |a| {
-        if (expected) |e| {
-            // Both values are present. Verify contents are the same.
-            return std.mem.eql(u8, a, e);
-        }
+const Verdict = enum {
+    correct,
+    wrong,
+    missing,
+
+    fn fail(v: Verdict) bool {
+        return v == .wrong;
     }
-    // Verify both values are absent.
-    return (actual == null) and (expected == null);
+    fn pass(v: Verdict) bool {
+        return v != .wrong;
+    }
+};
+
+fn compareAnswers(actual: ?[]const u8, expected: ?[]const u8) Verdict {
+    if (expected) |e| {
+        if (actual) |a| {
+            return if (std.mem.eql(u8, a, e)) .correct else .wrong;
+        }
+    } else if (actual == null) {
+        return .missing; // no answer given & no answer expected
+    }
+    return .wrong;
 }
 
 const tableHeader =
@@ -79,11 +157,37 @@ const tableFooter =
     \\
 ;
 
-fn printTime(opt_nanos: ?u64) !void {
+fn printTime(opt_nanos: ?u64, emphasize: bool) !void {
+    try stdoutWriter.writeAll("│");
     if (opt_nanos) |nanos| {
-        try stdoutWriter.print("│{d: >8.3} ", .{nanosToMillis(nanos)});
+        if (emphasize) try setAnsiStyle(.bold);
+        try stdoutWriter.print("{d: >8.3} ", .{nanosToMillis(nanos)});
+        if (emphasize) try setAnsiStyle(.reset);
     } else {
-        try stdoutWriter.print("│{s: >8} ", .{"-"});
+        try setAnsiStyle(.dim);
+        try stdoutWriter.print("{s: >8} ", .{"-"});
+        try setAnsiStyle(.reset);
+    }
+}
+
+fn printVerdict(verdict: Verdict) !void {
+    try stdoutWriter.print("│", .{});
+    switch (verdict) {
+        .correct => {
+            try setAnsiStyles(&[_]AnsiStyle{ .fgGreen, .bold });
+            try stdoutWriter.print(" OK     ", .{});
+            try setAnsiStyle(.reset);
+        },
+        .wrong => {
+            try setAnsiStyles(&[_]AnsiStyle{ .fgRed, .bold });
+            try stdoutWriter.print(" WRONG  ", .{});
+            try setAnsiStyle(.reset);
+        },
+        .missing => {
+            try setAnsiStyle(.dim);
+            try stdoutWriter.print(" -      ", .{});
+            try setAnsiStyle(.reset);
+        },
     }
 }
 
@@ -116,19 +220,19 @@ fn solveDay(
     const result = try Environment.run(allocator, inputData, solve);
     // Solver finished succesfully!
     defer result.deinit();
-    const correct1 = compareAnswers(result.answers.part1, expectedAnswers.part1);
-    const correct2 = compareAnswers(result.answers.part2, expectedAnswers.part2);
+    const verdict1 = compareAnswers(result.answers.part1, expectedAnswers.part1);
+    const verdict2 = compareAnswers(result.answers.part2, expectedAnswers.part2);
 
-    try stdoutWriter.print("│ {s: <6} ", .{if (correct1) "OK" else "WRONG"});
-    try stdoutWriter.print("│ {s: <6} ", .{if (correct2) "OK" else "WRONG"});
+    try printVerdict(verdict1);
+    try printVerdict(verdict2);
 
-    try printTime(result.totalTime);
-    try printTime(result.subTimes.parsing);
-    try printTime(result.subTimes.solving1);
-    try printTime(result.subTimes.solving2);
-    try printTime(result.subTimes.solving);
+    try printTime(result.totalTime, true);
+    try printTime(result.subTimes.parsing, false);
+    try printTime(result.subTimes.solving1, false);
+    try printTime(result.subTimes.solving2, false);
+    try printTime(result.subTimes.solving, false);
 
-    return correct1 and correct2;
+    return verdict1.pass() and verdict2.pass();
 }
 
 const DayConfig = struct {
@@ -170,7 +274,9 @@ fn getDayConfigs() []const DayConfig {
 fn solveDays(configs: []const DayConfig) !void {
     var timer = try std.time.Timer.start();
     var failures: isize = 0;
+
     try stdoutWriter.writeAll(tableHeader);
+
     for (configs) |config| {
         try stdoutWriter.print("║{d: >4} ", .{config.day});
         if (config.solve) |solve| {
@@ -185,9 +291,12 @@ fn solveDays(configs: []const DayConfig) !void {
         }
     }
     const totalNanos = timer.read();
+
     try stdoutWriter.writeAll(tableFooter);
     try stdout.flush();
+
     std.debug.print("Total time: {d:.3} ms\n", .{nanosToMillis(totalNanos)});
+
     if (failures > 0) {
         std.debug.print("{} solution(s) failed!\n", .{failures});
         std.process.exit(1);
