@@ -289,7 +289,11 @@ fn solveDays(configs: []const DayConfig) !void {
                 if (!ok) failures += 1;
                 try stdoutWriter.writeAll("║\n");
             } else |err| {
-                std.debug.print("Solver for day {} failed! {}\n", .{ config.day, err });
+                try stdoutWriter.print("│ ", .{});
+                try setAnsiStyles(&[_]AnsiStyle{ .fgRed, .bold });
+                try stdoutWriter.print("Solver failed! ", .{});
+                try setAnsiStyle(.reset);
+                try stdoutWriter.print("{}\n", .{err});
             }
         } else {
             try stdoutWriter.print("│ Missing solver for day {}\n", .{config.day});
