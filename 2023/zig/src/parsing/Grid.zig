@@ -1,3 +1,5 @@
+// Keep this in sync with grids.zig
+
 const findNewline = @import("./text.zig").findNewline;
 const std = @import("std");
 
@@ -39,8 +41,8 @@ pub fn charAt(self: Grid, row: isize, col: isize) u8 {
 }
 
 pub fn charPtrAt(self: Grid, row: isize, col: isize) *const u8 {
-    std.debug.assert(self.inBounds(row, col));
-    return &self.data[@as(usize, @intCast(row)) * self.stride + @as(usize, @intCast(col))];
+    std.debug.assert(row >= 0 and col >= 0);
+    return self.charPtrAtU(@as(usize, @intCast(row)), @as(usize, @intCast(col)));
 }
 
 pub fn charAtOr(self: Grid, row: isize, col: isize, default: u8) u8 {

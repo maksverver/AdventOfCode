@@ -4,6 +4,7 @@ const testing = @import("./testing.zig");
 const expectEqual = testing.expectEqual;
 const expectEqualString = testing.expectEqualString;
 const expectEqualStringSlice = testing.expectEqualStringSlice;
+const expectEqualOptionalString = testing.expectEqualOptionalString;
 
 /// Detects a newline sequence (either CR, LF, CR LF, or LF CR) in `data` and
 /// returns a pair {nl, end} indicating where the newline sequence begins and
@@ -67,14 +68,36 @@ pub fn splitLine(remaining: *[]const u8) ?[]const u8 {
     }
 }
 
+pub fn removeNewline(text: []const u8) ?[]const u8 {
+    const n = text.len;
+    if (n > 0 and text[n - 1] == '\n') {
+        if (n > 1 and text[n - 2] == '\r') return text[0 .. n - 2];
+        return text[0 .. n - 1];
+    }
+    if (n > 0 and text[n - 1] == '\r') {
+        if (n > 1 and text[n - 2] == '\n') return text[0 .. n - 2];
+        return text[0 .. n - 1];
+    }
+    return null;
+}
+
+test "removeNewline" {
+    try expectEqualOptionalString(removeNewline(""), null);
+    try expectEqualOptionalString(removeNewline("foo\nbar"), null);
+    try expectEqualOptionalString(removeNewline("foo\nbar\n").?, "foo\nbar");
+    try expectEqualOptionalString(removeNewline("foo\rbar\r").?, "foo\rbar");
+    try expectEqualOptionalString(removeNewline("foo\r\nbar\r\n").?, "foo\r\nbar");
+    try expectEqualOptionalString(removeNewline("foo\n\rbar\n\r").?, "foo\n\rbar");
+    try expectEqualOptionalString(removeNewline("foo\r\rbar\r\r").?, "foo\r\rbar\r");
+    try expectEqualOptionalString(removeNewline("foo\n\nbar\n\n").?, "foo\n\nbar\n");
+}
+
 pub const LineIterator = struct {
     remaining: []const u8,
 
     pub fn init(text: []const u8) !LineIterator {
-        if (text.len > 0 and text[text.len - 1] != '\r' and text[text.len - 1] != '\n') {
-            return error.MissingNewline;
-        }
-        return LineIterator{ .remaining = text };
+        if (text.len > 0 and removeNewline(text) == null) return error.MissingNewline;
+        return .{ .remaining = text };
     }
 
     pub fn isEmpty(self: *const LineIterator) bool {
@@ -85,6 +108,46 @@ pub const LineIterator = struct {
         return splitLine(&self.remaining);
     }
 };
+
+// Splits input into paragraphs delineated by double newline sequences. Each
+// item is a list of lines, each terminated by a newline character.
+pub const ParagraphIterator = struct {
+    it: LineIterator,
+
+    pub fn init(text: []const u8) !ParagraphIterator {
+        return .{ .it = try LineIterator.init(text) };
+    }
+
+    pub fn isEmpty(self: *const ParagraphIterator) bool {
+        return self.it.isEmpty();
+    }
+
+    pub fn next(self: *ParagraphIterator) ?[]const u8 {
+        if (self.it.isEmpty()) return null;
+        const begin = self.it.remaining;
+        while (self.it.next()) |line| {
+            if (line.len == 0) return begin[0 .. @intFromPtr(line.ptr) - @intFromPtr(begin.ptr)];
+        }
+        return begin;
+    }
+};
+
+test "ParagraphIterator basic" {
+    var it = try ParagraphIterator.init("foo\n\nbar\nbaz\n\nquux\n");
+    try expectEqualOptionalString(it.next(), "foo\n");
+    try expectEqualOptionalString(it.next(), "bar\nbaz\n");
+    try expectEqualOptionalString(it.next(), "quux\n");
+    try expectEqualOptionalString(it.next(), null);
+}
+
+test "ParagraphIterator empty" {
+    var it = try ParagraphIterator.init("");
+    try expectEqualOptionalString(it.next(), null);
+}
+
+test "ParagraphIterator missing newline" {
+    try expectEqual(ParagraphIterator.init("foobar"), error.MissingNewline);
+}
 
 /// Splits the data into lines, stripping newline characters.
 ///

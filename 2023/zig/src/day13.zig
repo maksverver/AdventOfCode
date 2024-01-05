@@ -1,7 +1,9 @@
 const Environment = @import("framework/Environment.zig");
-const Grid = @import("parsing/ReorientableGrid.zig");
+const grids = @import("parsing/grids.zig");
 const text = @import("parsing/text.zig");
 const std = @import("std");
+
+const Grid = grids.ReorientableGrid(u8, false);
 
 pub fn findReflectionRow(grid: Grid, comptime want_errors: usize) ?usize {
     loop: for (1..grid.height) |rr| {
@@ -21,7 +23,7 @@ pub fn findReflectionRow(grid: Grid, comptime want_errors: usize) ?usize {
 
 pub fn solvePart(grid: Grid, comptime errors: usize) !usize {
     if (findReflectionRow(grid, errors)) |r| return r * 100;
-    if (findReflectionRow(grid.transpose(), errors)) |c| return c;
+    if (findReflectionRow(grid.transposed(), errors)) |c| return c;
     return error.InvalidInput;
 }
 

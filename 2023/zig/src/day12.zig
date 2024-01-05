@@ -19,7 +19,7 @@ fn noneEqual(comptime T: type, slice: []const T, scalar: T) bool {
     return true;
 }
 
-fn calc(pattern: []const u8, runs: []usize) error{OutOfMemory}!Answer {
+fn calc(pattern: []const u8, runs: []usize) !Answer {
     if (runs.len == 0) {
         return if (noneEqual(u8, pattern, '#')) 1 else 0;
     }

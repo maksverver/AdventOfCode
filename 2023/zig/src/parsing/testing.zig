@@ -24,6 +24,22 @@ pub fn expectEqualString(actual: []const u8, expected: []const u8) !void {
     }
 }
 
+/// Convenience method that checks if two optional strings are equal.
+pub fn expectEqualOptionalString(actual: ?[]const u8, expected: ?[]const u8) !void {
+    if (actual) |a| {
+        if (expected) |e| {
+            if (!std.mem.eql(u8, a, e)) {
+                std.debug.print("expected {s}, found {s}\n", .{ e, a });
+                return error.TestExpectedEqual;
+            }
+        }
+    }
+    if ((actual == null) != (expected == null)) {
+        std.debug.print("expected {?s}, found {?s}\n", .{ expected, actual });
+        return error.TestExpectedEqual;
+    }
+}
+
 /// Convenience method that checks if twos slices of strings are equal.
 pub fn expectEqualStringSlice(actual: []const []const u8, expected: []const []const u8) !void {
     try expectEqual(actual.len, expected.len);
