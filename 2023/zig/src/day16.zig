@@ -31,52 +31,44 @@ const Solver = struct {
     grid: Grid,
     allocator: std.mem.Allocator,
 
-    // Slice of size height × width, indicating which tiles are illuminated.
-    _illuminated: []bool,
-
-    // _todo and _seen are used to implement a breadth-first search in solve()).
-    // _seen is a slice of size height × width × 4 that tracks whether a state
-    // is already in todo, and todo contains the reachable states.
-    _seen: []bool,
+    // These members are used to implement a breadth-first search in solve()).
+    // _todo contains the reachable states.
+    // _seen is a slice of size height × width that tracks whether a state is
+    // present in todo.
+    // _illuminated counts the number of distinct coordinate pairs in todo,
+    // ignoring directions.
     _todo: std.ArrayList(State),
+    _seen: []u4,
+    _illuminated: usize,
 
     fn init(allocator: std.mem.Allocator, grid: Grid) !Solver {
-        var illuminated = try allocator.alloc(bool, grid.height * grid.width);
-        errdefer allocator.free(illuminated);
-        @memset(illuminated, false);
-        var seen = try allocator.alloc(bool, grid.height * grid.width * 4);
+        var seen = try allocator.alloc(u4, grid.height * grid.width);
         errdefer allocator.free(seen);
-        @memset(seen, false);
+        @memset(seen, 0);
         var todo = std.ArrayList(State).init(allocator);
         errdefer todo.deinit();
-        return Solver{ .grid = grid, ._illuminated = illuminated, ._todo = todo, ._seen = seen, .allocator = allocator };
+        return Solver{ .grid = grid, ._todo = todo, ._seen = seen, ._illuminated = 0, .allocator = allocator };
     }
 
     fn deinit(self: Solver) void {
         self._todo.deinit();
         self.allocator.free(self._seen);
-        self.allocator.free(self._illuminated);
     }
 
-    pub fn _getIlluminated(self: *Solver, state: State) *bool {
+    pub fn _getSeen(self: *Solver, state: State) *u4 {
         const r = @as(usize, @intCast(state.r));
         const c = @as(usize, @intCast(state.c));
-        return &self._illuminated[r * self.grid.width + c];
-    }
-
-    pub fn _getSeen(self: *Solver, state: State) *bool {
-        const r = @as(usize, @intCast(state.r));
-        const c = @as(usize, @intCast(state.c));
-        const d = @intFromEnum(state.dir);
-        return &self._seen[(r * self.grid.width + c) * 4 + d];
+        return &self._seen[r * self.grid.width + c];
     }
 
     // Adds `state` to `self.todo` if it is in bounds and not yet in `self.seen`.
     fn _maybeAdd(self: *Solver, state: State) !void {
         if (!self.grid.inBounds(state.r, state.c)) return;
-        const v = self._getSeen(state);
-        if (v.*) return;
-        v.* = true;
+        const p = self._getSeen(state);
+        const bit = @as(u4, 1) << @intFromEnum(state.dir);
+        if (p.* == 0) self._illuminated += 1;
+        if ((p.* & bit) != 0) return;
+        p.* |= bit;
         return self._todo.append(state);
     }
 
@@ -84,21 +76,17 @@ const Solver = struct {
     // from row r, column c and direction dir. Runs in O(answer) time.
     fn solve(self: *Solver, r: isize, c: isize, dir: Dir) !usize {
         // Add initial state.
+        std.debug.assert(self._illuminated == 0);
         std.debug.assert(self._todo.items.len == 0);
         try self._maybeAdd(State{ .r = r, .c = c, .dir = dir });
+        std.debug.assert(self._illuminated == 1);
         std.debug.assert(self._todo.items.len == 1);
 
         // Breadth-first search for reachable states. (Depth-first search would
         // also work. This is just convenient.)
-        var answer: usize = 0;
         var pos: usize = 0;
         while (pos < self._todo.items.len) : (pos += 1) {
             const state = self._todo.items[pos];
-            const ptr = self._getIlluminated(state);
-            if (!ptr.*) {
-                answer += 1;
-                ptr.* = true;
-            }
             switch (self.grid.charAt(state.r, state.c)) {
                 '.' => {
                     try self._maybeAdd(state.step(state.dir));
@@ -136,17 +124,15 @@ const Solver = struct {
         // depends on how many states we visited.
         if (pos < self._seen.len / 16) {
             // Relatively few states visited. Erase only the visited states.
-            for (self._todo.items) |state| {
-                self._getIlluminated(state).* = false;
-                self._getSeen(state).* = false;
-            }
+            for (self._todo.items) |state| self._getSeen(state).* = 0;
         } else {
             // Many states visited. Zero out everything at once.
-            @memset(self._illuminated, false);
-            @memset(self._seen, false);
+            @memset(self._seen, 0);
         }
         self._todo.clearRetainingCapacity();
 
+        const answer = self._illuminated;
+        self._illuminated = 0;
         return answer;
     }
 };
