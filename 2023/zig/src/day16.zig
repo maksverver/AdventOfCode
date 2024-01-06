@@ -8,32 +8,8 @@
 
 const Environment = @import("framework/Environment.zig");
 const Grid = @import("parsing/Grid.zig");
+const Dir = Grid.Dir;
 const std = @import("std");
-
-const Dir = enum {
-    n, // north
-    e, // east
-    s, // south
-    w, // west
-
-    fn asInt(dir: Dir) u2 {
-        return @intFromEnum(dir);
-    }
-
-    fn asBit(dir: Dir) u4 {
-        return @as(u4, 1) << dir.asInt();
-    }
-
-    // Only used in tests.
-    fn reverse(dir: Dir) Dir {
-        return switch (dir) {
-            .e => .w,
-            .w => .e,
-            .n => .s,
-            .s => .n,
-        };
-    }
-};
 
 fn entranceCount(grid: Grid) usize {
     return grid.height * 2 + grid.width * 2;

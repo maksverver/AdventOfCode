@@ -1,8 +1,7 @@
 const Environment = @import("framework/Environment.zig");
 const Grid = @import("parsing/Grid.zig");
+const Dir = Grid.Dir;
 const std = @import("std");
-
-const Direction = enum { n, e, s, w };
 
 const Connections = struct {
     n: bool = false,
@@ -30,7 +29,7 @@ fn getConnections(ch: u8) Connections {
     };
 }
 
-fn nextDirection(c: Connections, d: Direction) !Direction {
+fn nextDirection(c: Connections, d: Dir) !Dir {
     if (c.n and d != .s) return .n;
     if (c.e and d != .w) return .e;
     if (c.s and d != .n) return .s;
