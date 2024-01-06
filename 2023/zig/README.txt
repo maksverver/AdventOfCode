@@ -12,10 +12,15 @@ To check which version of Zig is installed, run;
 
 ## Running
 
-To build and run all solutions:
+To build and run all solutions on the official test data:
 
 % zig build run                             (runs in debug mode)
 % zig build run -Doptimize=ReleaseFast      (runs in with optimizations)
+
+To run only some solutions, or the same solution multiple times (which is useful
+for benchmarking):
+
+% zig build run -Doptimize=ReleaseFast -- 7 7 7
 
 The last-built executable is written to zig-out/bin/aoc, which can be run like this:
 

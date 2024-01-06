@@ -10,22 +10,131 @@ const Environment = @import("framework/Environment.zig");
 const Grid = @import("parsing/Grid.zig");
 const std = @import("std");
 
-const Dir = enum { n, e, s, w };
+const Dir = enum {
+    n, // north
+    e, // east
+    s, // south
+    w, // west
 
-const State = struct {
-    r: isize,
-    c: isize,
-    dir: Dir,
+    fn asInt(dir: Dir) u2 {
+        return @intFromEnum(dir);
+    }
 
-    pub fn step(state: State, dir: Dir) State {
+    fn asBit(dir: Dir) u4 {
+        return @as(u4, 1) << dir.asInt();
+    }
+
+    // Only used in tests.
+    fn reverse(dir: Dir) Dir {
         return switch (dir) {
-            .n => .{ .r = state.r - 1, .c = state.c, .dir = .n },
-            .e => .{ .r = state.r, .c = state.c + 1, .dir = .e },
-            .s => .{ .r = state.r + 1, .c = state.c, .dir = .s },
-            .w => .{ .r = state.r, .c = state.c - 1, .dir = .w },
+            .e => .w,
+            .w => .e,
+            .n => .s,
+            .s => .n,
         };
     }
 };
+
+fn entranceCount(grid: Grid) usize {
+    return grid.height * 2 + grid.width * 2;
+}
+
+const StateOrEntrance = union(enum) {
+    state: State,
+    entrance: usize,
+};
+
+const State = struct {
+    r: usize,
+    c: usize,
+    dir: Dir,
+
+    fn step(state: State, grid: Grid, dir: Dir) StateOrEntrance {
+        const height = grid.height;
+        const width = grid.width;
+        const r = state.r;
+        const c = state.c;
+        return switch (dir) {
+            .e => if (c + 1 < width)
+                .{ .state = .{ .r = r, .c = c + 1, .dir = .e } }
+            else
+                .{ .entrance = r + height },
+
+            .w => return if (c > 0)
+                .{ .state = .{ .r = r, .c = c - 1, .dir = .w } }
+            else
+                .{ .entrance = r },
+
+            .n => return if (r > 0)
+                .{ .state = .{ .r = r - 1, .c = c, .dir = .n } }
+            else
+                .{ .entrance = c + 2 * height },
+
+            .s => if (r + 1 < height)
+                .{ .state = .{ .r = r + 1, .c = c, .dir = .s } }
+            else
+                .{ .entrance = c + 2 * height + width },
+        };
+    }
+
+    fn fromEntrance(grid: Grid, index: usize) State {
+        const height = grid.height;
+        const width = grid.width;
+        if (index < 2 * height) {
+            // Horizontal entrance.
+            if (index < height) {
+                return .{ .r = index, .c = 0, .dir = .e };
+            } else {
+                return .{ .r = index - height, .c = width - 1, .dir = .w };
+            }
+        } else {
+            // Vertical entrance.
+            if (index < 2 * height + width) {
+                return .{ .r = 0, .c = index - 2 * height, .dir = .s };
+            } else {
+                std.debug.assert(index < 2 * height + 2 * width);
+                return .{ .r = height - 1, .c = index - (2 * height + width), .dir = .n };
+            }
+        }
+    }
+};
+
+test "State entrance indices" {
+    const expectEqual = @import("parsing/testing.zig").expectEqual;
+
+    const grid = try Grid.init(
+        \\....
+        \\....
+        \\....
+        \\
+    );
+
+    // The 4 x 3 grid has 14 entrances with the following indices:
+    //
+    //      6 7 8 9
+    //      v v v v
+    //  0-> . . . . <-3
+    //  1-> . . . . <-4
+    //  2-> . . . . <-5
+    //      ^ ^ ^ ^
+    //    10 11 12 13
+    //
+    try expectEqual(entranceCount(grid), 14);
+
+    try expectEqual(State.fromEntrance(grid, 0), State{ .r = 0, .c = 0, .dir = .e });
+    try expectEqual(State.fromEntrance(grid, 2), State{ .r = 2, .c = 0, .dir = .e });
+    try expectEqual(State.fromEntrance(grid, 3), State{ .r = 0, .c = 3, .dir = .w });
+    try expectEqual(State.fromEntrance(grid, 5), State{ .r = 2, .c = 3, .dir = .w });
+    try expectEqual(State.fromEntrance(grid, 6), State{ .r = 0, .c = 0, .dir = .s });
+    try expectEqual(State.fromEntrance(grid, 9), State{ .r = 0, .c = 3, .dir = .s });
+    try expectEqual(State.fromEntrance(grid, 10), State{ .r = 2, .c = 0, .dir = .n });
+    try expectEqual(State.fromEntrance(grid, 13), State{ .r = 2, .c = 3, .dir = .n });
+
+    for (0..entranceCount(grid)) |i| {
+        const state = State.fromEntrance(grid, i);
+        try expectEqual(state.step(grid, state.dir.reverse()), StateOrEntrance{ .entrance = i });
+    }
+}
 
 const Solver = struct {
     grid: Grid,
@@ -41,18 +150,33 @@ const Solver = struct {
     _seen: []u4,
     _illuminated: usize,
 
+    // `exits` records which entrances have been used as exits, which is used to
+    // speed up part 2.
+    exits: []bool,
+
     fn init(allocator: std.mem.Allocator, grid: Grid) !Solver {
+        var todo = std.ArrayList(State).init(allocator);
+        errdefer todo.deinit();
         var seen = try allocator.alloc(u4, grid.height * grid.width);
         errdefer allocator.free(seen);
         @memset(seen, 0);
-        var todo = std.ArrayList(State).init(allocator);
-        errdefer todo.deinit();
-        return Solver{ .grid = grid, ._todo = todo, ._seen = seen, ._illuminated = 0, .allocator = allocator };
+        var exits = try allocator.alloc(bool, entranceCount(grid));
+        errdefer allocator.free(exits);
+        @memset(exits, false);
+        return Solver{
+            .grid = grid,
+            ._todo = todo,
+            ._seen = seen,
+            ._illuminated = 0,
+            .exits = exits,
+            .allocator = allocator,
+        };
     }
 
     fn deinit(self: Solver) void {
-        self._todo.deinit();
+        self.allocator.free(self.exits);
         self.allocator.free(self._seen);
+        self._todo.deinit();
     }
 
     pub fn _getSeen(self: *Solver, state: State) *u4 {
@@ -63,22 +187,28 @@ const Solver = struct {
 
     // Adds `state` to `self.todo` if it is in bounds and not yet in `self.seen`.
     fn _maybeAdd(self: *Solver, state: State) !void {
-        if (!self.grid.inBounds(state.r, state.c)) return;
         const p = self._getSeen(state);
-        const bit = @as(u4, 1) << @intFromEnum(state.dir);
         if (p.* == 0) self._illuminated += 1;
+        const bit = state.dir.asBit();
         if ((p.* & bit) != 0) return;
         p.* |= bit;
         return self._todo.append(state);
     }
 
+    fn _step(self: *Solver, state: State, dir: Dir) !void {
+        switch (state.step(self.grid, dir)) {
+            .entrance => |e| self.exits[e] = true,
+            .state => |s| try self._maybeAdd(s),
+        }
+    }
+
     // Calculates how many tiles would be illuminated if the light beam starts
     // from row r, column c and direction dir. Runs in O(answer) time.
-    fn solve(self: *Solver, r: isize, c: isize, dir: Dir) !usize {
+    fn solve(self: *Solver, entrance: usize) !usize {
         // Add initial state.
         std.debug.assert(self._illuminated == 0);
         std.debug.assert(self._todo.items.len == 0);
-        try self._maybeAdd(State{ .r = r, .c = c, .dir = dir });
+        try self._maybeAdd(State.fromEntrance(self.grid, entrance));
         std.debug.assert(self._illuminated == 1);
         std.debug.assert(self._todo.items.len == 1);
 
@@ -87,32 +217,32 @@ const Solver = struct {
         var pos: usize = 0;
         while (pos < self._todo.items.len) : (pos += 1) {
             const state = self._todo.items[pos];
-            switch (self.grid.charAt(state.r, state.c)) {
+            switch (self.grid.charAtU(state.r, state.c)) {
                 '.' => {
-                    try self._maybeAdd(state.step(state.dir));
+                    try self._step(state, state.dir);
                 },
                 '|' => {
-                    if (state.dir != .s) try self._maybeAdd(state.step(.n));
-                    if (state.dir != .n) try self._maybeAdd(state.step(.s));
+                    if (state.dir != .s) try self._step(state, .n);
+                    if (state.dir != .n) try self._step(state, .s);
                 },
                 '-' => {
-                    if (state.dir != .w) try self._maybeAdd(state.step(.e));
-                    if (state.dir != .e) try self._maybeAdd(state.step(.w));
+                    if (state.dir != .w) try self._step(state, .e);
+                    if (state.dir != .e) try self._step(state, .w);
                 },
                 '/' => {
                     switch (state.dir) {
-                        .n => try self._maybeAdd(state.step(.e)),
-                        .e => try self._maybeAdd(state.step(.n)),
-                        .s => try self._maybeAdd(state.step(.w)),
-                        .w => try self._maybeAdd(state.step(.s)),
+                        .n => try self._step(state, .e),
+                        .e => try self._step(state, .n),
+                        .s => try self._step(state, .w),
+                        .w => try self._step(state, .s),
                     }
                 },
                 '\\' => {
                     switch (state.dir) {
-                        .n => try self._maybeAdd(state.step(.w)),
-                        .e => try self._maybeAdd(state.step(.s)),
-                        .s => try self._maybeAdd(state.step(.e)),
-                        .w => try self._maybeAdd(state.step(.n)),
+                        .n => try self._step(state, .w),
+                        .e => try self._step(state, .s),
+                        .s => try self._step(state, .e),
+                        .w => try self._step(state, .n),
                     }
                 },
                 else => return error.InvalidInput,
@@ -137,35 +267,27 @@ const Solver = struct {
     }
 };
 
-fn solvePart1(solver: *Solver) !usize {
-    return solver.solve(0, 0, .e);
-}
-
-fn solvePart2(solver: *Solver) !usize {
-    std.debug.assert(solver.grid.width > 0 and solver.grid.height > 0);
-    var answer: usize = 0;
-    const last_c = @as(isize, @intCast(solver.grid.width - 1));
-    var r: isize = 0;
-    while (r < solver.grid.height) : (r += 1) {
-        answer = @max(answer, try solver.solve(r, 0, .e));
-        answer = @max(answer, try solver.solve(r, last_c, .w));
-    }
-    const last_r = @as(isize, @intCast(solver.grid.height - 1));
-    var c: isize = 0;
-    while (c < solver.grid.width) : (c += 1) {
-        answer = @max(answer, try solver.solve(0, c, .s));
-        answer = @max(answer, try solver.solve(last_r, c, .n));
-    }
-    return answer;
-}
-
 pub fn solve(env: *Environment) !void {
     const grid = try env.parseInput(Grid, Grid.init);
+    std.debug.assert(grid.width > 0 and grid.height > 0);
+
     var solver = try Solver.init(env.getHeapAllocator(), grid);
     defer solver.deinit();
 
-    try env.setAnswer1(try solvePart1(&solver));
-    try env.setAnswer2(try solvePart2(&solver));
+    // Part 1: try only the first entrance at (0, 0) going east:
+    var answer = try solver.solve(0);
+    try env.setAnswer1(answer);
+
+    // Part 2: try every other entrance too.
+    for (1..entranceCount(grid)) |entrance| {
+        // As an optimization, skip entrances which have been used as an exit
+        // before. Entering there would cause only a subset of the previous set
+        // of tiles to be visited, so we can disregard them for the purpose of
+        // computing the maximum.
+        if (solver.exits[entrance]) continue;
+        answer = @max(answer, try solver.solve(entrance));
+    }
+    try env.setAnswer2(answer);
 }
 
 pub fn main() !void {
