@@ -10,7 +10,7 @@ pub fn findReflectionRow(grid: Grid, comptime want_errors: usize) ?usize {
         var errors: usize = 0;
         for (0..@min(rr, grid.height - rr)) |r| {
             for (0..grid.width) |c| {
-                if (grid.charAtU(rr + r, c) != grid.charAtU(rr - 1 - r, c)) {
+                if (grid.charAt(rr + r, c) != grid.charAt(rr - 1 - r, c)) {
                     errors += 1;
                     if (errors > want_errors) continue :loop;
                 }

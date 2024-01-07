@@ -63,26 +63,12 @@ pub fn ReorientableGrid(comptime T: type, comptime mutable: bool) type {
             if (self.allocator) |a| a.free(self.data);
         }
 
-        pub fn inBounds(self: Self, row: isize, col: isize) bool {
-            return 0 <= row and row < self.height and 0 <= col and col < self.width;
-        }
-
-        pub fn charAt(self: Self, row: isize, col: isize) T {
+        pub fn charAt(self: Self, row: usize, col: usize) T {
             return self.charPtrAt(row, col).*;
         }
 
-        pub fn charPtrAt(self: Self, row: isize, col: isize) PtrT {
-            std.debug.assert(row >= 0 and col >= 0);
-            return self.charPtrAtU(@as(usize, @intCast(row)), @as(usize, @intCast(col)));
-        }
-
-        pub fn charAtOr(self: Self, row: isize, col: isize, default: T) T {
-            return if (self.inBounds(row, col)) self.charAt(row, col) else default;
-        }
-
-        // Like charAt(), but with unsigned coordinates.
-        pub fn charAtU(self: Self, row: usize, col: usize) T {
-            return self.charPtrAtU(row, col).*;
+        pub fn charPtrAt(self: Self, row: usize, col: usize) PtrT {
+            return &self.data[self.idx(row, col)];
         }
 
         fn idx(self: Self, row: usize, col: usize) usize {
@@ -90,11 +76,6 @@ pub fn ReorientableGrid(comptime T: type, comptime mutable: bool) type {
             return @as(usize, @intCast(@as(isize, @intCast(self.baseIndex)) +
                 @as(isize, @intCast(row)) * self.rowStride +
                 @as(isize, @intCast(col)) * self.colStride));
-        }
-
-        // Like charPtrAt(), but with unsigned coordinates.
-        pub fn charPtrAtU(self: Self, row: usize, col: usize) PtrT {
-            return &self.data[self.idx(row, col)];
         }
 
         pub fn transposed(self: Self) Self {
@@ -155,7 +136,7 @@ pub fn ReorientableGrid(comptime T: type, comptime mutable: bool) type {
             if (other.width != w) return false;
             for (0..h) |r| {
                 for (0..w) |c| {
-                    if (self.charAtU(r, c) != other.charAtU(r, c)) return false;
+                    if (self.charAt(r, c) != other.charAt(r, c)) return false;
                 }
             }
             return true;

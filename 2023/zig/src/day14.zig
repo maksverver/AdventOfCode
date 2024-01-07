@@ -10,7 +10,7 @@ fn debugPrint(grid: Grid) !void {
     std.debug.print("\n", .{});
     for (0..grid.height) |r| {
         for (0..grid.width) |c| {
-            std.debug.print("{c}", .{grid.charAtU(r, c)});
+            std.debug.print("{c}", .{grid.charAt(r, c)});
         }
         std.debug.print("\n", .{});
     }
@@ -20,13 +20,13 @@ fn moveUp(grid: *Grid) void {
     for (0..grid.width) |c| {
         var r_dst: usize = 0;
         for (0..grid.height) |r_src| {
-            switch (grid.charAtU(r_src, c)) {
+            switch (grid.charAt(r_src, c)) {
                 '#' => {
                     r_dst = r_src + 1;
                 },
                 'O' => {
-                    grid.charPtrAtU(r_src, c).* = '.';
-                    grid.charPtrAtU(r_dst, c).* = 'O';
+                    grid.charPtrAt(r_src, c).* = '.';
+                    grid.charPtrAt(r_dst, c).* = 'O';
                     r_dst += 1;
                 },
                 else => {},
@@ -39,7 +39,7 @@ fn computeSupport(grid: Grid) usize {
     var answer: usize = 0;
     for (0..grid.height) |r| {
         for (0..grid.width) |c| {
-            if (grid.charAtU(r, c) == 'O') answer += grid.height - r;
+            if (grid.charAt(r, c) == 'O') answer += grid.height - r;
         }
     }
     return answer;
