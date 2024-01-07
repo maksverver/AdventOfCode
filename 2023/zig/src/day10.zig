@@ -1,5 +1,6 @@
 const Environment = @import("framework/Environment.zig");
 const Grid = @import("parsing/Grid.zig");
+const Coords = Grid.Coords;
 const Dir = Grid.Dir;
 const std = @import("std");
 
@@ -37,12 +38,10 @@ fn nextDirection(c: Connections, d: Dir) !Dir {
     return error.InvalidInput;
 }
 
-fn findStart(grid: Grid) !struct { isize, isize } {
+fn findStart(grid: Grid) !Coords {
     for (0..grid.height) |r| {
         for (0..grid.width) |c| {
-            const sr = @as(isize, @intCast(r));
-            const sc = @as(isize, @intCast(c));
-            if (grid.charAt(sr, sc) == 'S') return .{ sr, sc };
+            if (grid.charAt(r, c) == 'S') return .{ .r = r, .c = c };
         }
     }
     return error.InvalidInput; // start not found!
@@ -53,13 +52,11 @@ pub fn solve(env: *Environment) !void {
 
     // Find the start, and determine the connections from the surrounding tiles.
     const start = try findStart(grid);
-    var sr = start[0];
-    var sc = start[1];
     const startConnections = Connections{
-        .n = getConnections(grid.charAtOr(sr - 1, sc, '.')).s,
-        .e = getConnections(grid.charAtOr(sr, sc + 1, '.')).w,
-        .s = getConnections(grid.charAtOr(sr + 1, sc, '.')).n,
-        .w = getConnections(grid.charAtOr(sr, sc - 1, '.')).e,
+        .n = if (grid.move(start, .n, 1)) |q| getConnections(grid.charAtPos(q)).s else false,
+        .e = if (grid.move(start, .e, 1)) |q| getConnections(grid.charAtPos(q)).w else false,
+        .s = if (grid.move(start, .s, 1)) |q| getConnections(grid.charAtPos(q)).n else false,
+        .w = if (grid.move(start, .w, 1)) |q| getConnections(grid.charAtPos(q)).e else false,
     };
     std.debug.assert(startConnections.count() == 2);
 
@@ -73,31 +70,30 @@ pub fn solve(env: *Environment) !void {
     // at a time.
     //
     // For the general case, see: https://en.wikipedia.org/wiki/Shoelace_formula
+    var pos = start;
     var area: isize = 0;
     var perimeter: isize = 0;
-    var r = sr;
-    var c = sc;
     var dir = try nextDirection(startConnections, .w);
     while (true) {
         perimeter += 1;
         switch (dir) {
             .n => {
-                r -= 1;
+                pos.r -= 1;
             },
             .e => {
-                area += r;
-                c += 1;
+                area += @as(isize, @intCast(pos.r));
+                pos.c += 1;
             },
             .s => {
-                r += 1;
+                pos.r += 1;
             },
             .w => {
-                c -= 1;
-                area -= r;
+                pos.c -= 1;
+                area -= @as(isize, @intCast(pos.r));
             },
         }
-        if (r == sr and c == sc) break;
-        dir = try nextDirection(getConnections(grid.charAt(r, c)), dir);
+        if (pos.r == start.r and pos.c == start.c) break;
+        dir = try nextDirection(getConnections(grid.charAtPos(pos)), dir);
     }
 
     // Part 1: report the maximum distance from the start. This is simply

@@ -1,5 +1,7 @@
 const Environment = @import("framework/Environment.zig");
 const Grid = @import("parsing/Grid.zig");
+const Dir = Grid.Dir;
+const Coords = Grid.Coords;
 const std = @import("std");
 
 // Represents a symbol adjacent to a number. (row, col) is the location of
@@ -21,9 +23,9 @@ fn isSymbol(c: u8) bool {
     return c != '.' and !isDigit(c);
 }
 
-fn detectSymbol(grid: *const Grid, symbols: *std.ArrayList(Symbol), r: isize, c: isize) !void {
-    if (grid.inBounds(r, c)) {
-        var ch = grid.charPtrAt(r, c);
+fn detectSymbol(grid: *const Grid, symbols: *std.ArrayList(Symbol), pos: Coords, dr: i2, dc: i2) !void {
+    if (grid.moveBy(pos, dr, dc)) |new_pos| {
+        var ch = grid.charPtrAtPos(new_pos);
         if (isSymbol(ch.*)) try symbols.append(Symbol{ .ch = ch });
     }
 }
@@ -34,27 +36,27 @@ fn detectSymbol(grid: *const Grid, symbols: *std.ArrayList(Symbol), r: isize, c:
 // This code also builds up a list of symbols adjacent to numbers for part 2.
 fn solvePart1(grid: *const Grid, symbols: *std.ArrayList(Symbol)) !isize {
     var answer: isize = 0;
-    var r: isize = 0;
-    while (r < grid.height) : (r += 1) {
-        var c: isize = 0;
-        while (c < grid.width) : (c += 1) {
-            std.debug.assert(!std.ascii.isWhitespace(grid.charAt(r, c)));
-            if (std.ascii.isDigit(grid.charAt(r, c))) {
+    var pos = Coords{ .r = 0, .c = undefined };
+    while (pos.r < grid.height) : (pos.r += 1) {
+        pos.c = 0;
+        while (pos.c < grid.width) : (pos.c += 1) {
+            std.debug.assert(!std.ascii.isWhitespace(grid.charAtPos(pos)));
+            if (std.ascii.isDigit(grid.charAtPos(pos))) {
                 var number: isize = 0;
                 const oldSymbolsLen = symbols.items.len;
-                try detectSymbol(grid, symbols, r - 1, c - 1);
-                try detectSymbol(grid, symbols, r + 0, c - 1);
-                try detectSymbol(grid, symbols, r + 1, c - 1);
-                while (c < grid.width) : (c += 1) {
-                    const ch = grid.charAt(r, c);
+                try detectSymbol(grid, symbols, pos, -1, -1);
+                try detectSymbol(grid, symbols, pos, 0, -1);
+                try detectSymbol(grid, symbols, pos, 1, -1);
+                while (pos.c < grid.width) : (pos.c += 1) {
+                    const ch = grid.charAtPos(pos);
                     if (!isDigit(ch)) break;
                     number = 10 * number + (ch - '0');
-                    try detectSymbol(grid, symbols, r - 1, c);
-                    try detectSymbol(grid, symbols, r + 1, c);
+                    try detectSymbol(grid, symbols, pos, -1, 0);
+                    try detectSymbol(grid, symbols, pos, 1, 0);
                 }
-                try detectSymbol(grid, symbols, r - 1, c);
-                try detectSymbol(grid, symbols, r + 0, c);
-                try detectSymbol(grid, symbols, r + 1, c);
+                try detectSymbol(grid, symbols, pos, -1, 0);
+                try detectSymbol(grid, symbols, pos, 0, 0);
+                try detectSymbol(grid, symbols, pos, 1, 0);
                 if (oldSymbolsLen < symbols.items.len) {
                     // This number is adjacent to one or more symbols
                     answer += number;

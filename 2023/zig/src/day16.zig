@@ -193,7 +193,7 @@ const Solver = struct {
         var pos: usize = 0;
         while (pos < self._todo.items.len) : (pos += 1) {
             const state = self._todo.items[pos];
-            switch (self.grid.charAtU(state.r, state.c)) {
+            switch (self.grid.charAt(state.r, state.c)) {
                 '.' => {
                     try self._step(state, state.dir);
                 },

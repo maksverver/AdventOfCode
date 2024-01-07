@@ -80,30 +80,23 @@ pub fn move(self: Grid, pos: Coords, dir: Dir, dist: usize) ?Coords {
     };
 }
 
-pub fn inBounds(self: Grid, row: isize, col: isize) bool {
-    return 0 <= row and row < self.height and 0 <= col and col < self.width;
+pub fn moveBy(self: Grid, pos: Coords, dr: isize, dc: isize) ?Coords {
+    var r = @as(isize, @intCast(pos.r)) + dr;
+    var c = @as(isize, @intCast(pos.c)) + dc;
+    if (0 <= r and r < self.height and 0 <= c and c < self.width) {
+        return Coords{
+            .r = @as(usize, @intCast(r)),
+            .c = @as(usize, @intCast(c)),
+        };
+    }
+    return null;
 }
 
-pub fn charAt(self: Grid, row: isize, col: isize) u8 {
+pub fn charAt(self: Grid, row: usize, col: usize) u8 {
     return self.charPtrAt(row, col).*;
 }
 
-pub fn charPtrAt(self: Grid, row: isize, col: isize) *const u8 {
-    std.debug.assert(row >= 0 and col >= 0);
-    return self.charPtrAtU(@as(usize, @intCast(row)), @as(usize, @intCast(col)));
-}
-
-pub fn charAtOr(self: Grid, row: isize, col: isize, default: u8) u8 {
-    return if (self.inBounds(row, col)) self.charAt(row, col) else default;
-}
-
-// Like charAt(), but with unsigned coordinates.
-pub fn charAtU(self: Grid, row: usize, col: usize) u8 {
-    return self.charPtrAtU(row, col).*;
-}
-
-// Like charPtrAt(), but with unsigned coordinates.
-pub fn charPtrAtU(self: Grid, row: usize, col: usize) *const u8 {
+pub fn charPtrAt(self: Grid, row: usize, col: usize) *const u8 {
     std.debug.assert(row < self.height and col < self.width);
     return &self.data[row * self.stride + col];
 }
@@ -113,5 +106,5 @@ pub fn charAtPos(self: Grid, pos: Coords) u8 {
 }
 
 pub fn charPtrAtPos(self: Grid, pos: Coords) *const u8 {
-    return self.charPtrAtU(pos.r, pos.c);
+    return self.charPtrAt(pos.r, pos.c);
 }
