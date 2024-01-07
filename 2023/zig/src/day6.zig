@@ -28,9 +28,7 @@ const Input = struct {
     allocator: std.mem.Allocator,
 
     fn init(allocator: std.mem.Allocator, times: []const Number, dists: []const Number) !Input {
-        if (times.len != dists.len) {
-            @panic("times and dists must have the same length");
-        }
+        if (times.len != dists.len) return error.InvalidInput;
         const records = try allocator.alloc(Record, times.len);
         errdefer allocator.free(records); // technically not necessary...
         for (0.., times, dists) |i, time, dist| {
