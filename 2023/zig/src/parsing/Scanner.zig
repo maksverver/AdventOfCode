@@ -62,9 +62,14 @@ pub fn scanPredicate(self: *Scanner, comptime predicate: fn (c: u8) bool) ![]con
 }
 
 pub fn scanInt(self: *Scanner, comptime T: type) !T {
-    const s = self.peekPredicate(std.ascii.isDigit);
+    return self.scanIntBase(T, 10);
+}
+
+// Note: this currently doesn't support a leading sign ('+' or '-').
+pub fn scanIntBase(self: *Scanner, comptime T: type, base: u8) !T {
+    const s = self.peekPredicate(std.ascii.isAlphanumeric);
     if (s.len == 0) return error.InvalidCharacter;
-    const result = try std.fmt.parseInt(T, s, 10);
+    const result = try std.fmt.parseInt(T, s, base);
     self.text = self.text[s.len..];
     return result;
 }
