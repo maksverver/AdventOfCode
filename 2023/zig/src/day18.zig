@@ -4,13 +4,17 @@ const std = @import("std");
 
 const Dir = enum { r, d, l, u };
 
+// Answer type. 64 bits is enough for the official input.
+const IAnswer = i64;
+const UAnswer = u64;
+
 // This solution uses a similar approach as for Day 10; see comments there.
 const Solver = struct {
-    row: isize = 0,
-    area: isize = 0,
-    perimeter: usize = 0,
+    row: IAnswer = 0,
+    area: IAnswer = 0,
+    perimeter: UAnswer = 0,
 
-    fn move(self: *Solver, dir: Dir, steps: usize) void {
+    fn move(self: *Solver, dir: Dir, steps: UAnswer) void {
         const i = @as(isize, @intCast(steps));
         switch (dir) {
             .u => self.row -= i,
@@ -21,7 +25,7 @@ const Solver = struct {
         self.perimeter += steps;
     }
 
-    fn getAnswer(self: *const Solver) usize {
+    fn getAnswer(self: *const Solver) UAnswer {
         std.debug.assert(self.row == 0);
         return std.math.absCast(self.area) + self.perimeter / 2 + 1;
     }
