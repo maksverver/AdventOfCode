@@ -108,3 +108,12 @@ pub fn charAtPos(self: Grid, pos: Coords) u8 {
 pub fn charPtrAtPos(self: Grid, pos: Coords) *const u8 {
     return self.charPtrAt(pos.r, pos.c);
 }
+
+pub fn indexOf(self: Grid, ch: u8) !Coords {
+    for (0..self.height) |r| {
+        for (0..self.width) |c| {
+            if (self.charAt(r, c) == ch) return .{ .r = r, .c = c };
+        }
+    }
+    return error.NotFound;
+}

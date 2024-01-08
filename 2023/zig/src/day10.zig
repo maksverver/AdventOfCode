@@ -38,20 +38,11 @@ fn nextDirection(c: Connections, d: Dir) !Dir {
     return error.InvalidInput;
 }
 
-fn findStart(grid: Grid) !Coords {
-    for (0..grid.height) |r| {
-        for (0..grid.width) |c| {
-            if (grid.charAt(r, c) == 'S') return .{ .r = r, .c = c };
-        }
-    }
-    return error.InvalidInput; // start not found!
-}
-
 pub fn solve(env: *Environment) !void {
     const grid = try env.parseInput(Grid, Grid.init);
 
     // Find the start, and determine the connections from the surrounding tiles.
-    const start = try findStart(grid);
+    const start = try grid.indexOf('S');
     const startConnections = Connections{
         .n = if (grid.move(start, .n, 1)) |q| getConnections(grid.charAtPos(q)).s else false,
         .e = if (grid.move(start, .e, 1)) |q| getConnections(grid.charAtPos(q)).w else false,

@@ -5,6 +5,9 @@
 // Keep the supported methods in sync with Grid.zig
 
 const std = @import("std");
+const Grid = @import("./Grid.zig");
+pub const Coords = Grid.Coords;
+pub const Dir = Grid.Dir;
 const findNewline = @import("./text.zig").findNewline;
 
 pub fn ReorientableGrid(comptime T: type, comptime mutable: bool) type {
@@ -24,6 +27,23 @@ pub fn ReorientableGrid(comptime T: type, comptime mutable: bool) type {
 
         pub fn init(data: SliceT) !Self {
             return initInternal(data, null);
+        }
+
+        // Allocates a grid of the given dimensions. The result must be freed with deinit().
+        // If `value` is not null, all elements are initialized to the given value, otherwise
+        // they are left undefined.
+        pub fn initAlloc(allocator: std.mem.Allocator, height: usize, width: usize, value: ?T) !Self {
+            var data = try allocator.alloc(T, width * height);
+            if (value) |v| @memset(data, v);
+            return Self{
+                .height = height,
+                .width = width,
+                .baseIndex = 0,
+                .rowStride = @as(isize, @intCast(width)),
+                .colStride = 1,
+                .data = data,
+                .allocator = allocator,
+            };
         }
 
         // Like `init`, but `allocator` is used to free `data` in deinit().
@@ -69,6 +89,14 @@ pub fn ReorientableGrid(comptime T: type, comptime mutable: bool) type {
 
         pub fn charPtrAt(self: Self, row: usize, col: usize) PtrT {
             return &self.data[self.idx(row, col)];
+        }
+
+        pub fn charAtPos(self: Self, pos: Coords) T {
+            return self.charPtrAtPos(pos).*;
+        }
+
+        pub fn charPtrAtPos(self: Self, pos: Coords) PtrT {
+            return self.charPtrAt(pos.r, pos.c);
         }
 
         fn idx(self: Self, row: usize, col: usize) usize {
