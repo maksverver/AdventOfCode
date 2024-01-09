@@ -135,20 +135,29 @@ pub fn parseInput(self: *Environment, comptime T: type, parse: *const fn ([]cons
     return res;
 }
 
-/// Convenience method that wraps getInput(), getHeapAllocator() and
-/// parsingDone(). This may be called instead of parsingDone().
-pub fn parseInputHeap(self: *Environment, comptime T: type, parse: *const fn (std.mem.Allocator, []const u8) anyerror!T) !T {
-    const res = try parse(self.getHeapAllocator(), self._input);
+/// Convenience method that wraps getInput() and parsingDone(). This may be
+/// called instead of parsingDone().
+pub fn parseInputAlloc(
+    self: *Environment,
+    comptime T: type,
+    parse: *const fn (std.mem.Allocator, []const u8) anyerror!T,
+    allocator: std.mem.Allocator,
+) !T {
+    const res = try parse(allocator, self._input);
     try self.parsingDone();
     return res;
 }
 
 /// Convenience method that wraps getInput(), getHeapAllocator() and
 /// parsingDone(). This may be called instead of parsingDone().
+pub fn parseInputHeap(self: *Environment, comptime T: type, parse: *const fn (std.mem.Allocator, []const u8) anyerror!T) !T {
+    return self.parseInputAlloc(T, parse, self.getHeapAllocator());
+}
+
+/// Convenience method that wraps getInput(), getHeapAllocator() and
+/// parsingDone(). This may be called instead of parsingDone().
 pub fn parseInputArena(self: *Environment, comptime T: type, parse: *const fn (std.mem.Allocator, []const u8) anyerror!T) !T {
-    const res = try parse(self.getArenaAllocator(), self._input);
-    try self.parsingDone();
-    return res;
+    return self.parseInputAlloc(T, parse, self.getArenaAllocator());
 }
 
 fn storeAnswer(self: *Environment, answer: *?[]const u8, value: anytype) !void {

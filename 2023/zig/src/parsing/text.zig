@@ -81,6 +81,20 @@ pub fn removeNewline(text: []const u8) ?[]const u8 {
     return null;
 }
 
+pub fn countLines(text: []const u8) ?usize {
+    var remaining = text;
+    var lines: usize = 0;
+    while (remaining.len > 0) {
+        if (findNewline(remaining)) |sep| {
+            remaining = remaining[sep.end..];
+            lines += 1;
+        } else {
+            return null;
+        }
+    }
+    return lines;
+}
+
 test "removeNewline" {
     try expectEqualOptionalString(removeNewline(""), null);
     try expectEqualOptionalString(removeNewline("foo\nbar"), null);

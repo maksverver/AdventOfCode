@@ -7,6 +7,7 @@ const nanosToMillis = running.nanosToMillis;
 const Environment = @import("framework/Environment.zig");
 const SolveFn = Environment.SolveFn;
 
+// Solvers per day. Use `null` to skip days that haven't been solved yet.
 const solvers = [_]?SolveFn{
     @import("day1.zig").solve,
     @import("day2.zig").solve,
@@ -29,8 +30,10 @@ const solvers = [_]?SolveFn{
     @import("day19.zig").solve,
     null, // TODO: day 20
     @import("day21.zig").solve,
-    // TODO: days 22-25
-    null, // null is allowed to skip days I haven't solved yet
+    @import("day22.zig").solve,
+    null, // TODO: day 23
+    null, // TODO: day 24
+    null, // TODO: day 25
 };
 
 // Silly logic to calculate default input and answer paths at compile time.
