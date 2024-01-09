@@ -45,10 +45,10 @@ pub fn solve(env: *Environment) !void {
     // Find the start, and determine the connections from the surrounding tiles.
     const start = try grid.indexOf('S');
     const startConnections = Connections{
-        .n = if (grid.move(start, .n, 1)) |q| getConnections(grid.charAtPos(q)).s else false,
-        .e = if (grid.move(start, .e, 1)) |q| getConnections(grid.charAtPos(q)).w else false,
-        .s = if (grid.move(start, .s, 1)) |q| getConnections(grid.charAtPos(q)).n else false,
-        .w = if (grid.move(start, .w, 1)) |q| getConnections(grid.charAtPos(q)).e else false,
+        .n = if (grid.move(start, .n, 1)) |q| getConnections(grid.atPos(q)).s else false,
+        .e = if (grid.move(start, .e, 1)) |q| getConnections(grid.atPos(q)).w else false,
+        .s = if (grid.move(start, .s, 1)) |q| getConnections(grid.atPos(q)).n else false,
+        .w = if (grid.move(start, .w, 1)) |q| getConnections(grid.atPos(q)).e else false,
     };
     std.debug.assert(startConnections.count() == 2);
 
@@ -85,7 +85,7 @@ pub fn solve(env: *Environment) !void {
             },
         }
         if (pos.r == start.r and pos.c == start.c) break;
-        dir = try nextDirection(getConnections(grid.charAtPos(pos)), dir);
+        dir = try nextDirection(getConnections(grid.atPos(pos)), dir);
     }
 
     // Part 1: report the maximum distance from the start. This is simply

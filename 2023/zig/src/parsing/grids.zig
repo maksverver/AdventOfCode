@@ -90,7 +90,7 @@ pub fn compareGrids(a: anytype, b: anytype) bool {
     if (a.height != b.height or a.width != b.width) return false;
     for (0..a.height) |r| {
         for (0..a.width) |c| {
-            if (a.charAt(r, c) != b.charAt(r, c)) return false;
+            if (a.at(r, c) != b.at(r, c)) return false;
         }
     }
     return true;
@@ -232,21 +232,21 @@ pub fn Grid(comptime T: type, comptime config: GridConfig) type {
             return null;
         }
 
-        pub fn charAt(self: Self, row: usize, col: usize) T {
-            return self.charPtrAt(row, col).*;
+        pub fn at(self: Self, row: usize, col: usize) T {
+            return self.ptrAt(row, col).*;
         }
 
-        pub fn charPtrAt(self: Self, row: usize, col: usize) PtrT {
+        pub fn ptrAt(self: Self, row: usize, col: usize) PtrT {
             std.debug.assert(row < self.height and col < self.width);
             return &self.data[row * self.stride + col];
         }
 
-        pub fn charAtPos(self: Self, pos: Coords) T {
-            return self.charPtrAtPos(pos).*;
+        pub fn atPos(self: Self, pos: Coords) T {
+            return self.ptrAtPos(pos).*;
         }
 
-        pub fn charPtrAtPos(self: Self, pos: Coords) PtrT {
-            return self.charPtrAt(pos.r, pos.c);
+        pub fn ptrAtPos(self: Self, pos: Coords) PtrT {
+            return self.ptrAt(pos.r, pos.c);
         }
 
         pub fn isEqualTo(self: Self, other: anytype) bool {
@@ -256,7 +256,7 @@ pub fn Grid(comptime T: type, comptime config: GridConfig) type {
         pub fn indexOf(self: Self, ch: T) !Coords {
             for (0..self.height) |r| {
                 for (0..self.width) |c| {
-                    if (self.charAt(r, c) == ch) return .{ .r = r, .c = c };
+                    if (self.at(r, c) == ch) return .{ .r = r, .c = c };
                 }
             }
             return error.NotFound;
@@ -302,20 +302,20 @@ pub fn Grid(comptime T: type, comptime config: GridConfig) type {
             if (self.allocator) |a| a.free(self.data);
         }
 
-        pub fn charAt(self: Self, row: usize, col: usize) T {
-            return self.charPtrAt(row, col).*;
+        pub fn at(self: Self, row: usize, col: usize) T {
+            return self.ptrAt(row, col).*;
         }
 
-        pub fn charPtrAt(self: Self, row: usize, col: usize) PtrT {
+        pub fn ptrAt(self: Self, row: usize, col: usize) PtrT {
             return &self.data[self._idx(row, col)];
         }
 
-        pub fn charAtPos(self: Self, pos: Coords) T {
-            return self.charPtrAtPos(pos).*;
+        pub fn atPos(self: Self, pos: Coords) T {
+            return self.ptrAtPos(pos).*;
         }
 
-        pub fn charPtrAtPos(self: Self, pos: Coords) PtrT {
-            return self.charPtrAt(pos.r, pos.c);
+        pub fn ptrAtPos(self: Self, pos: Coords) PtrT {
+            return self.ptrAt(pos.r, pos.c);
         }
 
         pub fn isEqualTo(self: Self, other: anytype) bool {

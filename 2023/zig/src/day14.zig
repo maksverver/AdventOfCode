@@ -16,7 +16,7 @@ fn debugPrint(grid: OwnedGrid) !void {
     std.debug.print("\n", .{});
     for (0..grid.height) |r| {
         for (0..grid.width) |c| {
-            std.debug.print("{c}", .{grid.charAt(r, c)});
+            std.debug.print("{c}", .{grid.at(r, c)});
         }
         std.debug.print("\n", .{});
     }
@@ -26,13 +26,13 @@ fn moveUp(grid: *OwnedGrid) void {
     for (0..grid.width) |c| {
         var r_dst: usize = 0;
         for (0..grid.height) |r_src| {
-            switch (grid.charAt(r_src, c)) {
+            switch (grid.at(r_src, c)) {
                 '#' => {
                     r_dst = r_src + 1;
                 },
                 'O' => {
-                    grid.charPtrAt(r_src, c).* = '.';
-                    grid.charPtrAt(r_dst, c).* = 'O';
+                    grid.ptrAt(r_src, c).* = '.';
+                    grid.ptrAt(r_dst, c).* = 'O';
                     r_dst += 1;
                 },
                 else => {},
@@ -45,7 +45,7 @@ fn computeSupport(grid: OwnedGrid) usize {
     var answer: usize = 0;
     for (0..grid.height) |r| {
         for (0..grid.width) |c| {
-            if (grid.charAt(r, c) == 'O') answer += grid.height - r;
+            if (grid.at(r, c) == 'O') answer += grid.height - r;
         }
     }
     return answer;

@@ -26,7 +26,7 @@ fn isSymbol(c: u8) bool {
 
 fn detectSymbol(grid: *const Grid, symbols: *std.ArrayList(Symbol), pos: Coords, dr: i2, dc: i2) !void {
     if (grid.moveBy(pos, dr, dc)) |new_pos| {
-        var ch = grid.charPtrAtPos(new_pos);
+        var ch = grid.ptrAtPos(new_pos);
         if (isSymbol(ch.*)) try symbols.append(Symbol{ .ch = ch });
     }
 }
@@ -41,15 +41,15 @@ fn solvePart1(grid: *const Grid, symbols: *std.ArrayList(Symbol)) !isize {
     while (pos.r < grid.height) : (pos.r += 1) {
         pos.c = 0;
         while (pos.c < grid.width) : (pos.c += 1) {
-            std.debug.assert(!std.ascii.isWhitespace(grid.charAtPos(pos)));
-            if (std.ascii.isDigit(grid.charAtPos(pos))) {
+            std.debug.assert(!std.ascii.isWhitespace(grid.atPos(pos)));
+            if (std.ascii.isDigit(grid.atPos(pos))) {
                 var number: isize = 0;
                 const oldSymbolsLen = symbols.items.len;
                 try detectSymbol(grid, symbols, pos, -1, -1);
                 try detectSymbol(grid, symbols, pos, 0, -1);
                 try detectSymbol(grid, symbols, pos, 1, -1);
                 while (pos.c < grid.width) : (pos.c += 1) {
-                    const ch = grid.charAtPos(pos);
+                    const ch = grid.atPos(pos);
                     if (!isDigit(ch)) break;
                     number = 10 * number + (ch - '0');
                     try detectSymbol(grid, symbols, pos, -1, 0);

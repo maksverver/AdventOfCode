@@ -46,8 +46,8 @@ fn solvePart(allocator: std.mem.Allocator, grid: Grid, min_repeat: usize, max_re
                 var new_pos = old_state.pos;
                 for (1..max_repeat + 1) |steps| {
                     new_pos = grid.move(new_pos, dir, 1) orelse break;
-                    std.debug.assert(std.ascii.isDigit(grid.charAtPos(new_pos)));
-                    new_dist += grid.charAtPos(new_pos) - '0';
+                    std.debug.assert(std.ascii.isDigit(grid.atPos(new_pos)));
+                    new_dist += grid.atPos(new_pos) - '0';
                     if (steps >= min_repeat) {
                         const new_state = State{ .pos = new_pos, .last_dir = dir };
                         const p = getDist(dists, grid, new_state);

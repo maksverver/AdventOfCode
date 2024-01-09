@@ -23,16 +23,16 @@ fn calculateReachability(allocator: std.mem.Allocator, grid: TextGrid) !DistGrid
     // Breadth-first search.
     const start = try grid.indexOf('S');
     buf[0] = start;
-    dist.charPtrAtPos(start).* = 0;
+    dist.ptrAtPos(start).* = 0;
     var idx: usize = 0;
     var len: usize = 1;
     while (idx < len) : (idx += 1) {
         const p = buf[idx];
         for (std.enums.values(Dir)) |dir| {
             if (grid.move(p, dir, 1)) |q| {
-                const dist_p = dist.charPtrAtPos(q);
-                if (grid.charAtPos(q) != '#' and dist_p.* == inf) {
-                    dist_p.* = dist.charAtPos(p) + 1;
+                const dist_p = dist.ptrAtPos(q);
+                if (grid.atPos(q) != '#' and dist_p.* == inf) {
+                    dist_p.* = dist.atPos(p) + 1;
                     buf[len] = q;
                     len += 1;
                 }
@@ -51,7 +51,7 @@ fn solvePart1(dist: DistGrid, steps: usize) Answer {
     var answer: Answer = 0;
     for (0..dist.height) |r| {
         for (0..dist.width) |c| {
-            const d = dist.charAt(r, c);
+            const d = dist.at(r, c);
             if (d <= steps and d % 2 == steps % 2) answer += 1;
         }
     }
@@ -151,13 +151,13 @@ fn solvePart2(dist: DistGrid, steps: usize) Answer {
     std.debug.assert(dist.height == dist.width);
     const size = dist.width; // official input: 131
     const mid = size / 2; // official input: 65
-    std.debug.assert(dist.charAt(mid, mid) == 0); // start at center
+    std.debug.assert(dist.at(mid, mid) == 0); // start at center
     std.debug.assert(steps % size == mid);
     const k = steps / size; // official input: 202300
     var answer: Answer = 0;
     for (0..dist.height) |r| {
         for (0..dist.width) |c| {
-            const d = dist.charAt(r, c);
+            const d = dist.at(r, c);
             if (d < inf) {
                 if (d % 2 == steps % 2) {
                     answer += (k + 1) * (k + 1);

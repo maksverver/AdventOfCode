@@ -9,7 +9,7 @@ fn countGalaxies(grid: Grid) usize {
     var res: usize = 0;
     for (0..grid.height) |r| {
         for (0..grid.width) |c| {
-            if (grid.charAt(r, c) == '#') res += 1;
+            if (grid.at(r, c) == '#') res += 1;
         }
     }
     return res;
@@ -18,7 +18,7 @@ fn countGalaxies(grid: Grid) usize {
 fn countGalaxiesInRow(grid: Grid, r: usize) usize {
     var res: usize = 0;
     for (0..grid.width) |c| {
-        if (grid.charAt(r, c) == '#') res += 1;
+        if (grid.at(r, c) == '#') res += 1;
     }
     return res;
 }
@@ -26,7 +26,7 @@ fn countGalaxiesInRow(grid: Grid, r: usize) usize {
 fn countGalaxiesInCol(grid: Grid, c: usize) usize {
     var res: usize = 0;
     for (0..grid.height) |r| {
-        if (grid.charAt(r, c) == '#') res += 1;
+        if (grid.at(r, c) == '#') res += 1;
     }
     return res;
 }
