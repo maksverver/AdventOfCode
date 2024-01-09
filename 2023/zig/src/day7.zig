@@ -70,8 +70,9 @@ pub fn solvePart(hands: []Hand) u64 {
 }
 
 pub fn solve(env: *Environment) !void {
-    const hands = try env.parseInputHeap([]Hand, parseInput);
-    defer env.getHeapAllocator().free(hands);
+    const allocator = env.getHeapAllocator();
+    const hands = try env.parseInputAlloc([]Hand, parseInput, allocator);
+    defer allocator.free(hands);
 
     // Part 1.
     try env.setAnswer1(solvePart(hands));

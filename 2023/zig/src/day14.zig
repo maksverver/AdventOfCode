@@ -94,9 +94,9 @@ fn solvePart2(allocator: std.mem.Allocator, input: Input) !usize {
 }
 
 pub fn solve(env: *Environment) !void {
-    const allocator = env.getHeapAllocator();
     const input = try env.parseInput(Input, Input.init);
 
+    const allocator = env.getHeapAllocator();
     try env.setAnswer1(try solvePart1(allocator, input));
     try env.setAnswer2(try solvePart2(allocator, input));
 }
