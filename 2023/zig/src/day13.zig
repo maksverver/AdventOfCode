@@ -3,7 +3,7 @@ const grids = @import("parsing/grids.zig");
 const text = @import("parsing/text.zig");
 const std = @import("std");
 
-const Grid = grids.ReorientableGrid(u8, false);
+const Grid = grids.Grid(u8, .{ .orientability = .orientable });
 
 pub fn findReflectionRow(grid: Grid, comptime want_errors: usize) ?usize {
     loop: for (1..grid.height) |rr| {
@@ -32,7 +32,7 @@ pub fn solve(env: *Environment) !void {
     var answer1: usize = 0;
     var answer2: usize = 0;
     while (it.next()) |p| {
-        const grid = try Grid.init(p);
+        const grid = try Grid.initFromText(p);
         answer1 += try solvePart(grid, 0);
         answer2 += try solvePart(grid, 1);
     }

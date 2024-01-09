@@ -1,20 +1,17 @@
 const Environment = @import("framework/Environment.zig");
-const Grid = @import("parsing/Grid.zig");
-const Coords = Grid.Coords;
-const Dir = Grid.Dir;
-const ReorientableGrid = @import("parsing/grids.zig").ReorientableGrid;
+const grids = @import("parsing/grids.zig");
+const TextGrid = grids.TextGrid;
+const Coords = grids.Coords;
+const Dir = grids.Dir;
 const std = @import("std");
 
 const inf = std.math.maxInt(Dist);
 const Answer = u64;
 
-// I use the ReorientableGrid here because it can be store mutable integers,
-// but I don't need it's reorientable features. Maybe I should refactor this
-// later. As it is, the solution is fast enough.
 const Dist = u32;
-const DistGrid = ReorientableGrid(Dist, true);
+const DistGrid = grids.Grid(Dist, .{ .ownability = .ownable, .mutability = .mutable });
 
-fn calculateReachability(allocator: std.mem.Allocator, grid: Grid) !DistGrid {
+fn calculateReachability(allocator: std.mem.Allocator, grid: TextGrid) !DistGrid {
     const dist = try DistGrid.initAlloc(allocator, grid.height, grid.width, inf);
     errdefer dist.deinit();
 
@@ -181,7 +178,7 @@ fn solvePart2(dist: DistGrid, steps: usize) Answer {
 }
 
 pub fn solve(env: *Environment) !void {
-    const grid = try env.parseInput(Grid, Grid.init);
+    const grid = try env.parseInput(TextGrid, TextGrid.initFromText);
     const dist = try calculateReachability(env.getHeapAllocator(), grid);
     defer dist.deinit();
     try env.setAnswer1(solvePart1(dist, 64));
@@ -193,7 +190,7 @@ pub fn main() !void {
 }
 
 test "example 1" {
-    const grid = try Grid.init(
+    const grid = try TextGrid.initFromText(
         \\...........
         \\.....###.#.
         \\.###.##..#.

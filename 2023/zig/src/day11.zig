@@ -1,5 +1,6 @@
 const Environment = @import("framework/Environment.zig");
-const Grid = @import("parsing/Grid.zig");
+const grids = @import("parsing/grids.zig");
+const Grid = grids.TextGrid;
 const std = @import("std");
 
 const Answer = u64;
@@ -34,7 +35,7 @@ const expand1 = 2;
 const expand2 = 1_000_000;
 
 pub fn solve(env: *Environment) !void {
-    const grid = try env.parseInput(Grid, Grid.init);
+    const grid = try env.parseInput(Grid, Grid.initFromText);
     const total = countGalaxies(grid);
     var answer1: Answer = 0;
     var answer2: Answer = 0;

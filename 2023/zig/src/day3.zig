@@ -1,7 +1,8 @@
 const Environment = @import("framework/Environment.zig");
-const Grid = @import("parsing/Grid.zig");
-const Dir = Grid.Dir;
-const Coords = Grid.Coords;
+const grids = @import("parsing/grids.zig");
+const Dir = grids.Dir;
+const Coords = grids.Coords;
+const Grid = grids.TextGrid;
 const std = @import("std");
 
 // Represents a symbol adjacent to a number. (row, col) is the location of
@@ -90,7 +91,7 @@ fn solvePart2(symbols: []Symbol) isize {
 }
 
 pub fn solve(env: *Environment) !void {
-    const grid = try env.parseInput(Grid, Grid.init);
+    const grid = try env.parseInput(Grid, Grid.initFromText);
 
     var symbols = std.ArrayList(Symbol).init(env.getHeapAllocator());
     defer symbols.deinit();

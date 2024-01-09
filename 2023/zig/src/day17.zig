@@ -1,7 +1,8 @@
 const Environment = @import("framework/Environment.zig");
-const Grid = @import("parsing/Grid.zig");
-const Coords = Grid.Coords;
-const Dir = Grid.Dir;
+const grids = @import("parsing/grids.zig");
+const Grid = grids.TextGrid;
+const Coords = grids.Coords;
+const Dir = grids.Dir;
 const std = @import("std");
 
 const State = struct {
@@ -69,7 +70,7 @@ pub fn solve(env: *Environment) !void {
     // at least when using Zig's general purpose allocator instead of the native
     // libc allocator.
     const allocator = env.getArenaAllocator();
-    const grid = try env.parseInput(Grid, Grid.init);
+    const grid = try env.parseInput(Grid, Grid.initFromText);
     try env.setAnswer1(try solvePart(allocator, grid, 1, 3));
     try env.setAnswer2(try solvePart(allocator, grid, 4, 10));
 }

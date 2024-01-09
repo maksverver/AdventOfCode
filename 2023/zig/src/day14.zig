@@ -2,11 +2,17 @@ const Environment = @import("framework/Environment.zig");
 const grids = @import("parsing/grids.zig");
 const std = @import("std");
 
-const Input = grids.ReorientableGrid(u8, false);
-const Grid = grids.ReorientableGrid(u8, true);
+const InputGrid = grids.Grid(u8, .{
+    .orientability = .orientable,
+});
+const OwnedGrid = grids.Grid(u8, .{
+    .orientability = .orientable,
+    .ownability = .ownable,
+    .mutability = .mutable,
+});
 
 // For debugging (currently unused)
-fn debugPrint(grid: Grid) !void {
+fn debugPrint(grid: OwnedGrid) !void {
     std.debug.print("\n", .{});
     for (0..grid.height) |r| {
         for (0..grid.width) |c| {
@@ -16,7 +22,7 @@ fn debugPrint(grid: Grid) !void {
     }
 }
 
-fn moveUp(grid: *Grid) void {
+fn moveUp(grid: *OwnedGrid) void {
     for (0..grid.width) |c| {
         var r_dst: usize = 0;
         for (0..grid.height) |r_src| {
@@ -35,7 +41,7 @@ fn moveUp(grid: *Grid) void {
     }
 }
 
-fn computeSupport(grid: Grid) usize {
+fn computeSupport(grid: OwnedGrid) usize {
     var answer: usize = 0;
     for (0..grid.height) |r| {
         for (0..grid.width) |c| {
@@ -45,14 +51,14 @@ fn computeSupport(grid: Grid) usize {
     return answer;
 }
 
-fn solvePart1(allocator: std.mem.Allocator, input: Input) !usize {
-    var grid = try input.mutableCopy(allocator);
+fn solvePart1(allocator: std.mem.Allocator, input: InputGrid) !usize {
+    var grid = try input.duplicate(.mutable, allocator);
     defer grid.deinit();
     moveUp(&grid);
     return computeSupport(grid);
 }
 
-pub fn step(grid: *Grid) void {
+pub fn step(grid: *OwnedGrid) void {
     for (0..4) |_| {
         moveUp(grid);
         grid.* = grid.rotatedAnticlockwise();
@@ -64,10 +70,10 @@ const target2: usize = 1000_000_000;
 
 // Cycle finding.
 // https://en.wikipedia.org/wiki/Cycle_detection#Floyd's_tortoise_and_hare
-fn solvePart2(allocator: std.mem.Allocator, input: Input) !usize {
-    var grid1 = try input.mutableCopy(allocator);
+fn solvePart2(allocator: std.mem.Allocator, input: InputGrid) !usize {
+    var grid1 = try input.duplicate(.mutable, allocator);
     defer grid1.deinit();
-    var grid2 = try input.mutableCopy(allocator);
+    var grid2 = try input.duplicate(.mutable, allocator);
     defer grid2.deinit();
     step(&grid1);
     step(&grid2);
@@ -94,9 +100,9 @@ fn solvePart2(allocator: std.mem.Allocator, input: Input) !usize {
 }
 
 pub fn solve(env: *Environment) !void {
-    const input = try env.parseInput(Input, Input.init);
-
     const allocator = env.getHeapAllocator();
+    const input = try env.parseInput(InputGrid, InputGrid.initFromText);
+
     try env.setAnswer1(try solvePart1(allocator, input));
     try env.setAnswer2(try solvePart2(allocator, input));
 }

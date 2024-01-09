@@ -1,7 +1,8 @@
 const Environment = @import("framework/Environment.zig");
-const Grid = @import("parsing/Grid.zig");
-const Coords = Grid.Coords;
-const Dir = Grid.Dir;
+const grids = @import("parsing/grids.zig");
+const Grid = grids.TextGrid;
+const Coords = grids.Coords;
+const Dir = grids.Dir;
 const std = @import("std");
 
 const Connections = struct {
@@ -39,7 +40,7 @@ fn nextDirection(c: Connections, d: Dir) !Dir {
 }
 
 pub fn solve(env: *Environment) !void {
-    const grid = try env.parseInput(Grid, Grid.init);
+    const grid = try env.parseInput(Grid, Grid.initFromText);
 
     // Find the start, and determine the connections from the surrounding tiles.
     const start = try grid.indexOf('S');

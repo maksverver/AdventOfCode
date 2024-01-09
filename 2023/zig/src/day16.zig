@@ -1,6 +1,7 @@
 const Environment = @import("framework/Environment.zig");
-const Grid = @import("parsing/Grid.zig");
-const Dir = Grid.Dir;
+const grids = @import("parsing/grids.zig");
+const Grid = grids.TextGrid;
+const Dir = grids.Dir;
 const std = @import("std");
 
 fn entranceCount(grid: Grid) usize {
@@ -70,7 +71,7 @@ const State = struct {
 test "State entrance indices" {
     const expectEqual = @import("parsing/testing.zig").expectEqual;
 
-    const grid = try Grid.init(
+    const grid = try Grid.initFromText(
         \\....
         \\....
         \\....
@@ -236,7 +237,7 @@ const Solver = struct {
 };
 
 pub fn solve(env: *Environment) !void {
-    const grid = try env.parseInput(Grid, Grid.init);
+    const grid = try env.parseInput(Grid, Grid.initFromText);
     std.debug.assert(grid.width > 0 and grid.height > 0);
 
     var solver = try Solver.init(env.getHeapAllocator(), grid);
