@@ -1,11 +1,3 @@
-//! A simple example of how to implement the solver for a day.
-//!
-//! This can be used as a template to implement subsequent days.
-//!
-//! In this example, the input is a single line of numbers separates by spaces.
-//! Part 1 calculates the sum of the numbers.
-//! Part 2 calculates the product of the numbers.
-
 const Environment = @import("framework/Environment.zig");
 const Grid = @import("parsing/Grid.zig");
 const Dir = Grid.Dir;
