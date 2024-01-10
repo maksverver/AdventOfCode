@@ -33,7 +33,7 @@ const solvers = [_]?SolveFn{
     @import("day22.zig").solve,
     @import("day23.zig").solve,
     null, // TODO: day 24
-    null, // TODO: day 25
+    @import("day25.zig").solve,
 };
 
 // Silly logic to calculate default input and answer paths at compile time.
