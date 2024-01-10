@@ -137,6 +137,10 @@ fn buildGraph(allocator: std.mem.Allocator, grid: Grid, respect_slopes: bool) ![
 }
 
 // Depth-first search for the longest path.
+//
+// We could memoize this based on (v, visited) pairs, but for the official test
+// input, this method is called around 30 million times with around 11 million
+// unique pairs of (v, visited), so memoization has little effect.
 fn findLongestPath(graph: []const []const Edge, v: Vertex, visited_arg: VertexMask) isize {
     if (v == finish) return 0;
     const visited = visited_arg | (@as(VertexMask, 1) << v);
