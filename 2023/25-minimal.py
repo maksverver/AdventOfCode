@@ -36,7 +36,7 @@ for finish in rest:
     return Dfs(start)
 
   min_cut = 0
-  while Augment() and min_cut <= 3:
+  while min_cut <= 3 and Augment():
     min_cut += 1
 
   if min_cut == 3: break
