@@ -83,7 +83,7 @@ pub fn run(allocator: std.mem.Allocator, input: []const u8, solve: SolveFn) !Run
 // Member fields. These should not be accessed directly even though Zig allows it.
 _input: []const u8,
 _allocator: std.mem.Allocator,
-_arena: ?std.heap.ArenaAllocator = null,
+_arena: std.heap.ArenaAllocator,
 _answers: Answers = .{},
 _timer: std.time.Timer,
 _times: Times = .{},
@@ -91,13 +91,14 @@ _times: Times = .{},
 fn init(allocator: std.mem.Allocator, input: []const u8) !Environment {
     return Environment{
         ._allocator = allocator,
+        ._arena = std.heap.ArenaAllocator.init(allocator),
         ._input = input,
         ._timer = try std.time.Timer.start(),
     };
 }
 
 fn deinit(self: Environment) void {
-    if (self._arena) |a| a.deinit();
+    self._arena.deinit();
     if (self._answers.part1) |p| self._allocator.free(p);
     if (self._answers.part2) |p| self._allocator.free(p);
 }
@@ -107,10 +108,7 @@ pub fn getHeapAllocator(self: Environment) std.mem.Allocator {
 }
 
 pub fn getArenaAllocator(self: *Environment) std.mem.Allocator {
-    if (self._arena == null) {
-        self._arena = std.heap.ArenaAllocator.init(self.getHeapAllocator());
-    }
-    return self._arena.?.allocator();
+    return self._arena.allocator();
 }
 
 pub fn getInput(self: Environment) []const u8 {
