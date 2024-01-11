@@ -28,7 +28,7 @@ const solvers = [_]?SolveFn{
     @import("day17.zig").solve,
     @import("day18.zig").solve,
     @import("day19.zig").solve,
-    null, // TODO: day 20
+    @import("day20.zig").solve,
     @import("day21.zig").solve,
     @import("day22.zig").solve,
     @import("day23.zig").solve,
