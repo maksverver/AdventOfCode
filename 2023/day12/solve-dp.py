@@ -21,8 +21,8 @@ def CountCombinations(s, runs):
     if ch != '.':
       max_hashes[j + 1] = max_hashes[j] + 1
 
-  # dp[i][j] is the number of ways the prefix of s of length i (s[:i]) can be
-  # filled to match the prefix of runs of length j (runs[:j]).
+  # dp[i][j] is the number of ways the prefix of s of length j (s[:j]) can be
+  # filled to match the prefix of runs of length i (runs[:i]).
   dp = [[0]*(len(s) + 1) for _ in range(len(runs) + 1)]
 
   # First row: using no runs, we can fill any prefix that does not contain a
