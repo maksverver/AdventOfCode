@@ -4,8 +4,7 @@
 //! A solver function receives an Environment pointer and should do two things:
 //!
 //!  1. Parse the input. Either by calling getInput() followed by parsingDone(),
-//!     or using one of the convenience methods parseInput(), or
-//!     parseInputArena().
+//!     or using one of the parseInput*() convenience methods.
 //!
 //!  2. Solve the problem, and report the answers either by calling setAnswer1()
 //!     and setAnswer2(), or by calling only setAnswers() to report both answers
@@ -50,10 +49,12 @@ const RunResult = struct {
     /// Answers produced by the solver.
     answers: Answers,
 
-    /// Total time taken (in nanoseconds).
+    /// Total time taken (in nanoseconds). This is typically close to the sum of
+    /// subtimes, but can be slightly larger, due to cleanup that happens after
+    /// reporting answers but before returning (e.g., deferred statements).
     totalTime: u64,
 
-    /// Time spent on parts of the problem.
+    /// Time spent on parts of the problem. These are non-overlapping.
     subTimes: Times,
 
     /// The allocator that was passed to run(). Used to free stuff in deinit().
