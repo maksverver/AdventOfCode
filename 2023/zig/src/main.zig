@@ -32,7 +32,7 @@ const solvers = [_]?SolveFn{
     @import("day21.zig").solve,
     @import("day22.zig").solve,
     @import("day23.zig").solve,
-    null, // TODO: day 24
+    @import("day24.zig").solve,
     @import("day25.zig").solve,
 };
 

@@ -48,9 +48,7 @@ pub fn skipNewline(self: *Scanner) !void {
 // Returns a maximal substring of consecutive characters matching `predicate`.
 pub fn peekPredicate(self: Scanner, comptime predicate: fn (c: u8) bool) []const u8 {
     var end: usize = 0;
-    while (end < self.text.len and predicate(self.text[end])) {
-        end += 1;
-    }
+    while (end < self.text.len and predicate(self.text[end])) end += 1;
     return self.text[0..end];
 }
 
@@ -65,13 +63,15 @@ pub fn scanInt(self: *Scanner, comptime T: type) !T {
     return self.scanIntBase(T, 10);
 }
 
-// Note: this currently doesn't support a leading sign ('+' or '-').
 pub fn scanIntBase(self: *Scanner, comptime T: type, base: u8) !T {
-    const s = self.peekPredicate(std.ascii.isAlphanumeric);
-    if (s.len == 0) return error.InvalidCharacter;
-    const result = try std.fmt.parseInt(T, s, base);
-    self.text = self.text[s.len..];
-    return result;
+    if (self.text.len == 0) return error.EndOfInput;
+    var end: usize = 0;
+    if (self.text[0] == '+' or self.text[0] == '-') end += 1;
+    // Note: use isAlphanumeric() instead of isDigit() to support base 16 etc.
+    while (end < self.text.len and std.ascii.isAlphanumeric(self.text[end])) end += 1;
+    const res = try std.fmt.parseInt(T, self.text[0..end], base);
+    self.text = self.text[end..];
+    return res;
 }
 
 pub fn peekText(self: Scanner, text: []const u8) bool {
