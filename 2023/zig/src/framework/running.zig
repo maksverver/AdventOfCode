@@ -43,7 +43,7 @@ pub fn runSolutionStdIO(solve: *const fn (*Environment) anyerror!void) !void {
     var bufferedStderr = std.io.bufferedWriter(std.io.getStdErr().writer());
 
     // Print answers.
-    try bufferedStdout.writer().print("{?s}\n{?s}\n", .{ result.answers.part1, result.answers.part2 });
+    try bufferedStdout.writer().print("{[part1]?s}\n{[part2]?s}\n", result.answers);
     try bufferedStdout.flush();
 
     // Print solution times.
