@@ -67,12 +67,10 @@ fn intersectInRange(x1: i64, y1: i64, vx1: i64, vy1: i64, x2: i64, y2: i64, vx2:
         (min * det <= ydet and ydet <= max * det);
 }
 
-fn solvePart1(rays: []const Ray) !u64 {
+fn solvePart1(rays: []const Ray, min: i64, max: i64) !u64 {
     var answer: u64 = 0;
     for (rays, 0..) |r, i| {
         for (rays[i + 1 ..]) |s| {
-            const min = 200_000_000_000_000;
-            const max = 400_000_000_000_000;
             if (intersectInRange(r.x, r.y, r.vx, r.vy, s.x, s.y, s.vx, s.vy, min, max)) answer += 1;
         }
     }
@@ -84,9 +82,31 @@ pub fn solve(env: *Environment) !void {
     const rays = try env.parseInputAlloc([]Ray, parseInput, allocator);
     defer allocator.free(rays);
 
-    try env.setAnswer1(try solvePart1(rays));
+    const min = 200_000_000_000_000;
+    const max = 400_000_000_000_000;
+    try env.setAnswer1(try solvePart1(rays, min, max));
 }
 
 pub fn main() !void {
     try @import("framework/running.zig").runSolutionStdIO(solve);
+}
+
+test "example" {
+    const expectEqual = @import("parsing/testing.zig").expectEqual;
+
+    const rays = try parseInput(std.testing.allocator,
+        \\19, 13, 30 @ -2, 1, -2
+        \\18, 19, 22 @ -1, -1, -2
+        \\20, 25, 34 @ -2, -2, -4
+        \\12, 31, 28 @ -1, -2, -1
+        \\20, 19, 15 @ 1, -5, -3
+        \\
+    );
+    defer std.testing.allocator.free(rays);
+
+    try expectEqual(rays.len, 5);
+    try expectEqual(rays[0], Ray{ .x = 19, .y = 13, .z = 30, .vx = -2, .vy = 1, .vz = -2 });
+    try expectEqual(rays[4], Ray{ .x = 20, .y = 19, .z = 15, .vx = 1, .vy = -5, .vz = -3 });
+
+    try expectEqual(try solvePart1(rays, 7, 27), 2);
 }
