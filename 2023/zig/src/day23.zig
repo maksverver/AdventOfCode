@@ -136,28 +136,55 @@ fn buildGraph(allocator: std.mem.Allocator, grid: Grid, respect_slopes: bool) ![
     return try edgesList.toOwnedSlice();
 }
 
+fn bit(v: Vertex) VertexMask {
+    return @as(VertexMask, 1) << v;
+}
+
 // Depth-first search for the longest path.
 //
 // We could memoize this based on (v, visited) pairs, but for the official test
 // input, this method is called around 30 million times with around 11 million
 // unique pairs of (v, visited), so memoization has little effect.
-fn findLongestPath(graph: []const []const Edge, v: Vertex, visited_arg: VertexMask) isize {
-    if (v == finish) return 0;
-    const visited = visited_arg | (@as(VertexMask, 1) << v);
+fn findLongestPath(graph: []const []const Edge, end: Vertex, v: Vertex, visited_arg: VertexMask) isize {
+    if (v == end) return 0;
+    const visited = visited_arg | bit(v);
     var res: isize = std.math.minInt(isize);
     for (graph[v]) |e| {
-        if ((visited & (@as(VertexMask, 1) << e.w)) == 0) {
-            res = @max(res, e.len + findLongestPath(graph, e.w, visited));
+        if ((visited & bit(e.w)) == 0) {
+            res = @max(res, e.len + findLongestPath(graph, end, e.w, visited));
         }
     }
     return res;
 }
 
 fn solvePart(allocator: std.mem.Allocator, grid: Grid, respect_slopes: bool) !isize {
+    // The hardest part is building the graph from the input:
     const graph: []const []const Edge = try buildGraph(allocator, grid, respect_slopes);
     defer allocator.free(graph);
     defer for (graph) |edges| allocator.free(edges);
-    return findLongestPath(graph, start, 0);
+
+    // At this point, we could calculate the longest path with:
+    //
+    //  return findLongestPath(graph, finish, start, 0);
+    //
+    // However, the search can be sped up by searching for the longest path from
+    // start to a predecessor of `finish` instead. The logic is that the longest
+    // path has to go through one of the predecessors of `finish` just before
+    // reaching `finish`, so we can prune solutions that have visited all
+    // predecessors without continuing to `finish`.
+    //
+    // In the official test data, `finish` has only one predecessor, and this
+    // optimization cuts the runtime approximately in half.
+    var answer: isize = std.math.minInt(isize);
+    for (graph, 0..) |edges, i| {
+        for (edges) |e| {
+            if (e.w == finish) {
+                const v: Vertex = @intCast(i);
+                answer = @max(answer, findLongestPath(graph, v, start, bit(finish)) + e.len);
+            }
+        }
+    }
+    return answer;
 }
 
 pub fn solve(env: *Environment) !void {
