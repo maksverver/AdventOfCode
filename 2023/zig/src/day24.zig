@@ -77,6 +77,76 @@ fn solvePart1(rays: []const Ray, min: i64, max: i64) !u64 {
     return answer;
 }
 
+// We need at least f80 to have enough precision to solve the official input
+// exactly. f128 works too, but is likely to be slower, especially since it's
+// rarely supported by hardware.
+const FloatT = f80;
+
+// Solves a system of linear equations in augmented matrix form using
+// Gauss-Jordan elimination.
+fn solveMatrix(comptime N: usize, matrix: *[N][N + 1]FloatT) ![N]FloatT {
+    for (0..N) |i| {
+        // Find a row that's nonzero in column i, and swap it with row i.
+        {
+            var j = i;
+            while (j < N and matrix[j][i] == 0) j += 1;
+            if (j == N) return error.MultipleSolutions;
+            if (i != j) std.mem.swap([N + 1]FloatT, &matrix[i], &matrix[j]);
+        }
+
+        // Normalize row i so it is matrix[i][i] = 1.
+        {
+            var x = matrix[i][i];
+            matrix[i][i] = 1;
+            // Note: instead of dividing by x, we could also precalculate 1/x
+            // and then multiply by that, which is faster but less precise.
+            for (i + 1..N + 1) |c| matrix[i][c] /= x;
+        }
+
+        // Subtract row i from other rows until matrix[r][i] = 0 for all r ≠ i.
+        for (0..N) |r| if (r != i) {
+            var x = matrix[r][i];
+            if (x == 0) continue;
+            for (i..N + 1) |c| matrix[r][c] -= x * matrix[i][c];
+        };
+    }
+
+    // The values for the variables are in the last column of the matrix.
+    var values: [N]FloatT = undefined;
+    for (&values, matrix) |*v, m| v.* = m[N];
+    return values;
+}
+
+// Since my integer-only Python solution is too much work to port to Zig,
+// I just stole this approach from:
+// https://github.com/bakkerjangert/AoC_2023/blob/fcc44a084d6b433049fcd6359681703d5abc1674/Day%2024/Day%2024.py#L72-L126
+//
+// Note it's not needed to shift the coordinates to increase precision when
+// using a sufficiently wide floating point format.
+fn solvePart2(rays: []const Ray) !i64 {
+    var matrix_xy: [4][5]FloatT = undefined;
+    var matrix_xz: [4][5]FloatT = undefined;
+    for (&matrix_xy, &matrix_xz, 0..) |*row_xy, *row_xz, i| {
+        const j = i + 1;
+        row_xy[0] = @floatFromInt(rays[j].vy - rays[i].vy);
+        row_xz[0] = @floatFromInt(rays[j].vz - rays[i].vz);
+        row_xy[1] = @floatFromInt(rays[i].vx - rays[j].vx);
+        row_xz[1] = @floatFromInt(rays[i].vx - rays[j].vx);
+        row_xy[2] = @floatFromInt(rays[i].y - rays[j].y);
+        row_xz[2] = @floatFromInt(rays[i].z - rays[j].z);
+        row_xy[3] = @floatFromInt(rays[j].x - rays[i].x);
+        row_xz[3] = @floatFromInt(rays[j].x - rays[i].x);
+        row_xy[4] = @floatFromInt(rays[i].y * rays[i].vx - rays[i].x * rays[i].vy - rays[j].y * rays[j].vx + rays[j].x * rays[j].vy);
+        row_xz[4] = @floatFromInt(rays[i].z * rays[i].vx - rays[i].x * rays[i].vz - rays[j].z * rays[j].vx + rays[j].x * rays[j].vz);
+    }
+    const x_y_vx_vy = try solveMatrix(4, &matrix_xy);
+    const x_z_vx_vz = try solveMatrix(4, &matrix_xz);
+    const x = x_y_vx_vy[0];
+    const y = x_y_vx_vy[1];
+    const z = x_z_vx_vz[1];
+    return @intFromFloat(@round(x + y + z));
+}
+
 pub fn solve(env: *Environment) !void {
     const allocator = env.getHeapAllocator();
     const rays = try env.parseInputAlloc([]Ray, parseInput, allocator);
@@ -85,6 +155,7 @@ pub fn solve(env: *Environment) !void {
     const min = 200_000_000_000_000;
     const max = 400_000_000_000_000;
     try env.setAnswer1(try solvePart1(rays, min, max));
+    try env.setAnswer2(try solvePart2(rays));
 }
 
 pub fn main() !void {
@@ -109,4 +180,6 @@ test "example" {
     try expectEqual(rays[4], Ray{ .x = 20, .y = 19, .z = 15, .vx = 1, .vy = -5, .vz = -3 });
 
     try expectEqual(try solvePart1(rays, 7, 27), 2);
+
+    try expectEqual(try solvePart2(rays), 47);
 }
