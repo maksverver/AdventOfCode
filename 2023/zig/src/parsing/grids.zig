@@ -136,6 +136,10 @@ pub fn Grid(comptime T: type, comptime config: GridConfig) type {
 
         const Self = @This();
 
+        pub fn initEmpty() Self {
+            return initUnowned(0, 0, 0, undefined);
+        }
+
         pub fn initUnowned(height: usize, width: usize, stride: usize, data: DataT) Self {
             return .{
                 .height = height,
@@ -209,6 +213,21 @@ pub fn Grid(comptime T: type, comptime config: GridConfig) type {
             };
         }
 
+        pub fn asUnowned(self: Self) Grid(T, config.setOwnability(.unowned)) {
+            return Grid(T, config.setOwnability(.unowned))
+                .initUnowned(self.height, self.width, self.stride, self.data);
+        }
+
+        pub fn asReadonly(self: Self) Grid(T, config.setMutability(.readonly)) {
+            return Grid(T, config.setMutability(.readonly)){
+                .height = self.height,
+                .width = self.width,
+                .stride = self.stride,
+                .data = self.data,
+                .allocator = self.allocator,
+            };
+        }
+
         // Maybe later: a method to return a readonly and/or unowned copy of this grid.
 
         pub fn move(self: Self, pos: Coords, dir: Dir, dist: usize) ?Coords {
@@ -260,6 +279,25 @@ pub fn Grid(comptime T: type, comptime config: GridConfig) type {
                 }
             }
             return error.NotFound;
+        }
+
+        const DirIterator = struct {
+            grid: Self,
+            dir: Dir,
+            pos: ?Coords,
+
+            pub fn next(self: *DirIterator) ?Coords {
+                if (self.pos) |p| {
+                    self.pos = self.grid.move(p, self.dir, 1);
+                    return p;
+                } else {
+                    return null;
+                }
+            }
+        };
+
+        pub fn iterateDir(self: Self, dir: Dir, start: ?Coords) DirIterator {
+            return DirIterator{ .grid = self, .dir = dir, .pos = start };
         }
     };
 
