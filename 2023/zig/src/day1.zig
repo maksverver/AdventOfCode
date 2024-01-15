@@ -4,7 +4,7 @@ const std = @import("std");
 
 const words = .{ "one", "two", "three", "four", "five", "six", "seven", "eight", "nine" };
 
-fn findFirstDigit(s_in: []const u8, comptime allowWords: bool) !usize {
+fn findFirstDigit(s_in: []const u8, comptime allow_words: bool) !usize {
     var s = s_in;
     while (s.len > 0) : (s = s[1..]) {
         const first = s[0];
@@ -12,7 +12,7 @@ fn findFirstDigit(s_in: []const u8, comptime allowWords: bool) !usize {
             return first - '0';
         }
 
-        if (allowWords) {
+        if (allow_words) {
             inline for (words, 1..) |word, i| {
                 if (std.mem.startsWith(u8, s, word)) {
                     return i;
@@ -23,14 +23,14 @@ fn findFirstDigit(s_in: []const u8, comptime allowWords: bool) !usize {
     return error.EndOfInput;
 }
 
-fn findLastDigit(s_in: []const u8, comptime allowWords: bool) !usize {
+fn findLastDigit(s_in: []const u8, comptime allow_words: bool) !usize {
     var s = s_in;
     while (s.len > 0) : (s = s[0 .. s.len - 1]) {
         const last = s[s.len - 1];
         if (last >= '1' and last <= '9') {
             return last - '0';
         }
-        if (allowWords) {
+        if (allow_words) {
             inline for (words, 1..) |word, i| {
                 if (std.mem.endsWith(u8, s, word)) {
                     return i;
