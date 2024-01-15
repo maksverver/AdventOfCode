@@ -1,3 +1,7 @@
+// Solution to day 14 that explicitly simulates all moves. This is pretty short
+// and a cool application of the orientable grid, but it is much slower than
+// the optimized version in day14.zig.
+
 const Environment = @import("framework/Environment.zig");
 const grids = @import("parsing/grids.zig");
 const std = @import("std");

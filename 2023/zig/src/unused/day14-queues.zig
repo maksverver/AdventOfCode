@@ -1,6 +1,11 @@
-// Really optimized version of Day 14, which also runs great on larger inputs.
+// Version of day14.zig that uses the `changed` array to keep track of nonzero
+// elements in `counts`. In theory, this is faster when the counts array is
+// sparse. In practice, about half the array is nonzero, so the costs outweigh
+// the benefits.
 //
-// For a more sensible but slower solution see unused/day14-slow.zig
+// (Also this implementation cheats slightly by using the hash of the state as
+// the key in the hashmap, which theoretically is susceptible to hash collisions
+// causing spurious detection of cycles, but in practice it's not a problem.)
 
 const Environment = @import("framework/Environment.zig");
 const grids = @import("parsing/grids.zig");
@@ -18,20 +23,15 @@ const Stripes = struct {
     across: Dir,
 };
 
-// Returns the four orientations of the grid. Order matters!
-//
-// Note that east comes first because it represents the orientation that the
-// boulders are in *after* tumbling east, which is the last direction after
-// tumbling north, west, south, east in that order.
 fn getStripes(grid: Grid) [4]Stripes {
     const W = grid.width;
     const H = grid.height;
     // zig fmt: off
     return .{
-        .{ .start = Coords{ .r = 0,     .c = W - 1 }, .along = .w, .across = .s }, // East (reverse rows)
         .{ .start = Coords{ .r = 0,     .c = 0 },     .along = .s, .across = .e }, // North (columns)
         .{ .start = Coords{ .r = H - 1, .c = 0 },     .along = .e, .across = .n }, // West (rows)
         .{ .start = Coords{ .r = H - 1, .c = W - 1 }, .along = .n, .across = .w }, // South (reverse columns)
+        .{ .start = Coords{ .r = 0,     .c = W - 1 }, .along = .w, .across = .s }, // East (reverse rows)
     };
     // zig fmt: on
 }
@@ -85,9 +85,24 @@ fn countSpace(grid: Grid) usize {
     return res;
 }
 
-// Represents a stack of boulders starting at `pos` and extending in the given
-// direction. To calculate boulder positions, we also need to know the count
-// of boulders per stack, which is tracked separately (in the `counts` array).
+const Hash = u64;
+
+fn hashState(counts: []usize, changed: []usize, random_keys: []Hash) Hash {
+    var hash: Hash = 0;
+    for (changed) |i| hash ^= random_keys[i] *% counts[i];
+    return hash;
+}
+
+const HashContext = struct {
+    pub fn hash(_: HashContext, h: Hash) u64 {
+        return @intCast(h);
+    }
+
+    pub fn eql(_: HashContext, a: Hash, b: Hash) bool {
+        return a == b;
+    }
+};
+
 const BoulderStack = struct {
     pos: Coords,
     dir: Dir,
@@ -101,7 +116,10 @@ const Part2Solver = struct {
     stacks: std.ArrayList(BoulderStack),
     next_wall_data: []usize,
     next_wall_start: []usize,
-    counts: []u8,
+    random_keys: []Hash,
+    changed: std.ArrayList(usize),
+    new_changed: std.ArrayList(usize),
+    counts: []usize,
     allocator: std.mem.Allocator,
 
     fn init(allocator: std.mem.Allocator, grid: Grid) !Part2Solver {
@@ -154,22 +172,23 @@ const Part2Solver = struct {
         // can calculate the wall indices (with walls between square brackets, and
         // numbers indicating the nearest wall in each direction):
         //
-        // Grid           East                North             West            South
+        // Grid         North             West            South         East
         //
-        //                              [3][4] -
-        //          +-----------+      +---------+       +---------+    +-------------+
-        //  . . #   | 0  0  [0] |  -   | 3  4 [6]|  [10] | 10 10  - |   |  14  13   - |
-        //  . # .   | 2 [2]  1  | [1]  | 3 [5] 6 |   [8] |  8 [9] 9 |   |  14 [13] 11 |
-        //  # O O   | -  3   3  | [3]  | -  5  6 |   [7] |  7  7  7 |   | [14] 12  11 |
-        //          +-----------+      +---------+       +---------+    +-------------+
-        //                                                                  - [12][11]
+        //           [0][1] -
+        //          +---------+       +---------+   +-------------+   +--------------+
+        //  . . #   | 0  1 [3]|   [7] | 7  7  - |   |  11  10   - |   | 12  12  [12] |  -
+        //  . # O   | 0 [2] 3 |   [5] | 5 [6] 6 |   |  11 [10]  8 |   | 14 [14]  13  | [13]
+        //  # . O   | -  2  3 |   [4] | 4  4  4 |   | [11]  9   8 |   | -   15   15  | [15]
+        //          +---------+       +---------+   +-------------+   +--------------+
+        //                                            -   [9]  [8]
         //
-        // Then if the east wall 3 has two boulders resting against it, then
-        // tumbling north next, would move the first boulder up to wall 6, and
-        // the second boulder to wall 5, so for wall index 3 we can precompute
-        // [5, 6], etc.
+        // Then we start with two boulders resting against the south side of north
+        // wall 3, the first of which will roll west against the east side of west
+        // wall 6, and the second will roll against wall 4, so for wall index 3
+        // we can precompute [6, 4], etc.
         //
-        var next_wall_data = try allocator.alloc(usize, countSpace(grid) * 4);
+        const space_count = countSpace(grid);
+        var next_wall_data = try allocator.alloc(usize, space_count * 4);
         errdefer allocator.free(next_wall_data);
 
         // The ranges of walls are encoded by consecutive offsets into next_wall_data.
@@ -178,7 +197,7 @@ const Part2Solver = struct {
         var next_wall_start = try allocator.alloc(usize, wall_count);
         errdefer allocator.free(next_wall_start);
         var wall_number: usize = 0;
-        var next_wall_pos: usize = 0;
+        var buf_pos: usize = 0;
         for (0..4) |dir| {
             const next_dir = @as(u2, @intCast(dir)) +% 1;
             const stripe = stripes[dir];
@@ -191,30 +210,51 @@ const Part2Solver = struct {
                         .wall => current_wall = no_index,
                         else => {
                             if (current_wall == no_index) {
-                                next_wall_start[wall_number] = next_wall_pos;
+                                next_wall_start[wall_number] = buf_pos;
                                 current_wall = wall_number;
                                 wall_number += 1;
                             }
-                            next_wall_data[next_wall_pos] = wall_index[next_dir].atPos(pos);
-                            next_wall_pos += 1;
+                            next_wall_data[buf_pos] = wall_index[next_dir].atPos(pos);
+                            buf_pos += 1;
                         },
                     }
                 }
             }
         }
         std.debug.assert(wall_number == wall_count);
-        std.debug.assert(next_wall_pos == next_wall_data.len);
+        std.debug.assert(buf_pos == space_count * 4);
 
-        // Calculate counts after initially tilting north, using wall_index[1].
+        // Generate random keys for walls.
+        var random_keys = try allocator.alloc(Hash, wall_count);
+        errdefer allocator.free(random_keys);
+        {
+            var prng = std.rand.DefaultPrng.init(31337);
+            var rand = prng.random();
+            for (random_keys) |*p| p.* = rand.int(Hash);
+        }
+
+        // Calculate initial counts.
         //
+        // `changed` contains the indices of walls that have some boulders resting
+        // against them, i.e. `changed` contains i iff. count[i] != 0.
+        // `new_changed` is scratch space used to calculate changed.
+        var changed = std.ArrayList(usize).init(allocator);
+        errdefer changed.deinit();
+        var new_changed = std.ArrayList(usize).init(allocator);
+        errdefer new_changed.deinit();
+
         // counts[i] = the number of boulder resting against the i-th wall
-        var counts = try allocator.alloc(u8, wall_count);
+        var counts = try allocator.alloc(usize, wall_count);
         errdefer allocator.free(counts);
         @memset(counts, 0);
+
+        // Calculate initial counts after tilting north.
         for (0..grid.height) |r| {
             for (0..grid.width) |c| {
                 if (grid.at(r, c) == .boulder) {
-                    counts[wall_index[1].at(r, c)] += 1;
+                    const i = wall_index[0].at(r, c);
+                    if (counts[i] == 0) try changed.append(i);
+                    counts[i] += 1;
                 }
             }
         }
@@ -223,64 +263,73 @@ const Part2Solver = struct {
             .stacks = stacks,
             .next_wall_data = next_wall_data,
             .next_wall_start = next_wall_start,
+            .random_keys = random_keys,
+            .changed = changed,
+            .new_changed = new_changed,
             .counts = counts,
             .allocator = allocator,
         };
+        // Finish initial cyle by tilting in the other 3 directions too.
+        for (1..4) |_| try solver.tumbleQuarterTurn();
         return solver;
     }
 
     fn deinit(self: Part2Solver) void {
         self.allocator.free(self.counts);
+        self.new_changed.deinit();
+        self.changed.deinit();
+        self.allocator.free(self.random_keys);
         self.allocator.free(self.next_wall_start);
         self.allocator.free(self.next_wall_data);
         self.stacks.deinit();
     }
 
-    fn tumbleAllDirections(self: *Part2Solver) !void {
-        for (self.counts, self.next_wall_start) |*c, start| {
-            const count = c.*;
-            c.* = 0;
-            for (self.next_wall_data[start .. start + count]) |i| self.counts[i] += 1;
+    fn tumbleQuarterTurn(self: *Part2Solver) !void {
+        self.new_changed.clearRetainingCapacity();
+        for (self.changed.items) |i| {
+            std.debug.assert(self.counts[i] > 0);
+            const start = self.next_wall_start[i];
+            for (self.next_wall_data[start .. start + self.counts[i]]) |j| {
+                if (self.counts[j] == 0) try self.new_changed.append(j);
+                self.counts[j] += 1;
+            }
+            self.counts[i] = 0;
         }
+        std.mem.swap(std.ArrayList(usize), &self.changed, &self.new_changed);
+    }
+
+    fn tumbleFullTurn(self: *Part2Solver) !void {
+        for (0..4) |_| try self.tumbleQuarterTurn();
     }
 
     fn calculateSupport(self: *const Part2Solver) usize {
         // This works for all directions, even though we only use this in part 2,
         // where all boulders lie against eastern walls. We could use this to speed it
         // up slightly but it probably doesn't matter.
+        const stacks = self.stacks.items;
         var answer: usize = 0;
-        for (self.counts, self.stacks.items) |count, stack| {
-            var it = self.grid.iterateDir(stack.dir, stack.pos);
-            for (0..count) |_| answer += self.grid.height - it.next().?.r;
+        for (self.changed.items) |i| {
+            var it = self.grid.iterateDir(stacks[i].dir, stacks[i].pos);
+            for (0..self.counts[i]) |_| answer += self.grid.height - it.next().?.r;
         }
         return answer;
     }
 
     fn solve(self: *Part2Solver) !usize {
-        // Now iterate until we can detect a cycle (using a HashMap).
-        var steps: usize = 0;
-        var last_seen = std.StringHashMap(u32).init(self.allocator);
-        defer {
-            var it = last_seen.keyIterator();
-            while (it.next()) |key| self.allocator.free(key.*);
-            last_seen.deinit();
-        }
+        // Now iterate until we can detect a cycle.
+        var steps: usize = 1;
+        var last_seen = std.HashMap(Hash, u32, HashContext, std.hash_map.default_max_load_percentage).init(self.allocator);
+        defer last_seen.deinit();
         while (true) {
-            try self.tumbleAllDirections();
+            try self.tumbleFullTurn();
             steps += 1;
-
-            var key: ?[]u8 = try self.allocator.dupe(u8, self.counts);
-            defer if (key) |p| self.allocator.free(p);
-            var res = try last_seen.getOrPut(key.?);
+            var res = try last_seen.getOrPut(hashState(self.counts, self.changed.items, self.random_keys));
             if (!res.found_existing) {
-                key = null; // last_seen owns the key now
                 res.value_ptr.* = @intCast(steps);
             } else {
-                // Cycle found!
                 const cycle_start = res.value_ptr.*;
                 const cycle_len = steps - cycle_start;
-                const steps_remaining = (total_steps - steps) % cycle_len;
-                for (0..steps_remaining) |_| try self.tumbleAllDirections();
+                for (0..(total_steps - steps) % cycle_len) |_| try self.tumbleFullTurn();
                 return self.calculateSupport();
             }
         }
