@@ -92,6 +92,18 @@ write answers to stdout:
 % time ./day1 < ../testdata/01.in
 
 
+## Some interesting solutions
+
+ - src/day11.zig (runs really fast!)
+ - src/day14.zig (clever algorithm)
+ - src/day17.zig (Dijkstra's algorithm)
+ - src/day18.zig (combines parsing with solving)
+ - src/day19.zig (normalizes input while parsing)
+ - src/day20.zig (implements polymorphism with a tagged union)
+ - src/day22.zig (clever algorithm)
+ - src/day25.zig (graph builder)
+
+
 ## Observations about Zig
 
 Zig is a low level systems programming language, so it is not an obvious choice
