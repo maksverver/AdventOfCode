@@ -1,5 +1,5 @@
 const Environment = @import("framework/Environment.zig");
-const grids = @import("parsing/grids.zig");
+const grids = @import("util/grids.zig");
 const Grid = grids.TextGrid;
 const Dir = grids.Dir;
 const std = @import("std");
@@ -69,7 +69,7 @@ const State = struct {
 };
 
 test "State entrance indices" {
-    const expectEqual = @import("parsing/testing.zig").expectEqual;
+    const expectEqual = @import("util/testing.zig").expectEqual;
 
     const grid = try Grid.initFromText(
         \\....

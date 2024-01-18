@@ -1,5 +1,5 @@
 const Environment = @import("framework/Environment.zig");
-const Scanner = @import("parsing/Scanner.zig");
+const Scanner = @import("util/Scanner.zig");
 const std = @import("std");
 
 /// An edge in the graph. Edges are undirected, but in the Ford-Fulkerson

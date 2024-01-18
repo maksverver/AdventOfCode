@@ -7,7 +7,7 @@
 //! Part 2 calculates the product of the numbers.
 
 const Environment = @import("framework/Environment.zig");
-const text = @import("parsing/text.zig");
+const text = @import("util/text.zig");
 const std = @import("std");
 
 const Input = []const i64;

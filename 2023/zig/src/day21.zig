@@ -1,5 +1,5 @@
 const Environment = @import("framework/Environment.zig");
-const grids = @import("parsing/grids.zig");
+const grids = @import("util/grids.zig");
 const TextGrid = grids.TextGrid;
 const Coords = grids.Coords;
 const Dir = grids.Dir;

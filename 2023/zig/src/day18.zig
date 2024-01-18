@@ -1,5 +1,5 @@
 const Environment = @import("framework/Environment.zig");
-const Scanner = @import("parsing/Scanner.zig");
+const Scanner = @import("util/Scanner.zig");
 const std = @import("std");
 
 const Dir = enum { r, d, l, u };

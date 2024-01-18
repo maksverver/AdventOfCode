@@ -1,7 +1,7 @@
 ///! Runs all the solvers on the official test data, and reports time taken.
 ///!
 const std = @import("std");
-const text = @import("parsing/text.zig");
+const text = @import("util/text.zig");
 const running = @import("framework/running.zig");
 const nanosToMillis = running.nanosToMillis;
 const Environment = @import("framework/Environment.zig");

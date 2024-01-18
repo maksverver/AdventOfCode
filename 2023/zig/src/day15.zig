@@ -1,5 +1,5 @@
 const Environment = @import("framework/Environment.zig");
-const text = @import("parsing/text.zig");
+const text = @import("util/text.zig");
 const std = @import("std");
 
 const Answer = u64;

@@ -1,5 +1,5 @@
 const Environment = @import("framework/Environment.zig");
-const text = @import("parsing/text.zig");
+const text = @import("util/text.zig");
 const std = @import("std");
 
 fn extrapolate(data: []i64) i64 {

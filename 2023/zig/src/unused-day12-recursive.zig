@@ -1,6 +1,6 @@
 const Environment = @import("framework/Environment.zig");
-const Scanner = @import("parsing/Scanner.zig");
-const text = @import("parsing/text.zig");
+const Scanner = @import("util/Scanner.zig");
+const text = @import("util/text.zig");
 const std = @import("std");
 
 const Answer = u64;

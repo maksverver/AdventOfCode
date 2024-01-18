@@ -8,7 +8,7 @@
 // causing spurious detection of cycles, but in practice it's not a problem.)
 
 const Environment = @import("framework/Environment.zig");
-const grids = @import("parsing/grids.zig");
+const grids = @import("util/grids.zig");
 const Dir = grids.Dir;
 const Coords = grids.Coords;
 const std = @import("std");

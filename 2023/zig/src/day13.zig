@@ -1,6 +1,6 @@
 const Environment = @import("framework/Environment.zig");
-const grids = @import("parsing/grids.zig");
-const text = @import("parsing/text.zig");
+const grids = @import("util/grids.zig");
+const text = @import("util/text.zig");
 const std = @import("std");
 
 const Grid = grids.Grid(u8, .{ .orientability = .orientable });

@@ -1,5 +1,5 @@
 const Environment = @import("framework/Environment.zig");
-const Scanner = @import("parsing/Scanner.zig");
+const Scanner = @import("util/Scanner.zig");
 const std = @import("std");
 
 const Ray = struct {
@@ -163,7 +163,7 @@ pub fn main() !void {
 }
 
 test "example" {
-    const expectEqual = @import("parsing/testing.zig").expectEqual;
+    const expectEqual = @import("util/testing.zig").expectEqual;
 
     const rays = try parseInput(std.testing.allocator,
         \\19, 13, 30 @ -2, 1, -2

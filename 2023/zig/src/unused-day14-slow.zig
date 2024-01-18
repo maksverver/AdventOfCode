@@ -3,7 +3,7 @@
 // the optimized version in day14.zig.
 
 const Environment = @import("framework/Environment.zig");
-const grids = @import("parsing/grids.zig");
+const grids = @import("util/grids.zig");
 const std = @import("std");
 
 const InputGrid = grids.Grid(u8, .{
