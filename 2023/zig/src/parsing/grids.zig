@@ -96,6 +96,39 @@ pub fn compareGrids(a: anytype, b: anytype) bool {
     return true;
 }
 
+const FixedAxes = struct {
+    stride: usize,
+
+    fn initFromRowStride(stride: usize) @This() {
+        return .{ .stride = stride };
+    }
+
+    fn index(self: @This(), row: usize, col: usize) usize {
+        return row * self.stride + col;
+    }
+};
+
+const OrientableAxes = struct {
+    baseIndex: usize,
+    rowStride: isize,
+    colStride: isize,
+
+    fn initFromRowStride(stride: usize) @This() {
+        return .{
+            .baseIndex = 0,
+            .rowStride = @intCast(stride),
+            .colStride = 1,
+        };
+    }
+
+    // Translate (row, col) coords into a scalar index into the data array.
+    fn index(self: @This(), row: usize, col: usize) usize {
+        return @intCast(@as(isize, @intCast(self.baseIndex)) +
+            @as(isize, @intCast(row)) * self.rowStride +
+            @as(isize, @intCast(col)) * self.colStride);
+    }
+};
+
 pub fn Grid(comptime T: type, comptime config: GridConfig) type {
     const SliceT = switch (config.mutability) {
         .readonly => []const T,
@@ -122,15 +155,17 @@ pub fn Grid(comptime T: type, comptime config: GridConfig) type {
         .unowned => {}, // void
     };
 
-    // The fixed grid has a fixed orientation. It contains width and height to
-    // describe the dimensions of the grid, and the row stride which is used to
-    // index into `data`.
-    //
-    // Keep the methods in sync with OrientableGrid below, where it makes sense.
-    const FixedGrid = struct {
+    const AxesT = switch (config.orientability) {
+        .fixed => FixedAxes,
+        .orientable => OrientableAxes,
+    };
+
+    // A grid is a 2D structure with a width and a height, that can be indexed
+    // by row and column pairs. It is backed by a data array.
+    return struct {
         height: usize,
         width: usize,
-        stride: usize,
+        axes: AxesT,
         data: DataT,
         allocator: AllocatorT = allocatorNull,
 
@@ -144,7 +179,7 @@ pub fn Grid(comptime T: type, comptime config: GridConfig) type {
             return .{
                 .height = height,
                 .width = width,
-                .stride = stride,
+                .axes = AxesT.initFromRowStride(stride),
                 .data = data,
             };
         }
@@ -153,7 +188,7 @@ pub fn Grid(comptime T: type, comptime config: GridConfig) type {
             return .{
                 .height = height,
                 .width = width,
-                .stride = stride,
+                .axes = AxesT.initFromRowStride(stride),
                 .data = data,
                 .allocator = allocator,
             };
@@ -187,7 +222,12 @@ pub fn Grid(comptime T: type, comptime config: GridConfig) type {
                 if (nl.nl != width or nl.end != stride) return error.InvalidInput;
                 remaining = remaining[stride..];
             }
-            return Self.initUnowned(height, width, stride, text.ptr);
+            const data = switch (DataT) {
+                ManyItemPtrT => text.ptr,
+                SliceT => text[0 .. (height - 1) * stride + width],
+                else => unreachable,
+            };
+            return Self.initUnowned(height, width, stride, data);
         }
 
         pub fn deinit(self: Self) void {
@@ -195,7 +235,11 @@ pub fn Grid(comptime T: type, comptime config: GridConfig) type {
         }
 
         pub fn dataSlice(self: Self) SliceT {
-            return self.data[0 .. (self.height - 1) * self.stride + self.width];
+            return switch (@TypeOf(self.data)) {
+                SliceT => self.data,
+                ManyItemPtrT => self.data[0 .. (self.height - 1) * self.axes.stride + self.width],
+                else => unreachable,
+            };
         }
 
         // Creates a mutable copy of the current grid. Must be freed by calling deinit().
@@ -204,31 +248,38 @@ pub fn Grid(comptime T: type, comptime config: GridConfig) type {
             comptime mutability: Mutability,
             allocator: std.mem.Allocator,
         ) !Grid(T, config.setOwnability(.ownable).setMutability(mutability)) {
+            const new_data = switch (DataT) {
+                ManyItemPtrT => try allocator.dupe(T, self.dataSlice()).ptr,
+                SliceT => try allocator.dupe(T, self.data),
+                else => unreachable,
+            };
             return .{
                 .height = self.height,
                 .width = self.width,
-                .stride = self.stride,
-                .data = (try allocator.dupe(T, self.dataSlice())).ptr,
+                .axes = self.axes,
+                .data = new_data,
                 .allocator = allocator,
             };
         }
 
         pub fn asUnowned(self: Self) Grid(T, config.setOwnability(.unowned)) {
-            return Grid(T, config.setOwnability(.unowned))
-                .initUnowned(self.height, self.width, self.stride, self.data);
+            return Grid(T, config.setOwnability(.unowned)){
+                .height = self.height,
+                .width = self.width,
+                .axes = self.axes,
+                .data = self.data,
+            };
         }
 
         pub fn asReadonly(self: Self) Grid(T, config.setMutability(.readonly)) {
             return Grid(T, config.setMutability(.readonly)){
                 .height = self.height,
                 .width = self.width,
-                .stride = self.stride,
+                .axes = self.axes,
                 .data = self.data,
                 .allocator = self.allocator,
             };
         }
-
-        // Maybe later: a method to return a readonly and/or unowned copy of this grid.
 
         pub fn move(self: Self, pos: Coords, dir: Dir, dist: usize) ?Coords {
             return switch (dir) {
@@ -257,7 +308,7 @@ pub fn Grid(comptime T: type, comptime config: GridConfig) type {
 
         pub fn ptrAt(self: Self, row: usize, col: usize) PtrT {
             std.debug.assert(row < self.height and col < self.width);
-            return &self.data[row * self.stride + col];
+            return &self.data[self.axes.index(row, col)];
         }
 
         pub fn atPos(self: Self, pos: Coords) T {
@@ -299,134 +350,54 @@ pub fn Grid(comptime T: type, comptime config: GridConfig) type {
         pub fn iterateDir(self: Self, dir: Dir, start: ?Coords) DirIterator {
             return DirIterator{ .grid = self, .dir = dir, .pos = start };
         }
-    };
 
-    // The orientable grid also has a base index and column stride, which allows
-    // operations like rotation, reflection, and transposition in O(1) time.
-    //
-    // Keep the methods in sync with FixedGrid above, where it makes sense.
-    const OrientableGrid = struct {
-        height: usize,
-        width: usize,
-        baseIndex: usize,
-        rowStride: isize,
-        colStride: isize,
-        data: DataT,
-        allocator: AllocatorT = allocatorNull,
+        // The following methods are only supported for orientable grids:
 
-        const Self = @This();
-
-        fn initUnowned(height: usize, width: usize, stride: usize, data: DataT) Self {
+        pub fn _changeAxes(self: Self, axes: AxesT) Self {
             return .{
-                .height = height,
-                .width = width,
-                .baseIndex = 0,
-                .rowStride = @as(isize, @intCast(stride)),
-                .colStride = 1,
-                .data = data,
+                .height = self.width,
+                .width = self.height,
+                .axes = axes,
+                .data = self.data,
+                .allocator = self.allocator,
             };
         }
 
-        // We could/should also support initOwned() and initAlloc() like
-        // FixedGrid does, but currently there is no use case for it.
-
-        pub fn initFromText(text: []const u8) !Self {
-            const grid = try TextGrid.initFromText(text);
-            return Self.initUnowned(grid.height, grid.width, grid.stride, grid.dataSlice());
-        }
-
-        pub fn deinit(self: Self) void {
-            std.debug.assert(self.allocator != null);
-            if (self.allocator) |a| a.free(self.data);
-        }
-
-        pub fn at(self: Self, row: usize, col: usize) T {
-            return self.ptrAt(row, col).*;
-        }
-
-        pub fn ptrAt(self: Self, row: usize, col: usize) PtrT {
-            return &self.data[self._idx(row, col)];
-        }
-
-        pub fn atPos(self: Self, pos: Coords) T {
-            return self.ptrAtPos(pos).*;
-        }
-
-        pub fn ptrAtPos(self: Self, pos: Coords) PtrT {
-            return self.ptrAt(pos.r, pos.c);
-        }
-
-        pub fn isEqualTo(self: Self, other: anytype) bool {
-            return compareGrids(self, other);
-        }
-
-        fn _idx(self: Self, row: usize, col: usize) usize {
-            std.debug.assert(row < self.height and col < self.width);
-            return @as(usize, @intCast(@as(isize, @intCast(self.baseIndex)) +
-                @as(isize, @intCast(row)) * self.rowStride +
-                @as(isize, @intCast(col)) * self.colStride));
-        }
-
+        /// Returns a transposed view of the grid.
         pub fn transposed(self: Self) Self {
-            return .{
-                .height = self.width,
-                .width = self.height,
-                .baseIndex = self._idx(0, 0),
-                .rowStride = self.colStride,
-                .colStride = self.rowStride,
-                .data = self.data,
-                .allocator = self.allocator,
-            };
+            return self._changeAxes(.{
+                .baseIndex = self.axes.index(0, 0),
+                .rowStride = self.axes.colStride,
+                .colStride = self.axes.rowStride,
+            });
         }
 
-        // Rotate the grid 90 degrees clockwise.
+        /// Returns a view of the grid rotated 90 degrees clockwise.
         pub fn rotatedClockwise(self: Self) Self {
-            return .{
-                .height = self.width,
-                .width = self.height,
-                .baseIndex = self._idx(0, self.width - 1),
-                .rowStride = -self.colStride,
-                .colStride = self.rowStride,
-                .data = self.data,
-                .allocator = self.allocator,
-            };
+            return self._changeAxes(.{
+                .baseIndex = self.axes.index(0, self.width - 1),
+                .rowStride = -self.axes.colStride,
+                .colStride = self.axes.rowStride,
+            });
         }
 
-        // Rotate the grid 90 degrees anticlockwise.
+        /// Returns a view of the grid rotated 90 degrees anticlockwise.
         pub fn rotatedAnticlockwise(self: Self) Self {
-            return .{
-                .height = self.width,
-                .width = self.height,
-                .baseIndex = self._idx(self.height - 1, 0),
-                .rowStride = self.colStride,
-                .colStride = -self.rowStride,
-                .data = self.data,
-                .allocator = self.allocator,
-            };
+            return self._changeAxes(.{
+                .baseIndex = self.axes.index(self.height - 1, 0),
+                .rowStride = self.axes.colStride,
+                .colStride = -self.axes.rowStride,
+            });
         }
-
-        // Creates a mutable copy of the current grid. Must be freed by calling deinit().
-        pub fn duplicate(
-            self: Self,
-            comptime mutability: Mutability,
-            allocator: std.mem.Allocator,
-        ) !Grid(T, config.setOwnability(.ownable).setMutability(mutability)) {
-            return .{
-                .height = self.height,
-                .width = self.width,
-                .baseIndex = self.baseIndex,
-                .rowStride = self.rowStride,
-                .colStride = self.colStride,
-                .data = try allocator.dupe(T, self.data),
-                .allocator = allocator,
-            };
-        }
-    };
-
-    return switch (config.orientability) {
-        .fixed => FixedGrid,
-        .orientable => OrientableGrid,
     };
 }
 
 pub const TextGrid = Grid(u8, .{});
+
+comptime {
+    const Grid1 = Grid(u8, .{});
+    const Grid2 = Grid(u8, .{ .ownability = .ownable });
+    const Grid3 = Grid(u8, .{ .ownability = .ownable, .orientability = .orientable });
+    std.debug.assert(@sizeOf(Grid1) < @sizeOf(Grid2));
+    std.debug.assert(@sizeOf(Grid2) < @sizeOf(Grid3));
+}
