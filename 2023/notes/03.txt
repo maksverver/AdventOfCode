@@ -1,0 +1,10 @@
+Advent of Code 2023 Day 3: Gear Ratios
+https://adventofcode.com/2023/day/3
+
+Fun: 1/5
+Difficulty: 2/5 (implementation)
+
+For this problem we simply need to scan the grid to find the numbers, and
+check the adjacent cells for symbols. Then for part 1, we sum up the numbers
+that are adjacent to a symbol. For part 2, we multiply the pairs of numbers
+that are adjacent to the same '*' symbol.

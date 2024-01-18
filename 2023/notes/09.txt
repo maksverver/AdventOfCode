@@ -1,0 +1,11 @@
+Advent of Code 2023 Day 9: Mirage Maintenance
+https://adventofcode.com/2023/day/9
+
+Fun: 2/5
+Difficulty: 1/5
+
+Part 1: Just Do It™
+Part 2: realize you can simply reverse the rows and do the same computation.
+
+Fun fact: I reached 8th place on the global leaderboard with a solution time
+of 00:11:08 for this problem.

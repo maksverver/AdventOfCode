@@ -1,0 +1,25 @@
+Advent of Code 2023 Day 23: A Long Walk
+https://adventofcode.com/2023/day/23
+
+Fun: 3/5
+Difficulty: 3/5 (implementation)
+
+Basically a depth-first search problem, where we are asked to find the
+*longest* path from start ot finish, without revisiting any cell. This can be
+done with a depth-first search of course.
+
+For part 1 we have to respect slopes like '>', 'v', etc. which only allow
+passing in one direction, which limits the number of paths we can take through
+the grid.
+
+For part 2, those slopes disappear, and it becomes necessary to observe that
+the grid consists of about 36 junctions connected by long corridors. We can
+construct a graph with those junctions as vertices and weighted edges
+corresponding to the lengths of the corridors, and do the DFS on that graph
+for a large speedup.
+
+My main complaint is that the DFS on part 2 is pretty slow, and there doesn't
+seem to be a non-cheesy way to improve this.
+
+I also struggled quite a bit with constructing the graph correctly, especially
+since the start and finish are special cases, but maybe that's on me.

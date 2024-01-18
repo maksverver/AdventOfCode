@@ -1,0 +1,36 @@
+Advent of Code 2023 Day 21: Step Counter
+https://adventofcode.com/2023/day/21
+
+Fun: 1/5
+Difficulty: 4/5
+
+Part 1 is kind of fun: determine the number of spaces reachable after exactly
+64 steps, which is the number of of squares that have an *even* distance less
+than or equal to 64 from the startingpoint.
+
+Part 2 is really annoying because implementing a general solution is nigh
+impossible, and instead you are supposed to notice several problems of the
+input:
+
+ 1. The grid is a square of odd size.
+ 2. The cells on the edge of the square are clear.
+ 3. The starting point ('S') is in the exact center.
+ 4. The center row and column are clear.
+ 5. The diagonals are clear.
+ 6. The input is so sparse that the distance between points is the Manhattan
+    distance, despite the existence of rocks.
+ 6. The total number of steps taken in part 2 (26501365) is exactly
+    202300 × 131 + 65, where 131 is the size of the square, and 65 is half
+    that size.
+
+That means in effect you can calculate how often each space in the eight
+triangular parts of the input square can be reached.
+
+What I hated about this problem:
+
+ - While the generic problem is interesting, it's extremely difficult, which
+   pretty much requires cheesing it.
+
+ - The sample data doesn't contain the properties that make solving the
+   general problem easy, which means solving the sample problem is actually
+   *harder* than solving the official input. That's just stupid.

@@ -1,0 +1,23 @@
+Advent of Code 2023 Day 17: Clumsy Crucible
+https://adventofcode.com/2023/day/17
+
+Fun: 4/5
+Difficulty: 3/5 (algorithm, implementation)
+
+Fun twist on a standard path finding problem! Dijkstra's algorithm works of
+course, but you have to represent your state correctly and carefully implement
+the state transitions.
+
+There are two reasonable state representations:
+
+ 1. (row, column, last direction moved): that's implemented in 17.py.
+    Then each transition involves turning and moving a certain distance in the
+    new single direction.
+
+ 2. (row, column, last direction moved, number of steps moved): that's
+    implemented in 17-slower.py. Each state transition involves either moving
+    one more step in the same direction, or turning (and resetting steps
+    moved to 0).
+
+Representation 1 implies a smaller graph (both in terms of vertices and
+edges) so it's preferable, but both are feasible.

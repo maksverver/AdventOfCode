@@ -1,0 +1,28 @@
+Advent of Code 2023 Day 18: Lavaduct Lagoon
+https://adventofcode.com/2023/day/18
+
+Fun: 3/5
+Difficulty: 4/5 (algorithm, mathematics)
+
+We are given a rectilinear polygon that is drawn in a pixel grid, and are
+asked to calculate the number of pixels that lie either inside the polygon, or
+on its boundary.
+
+For part 1, we can simply draw the polygon in a bitmap and flood fill from the
+outside, then count the number of pixels. For part 2, the coordinates are much
+bigger, so we need a smarter approach. There are two main ideas:
+
+ 1. Compress the coordinates, then run the same flood fill as in part 1. This
+    is the inverse of what we did for Day 11. This approach is implemented in
+    this file.
+
+ 2. Figure out that the formula boils down: area + circumference/2 + 1.
+
+    Calculating the circumference is trivial. Calculating the area can be
+    done with the shoelace formula. This is implemented in 18-fast.py
+
+    The formula can be derived from Pick's theorem but it can also be deduced
+    for the simpler case of a rectilinear polygon.Explanation in Dutch:
+    https://gathering.tweakers.net/forum/list_message/77540120#77540120
+
+This problem has some similarities to day 11 and day 12.

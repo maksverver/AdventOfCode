@@ -1,0 +1,15 @@
+Advent of Code 2023 Day 5: If You Give A Seed A Fertilizer
+https://adventofcode.com/2023/day/5
+
+Fun: 2/5
+Difficulty: 3/5 (implementation)
+
+The input specifies a list of range-based mappings from integers to shifted
+integers. For part 1 we only need to translate individual numbers which is
+straightforward to do one-by-one. For part 2 we need to translate ranges of
+numbers. The solution is to keep the numbers as consecutive ranges, and split
+them up as needed.
+
+The input is constructed in a way so that output ranges don't overlap. This
+is not strictly guaranteed by the problem statement, which makes the time
+complexity in the worst case much worse than it is in practice.

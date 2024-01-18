@@ -1,0 +1,14 @@
+Advent of Code 2023 Day 14: Parabolic Reflector Dish
+https://adventofcode.com/2023/day/14
+
+Fun: 2/5
+Difficulty: 3/5
+
+Simulation followed by cycle detection. This is something that Advent of Code
+has done a number of times already (including on Day 8 of this year!) so the
+problem is a little stale at this point.
+
+The interesting part is to figure out how to move the boulders in a line in O(N)
+time so that each simulation step takes only O(HW) time, but since the cycle
+is detected very early (after 14 steps, in my case) it isn't even necessary to
+optimize this.

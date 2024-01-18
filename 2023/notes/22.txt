@@ -1,0 +1,9 @@
+Advent of Code 2023 Day 22: Sand Slabs
+https://adventofcode.com/2023/day/22
+
+Fun: 4/5
+Difficulty: 2/5
+
+A simple problem that's relatively easy to solve for the given input. It's a
+fun problem because much more efficient solutions are possible, see e.g.
+22-fast.py which works great on much larger inputs!

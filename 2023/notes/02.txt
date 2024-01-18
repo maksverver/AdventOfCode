@@ -1,0 +1,12 @@
+Advent of Code 2023 Day 2: Cube Conundrum
+https://adventofcode.com/2023/day/2
+
+Fun: 2/5
+Difficulty: 1/5
+
+Surprisingly, the second problem is much easier than the first one, because
+there are no tricky edge cases to consider here.
+
+Each set of cubes revealed enforces a minimum on the number of red, green and
+blue cubes that exist. For part 1, we need to check if those numbers are less
+than 12, 13 and 14 respetively. For part 2, we need to multiply them.

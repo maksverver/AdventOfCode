@@ -1,0 +1,19 @@
+Advent of Code 2023 Day 10: Pipe Maze
+https://adventofcode.com/2023/day/10
+
+Fun: 5/5
+Difficulty: 4/5 (implementation, algorithms)
+
+For part 1, we just have to find the loop. This is basically just following the
+only possible path.
+
+For part 2, we have to count the area inside the loop. There are several ways:
+
+   1. For each cell, cast a ray and count crossings, using the even-odd rule.
+      This can be done in different ways: horizontally, vertically or
+      diagonally. (See 10.py for a horizontal version.)
+   2. Expand the grid into 2x2 or 3x3 tiles (see 10-alt.py) and then run
+      a floodfill.
+   3. Calculate the polygon area with some variant of the shoelace theorem.
+
+The variety of ways to tackle this problem made it a lot of fun!

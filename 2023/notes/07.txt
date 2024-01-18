@@ -1,0 +1,13 @@
+Advent of Code 2023 Day 7: Camel Cards
+https://adventofcode.com/2023/day/7
+
+Fun: 4/5
+Difficulty: 3/5 (implementation)
+
+Basically a Poker hand ranking problem, with some custom rules. Part 2
+requires replacing jokers with optimal cards, which can be done by brute
+force (as I did here), though a smarter solution uses the insight that the
+more copies we have of a card, the better the hand is (i.e., there are no
+combinations like e.g. a straight flush that would beat e.g. a full house), so
+using jokers as the most common card is always optimal. See 07-alt.py for an
+explanation of this approach.

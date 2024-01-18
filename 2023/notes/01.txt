@@ -1,0 +1,20 @@
+Advent of Code 2023 Day 1: Trebuchet?!
+https://adventofcode.com/2023/day/1
+
+Fun: 4/5
+Difficulty: 2/5 (edge cases)
+
+For part 2, we need to detect the first and last digit in each line, where
+a number can be either a single digit character ('2', '3', etc.) or a word
+("two", "three", etc.).
+
+The tricky part is handling cases where numbers overlap (e.g."twone" starts
+with 2 and ends with 1) which makes invalidates obvious solutions that do a
+simple search-and-replace. The better approach is to blindly do what the
+problem asks:
+
+ 1. Does the string start with a digit (either a numeric one, or a word)?
+    Then return it.
+ 2. Otherwise, remove the first character, and goto 1.
+
+And similarly for the last digit.

@@ -1,0 +1,27 @@
+Advent of Code 2023 Day 19: Aplenty
+https://adventofcode.com/2023/day/19
+
+Fun: 4/5
+Difficulty: 4/5 (implementation)
+
+For part 1, we need to evaluate a list of objects with 4 integer properties
+against a list of rules to determine which will eventually be accepted. This
+can be done by simulation. See: IsAccepted() in 19.py.
+
+For part 2, we have to determine how many different objects exist that could
+be accepted. The range of values is too large to simulate all possibilities.
+Instead, we can start with undetermined properties as ranges of possible
+values, and narrow them down recursively. See: CountSolutions().
+
+The most fun part of this problem is thinking about how to represent the rules
+so that processing them later becomes easy. I ended up rewriting the rules
+into a canonical form with only a single conjunction per rule (see:
+ParseRules()) which realy simplifies the rest of the solution.
+
+Complaints about this problem:
+
+ 1. Parsing is annoying.
+ 2. The solution for part 2 would be too slow in general, so this solution
+    relies on the assumption that the official test data is relatively easy.
+
+Overall still a pretty entertaining problem.

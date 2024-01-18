@@ -1,0 +1,8 @@
+Advent of Code 2023 Day 15: Lens Library
+https://adventofcode.com/2023/day/15
+
+Fun: 1/5
+Difficulty: 1/5
+
+Very uncreative implementation problem. Simply read the problem statement
+carefully and do exactly what is asked without thinking.

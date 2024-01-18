@@ -1,0 +1,18 @@
+Advent of Code 2023 Day 24: Never Tell Me The Odds
+https://adventofcode.com/2023/day/24
+
+Fun: 2/5
+Difficulty: 5/5 (implementation)
+
+Part 1 is just doing 2D line-line intersection, which is a standard problem.
+I did solve it using only integer arithmetic (this is a bit of twist on the
+standard solution) but apparently you could have used floating point arithmetic
+and rounding.
+
+Part 2 requires finding a ray that intersects all other given rays at
+integer coordinates.
+
+Part 2 is easily the hardest problem of this year! I ended up solving it on an
+axis-by-axis basis, which is still quite difficult (see 24.py). An easier way
+is to create linear equations for two 2D planes (see 24-linalg.py). It's not a
+bad problem but overall I didn't have a lot of fun solving this.

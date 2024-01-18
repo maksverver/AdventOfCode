@@ -1,0 +1,8 @@
+Advent of Code 2023 Day 4: Scratchcards
+https://adventofcode.com/2023/day/4
+
+Fun: 4/5
+Difficulty: 2/5 (insight)
+
+Part 1 is simple counting.
+Part 2 requires tracking the number of copies of each card we have.

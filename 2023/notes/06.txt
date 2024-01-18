@@ -1,0 +1,10 @@
+Advent of Code 2023 Day 6: Wait For It
+https://adventofcode.com/2023/day/6
+
+Fun: 3/5
+Difficulty: 3/5 (math / algorithms)
+
+Interesting little problem. It basically boils down to finding the solutions
+to a quadratic equation. See the comments for CountWinning() on how this
+solution works, or see 06-exact.py for an exact closed-form solution. The main
+tricky part there is to get rounding correct.

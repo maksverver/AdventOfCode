@@ -1,0 +1,19 @@
+Advent of Code 2023 Day 11: Mirage Maintenance
+https://adventofcode.com/2023/day/11
+
+Fun: 4/5
+Difficulty: 3/5 (implementation, algorithms)
+
+We need to expand empty rows and columns. For part 1, a brute force solution
+that inserts empty rows and columns works. For part 2 this is obviously not
+sufficient, but we can calculate the target height and width of each row and
+column, and use that to calculate the new coordinates for all the galaxies.
+The accumulate() function is useful here.
+
+This is still an O(N^2) solution. I did have fun figuring out an O(N) solution
+instead: see day11/fast.py
+
+Alternative solution: if you can calculate the solution for part 1 with and
+without empty rows/columns doubled, then you can derive the solution for
+part 2 as something like f(n) = (f(2) - f(1)) × f(n - 1) where f(n) is the sum
+of distances when expanding empty rows/columns to height/width `n`.

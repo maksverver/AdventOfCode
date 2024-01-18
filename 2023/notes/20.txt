@@ -1,0 +1,24 @@
+Advent of Code 2023 Day 20: Pulse Propagation
+https://adventofcode.com/2023/day/20
+
+Fun: 3/5
+Difficulty: 3/5 (simulation, input decoding)
+
+For part 1, we have to simulate a sort of discrete-time logical circuit.
+I liked implementing the digital circuitry, but disliked how much careful
+reading was required to figure out what all the modules do. Fortunately,
+it was not just a simulation problem.
+
+For part 2, we had to figure out how long it takes before the `rx` module
+receives a low pulse. This takes much too long to simulate automatically, so
+we have to introspect the input data to determine what it actually does. It
+turns out that `rx` receives input from 4 periodic components, so we can
+determine their periods individually, and then calculate their LCM.
+
+Introspecting the input in this case was more fun than usual. My main
+complaint is that this type of problem, where you have to figure out what a
+machine actually does, has been done so much before in Advent of Code problems
+and even on Day 8 of this year.
+
+Overall I did have fun part building up the circuit components, and I liked
+figuring out how the input is constructed (see: day20/uitleg-1.png etc.)

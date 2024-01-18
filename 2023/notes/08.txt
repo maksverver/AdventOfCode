@@ -1,0 +1,13 @@
+Advent of Code 2023 Day 8: Haunted Wasteland
+https://adventofcode.com/2023/day/8
+
+Fun: 2/5
+Difficulty: 3/5 (math, insight)
+
+Inspecting the input, we can find out that each “ghost” ends up in a simple
+cycle (see comments on FindCycle() below). We can determine the length of each
+cycle and then take the least-common-multiple.
+
+I didn't struggle too much with this because this kind of problem is typical
+for Advent of Code, but I'm not really a fan of these kind of problems that
+require exploiting some mysterious property of the input file.

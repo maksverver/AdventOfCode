@@ -1,0 +1,30 @@
+Advent of Code 2023 Day 16: The Floor Will Be Lava
+https://adventofcode.com/2023/day/16
+
+Fun: 3/5
+Difficulty: 2/5 (simulation)
+
+Enjoyable but easy problem. Straightforward simulation works for both parts.
+
+It's hard to come up with a more efficient solution. It initially seemed like
+we could do something like construct a directed graph of the possible light
+paths, and then compute the vertex with the maximal reachable set through
+decomposition into into strongly connected components, but this fails because
+the vertices in this graph would be of the form (row, column, direction),
+while we need to count total tiles energized, i.e., just (row, column) pairs,
+which may appear in multiple components.
+
+Optimizations that do work are:
+
+ 1. When a light beam exits the grid, we don't have to consider that exit
+    as an entry, since the tiles energized would be a subset of those just
+    found in the other direction.
+
+    Note the sets are not the same due to the asymmetric behavior of the
+    splitters.
+
+ 2. In our state, which consists of (row, column, direction), we only need to
+    keep track of whether the ray entered horizontally/vertically, not all
+    four orthogonal directions.
+
+These don't improve runtime very much though.

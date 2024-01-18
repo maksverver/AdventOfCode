@@ -1,0 +1,50 @@
+Advent of Code 2023 Day 25: Snowverload
+https://adventofcode.com/2023/day/25
+
+Fun: 3/5
+Difficulty: 2/5
+
+We are given a graph which we are told can be partitioned into two parts,
+A and B, so that there are exactly 3 edges connecting the two parts.
+
+There are many different ways to solve this:
+
+ 1. By visualization: see day25/input.png, which was created by converting the
+    input to GraphViz format and rendering it with `neato`.
+
+ 2. Using a min-cut max-flow algorithm: that's what I did here, using
+    Ford-Fulkerson with depth-first search to find augmenting paths. This
+    requires guessing a start and finish vertex to find the minimum cut, but
+    if we (correctly) assume both parts are approximately the same size, the
+    guess is right about 50% of the time.
+
+ 3. Karger's algorithm: https://en.wikipedia.org/wiki/Karger%27s_algorithm
+    See 25-karger.py
+
+ 4. Girvan-Newman algorithm?
+    https://en.wikipedia.org/wiki/Girvan%E2%80%93Newman_algorithm
+
+ 5. Stoer-Wagner algorithm?
+    https://en.wikipedia.org/wiki/Stoer%E2%80%93Wagner_algorithm
+
+ 6. Ad-hoc: for each edge v-w, in the graph, do a shortest path search from
+    v to w *without* using edge v-w. The edges that cross the parts tend to
+    be far away. (This isn't necessarily true, but it works for to the
+    official input.)
+
+ 7. Ad-hoc: start with a set S containing all vertices except one. Greedily
+    remove one of the vertices that has a maximal number of connections to
+    vertices outside S. Repeat until the set S has exactly 3 edges to the
+    outside; that's the desired cut. (This doesn't work for all inputs, but
+    it works for the official input and the test input.)
+
+    See day25/friits-greedy.py for a clean implementation and the
+    counterexamples for situations where it doesn't work.
+
+I liked the variety of ways this problem could be solved. I didn't like that
+the easiest way to solve the official test input is to visualize it, which
+means you are basically running someone else's algorithm to do the hard work
+for you.
+
+(The low difficulty rating is based on the assumption that you solve it
+visually rather than algorithmically.)

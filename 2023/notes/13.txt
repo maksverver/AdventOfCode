@@ -1,0 +1,20 @@
+Advent of Code 2023 Day 13: Point of Incidence
+https://adventofcode.com/2023/day/13
+
+Fun: 2/5
+Difficulty: 2/5 (implementation)
+
+An implementation problem where brute force suffices: simply check every
+possible horizontal and vertical line of reflection.
+
+The time complexity is something like O(H×H×W + H×W×W) per pattern in the
+worst case, but the patterns in the input are small enough that this works.
+
+For part 1, we only need to check if a grid matches its reflection along a
+given horizontal or vertical line.
+
+For part 2, we need to determine which bit we can toggle to make the pattern
+reflect along a different line. This can be implemented in a similar way:
+instead of checking whether or not the the reflection matches, count the
+number of positions where it doesn't match. Then part 1 can be solved by
+looking for 0 errors, and part 2 by looking for exactly 1 error.

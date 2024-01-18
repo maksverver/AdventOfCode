@@ -1,0 +1,22 @@
+Advent of Code 2023 Day 12: Hot Springs
+https://adventofcode.com/2023/day/12
+
+Fun: 4/5
+Difficulty: 3/5 (algorithms)
+
+A standard dynamic programming problem.
+
+Given a template string that contains characters '#', '.' and '?', we are asked
+to count the number of ways we can replace the question marks with '.' or '#'
+so that the lengths of the runs of consecutive '#' characters matches a given
+list of positive integers. For example: "#.?#?.###" matches [1, 2, 3] two ways
+"#.##..###" and "#..##.###".
+
+It helps to append a '.' to the end of the pattern, which doesn't change the
+number of solutions, but guarantees that each run of '#'s ends with a '.',
+removing an edge case at the end of the string.
+
+Now we can solve the problem recursively, using a state that consists of a
+pair of integers: the position in the template string and the list of
+integers. At each position we either put a '.' or we fill in the next run of
+hashes, for a solution that runs in O(|s| × sum(runs)) time.
