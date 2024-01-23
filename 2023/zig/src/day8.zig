@@ -59,7 +59,7 @@ const GraphBuilder = struct {
     }
 
     fn getVertexId(self: *GraphBuilder, name: []const u8) !usize {
-        var result = try self.vertex_ids.getOrPut(name);
+        const result = try self.vertex_ids.getOrPut(name);
         if (result.found_existing) return result.value_ptr.*;
         errdefer _ = self.vertex_ids.remove(name);
         const id = self.vertices.items.len;
@@ -87,7 +87,7 @@ fn parseInput(allocator: std.mem.Allocator, input: []const u8) !Input {
     // Parse first line: a sequence of instructions ('L' or 'R')
     const firstLine = try scanner.scanAlphabetic();
     try scanner.skipNewline();
-    var instructions = try allocator.alloc(Instruction, firstLine.len);
+    const instructions = try allocator.alloc(Instruction, firstLine.len);
     errdefer allocator.free(instructions);
     for (instructions, firstLine) |*i, ch| {
         switch (ch) {

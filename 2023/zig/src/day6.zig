@@ -89,7 +89,7 @@ const Record = struct {
         var lo = lo_arg;
         var hi = hi_arg;
         while (lo < hi) {
-            var mid = lo + @divFloor((hi - lo), 2);
+            const mid = lo + @divFloor((hi - lo), 2);
             if (record.isWinning(mid) == target) {
                 hi = mid;
             } else {

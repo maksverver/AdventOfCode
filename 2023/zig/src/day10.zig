@@ -64,7 +64,7 @@ pub fn solve(env: *Environment) !void {
     // For the general case, see: https://en.wikipedia.org/wiki/Shoelace_formula
     var pos = start;
     var area: isize = 0;
-    var perimeter: isize = 0;
+    var perimeter: usize = 0;
     var dir = try nextDirection(startConnections, .w);
     while (true) {
         perimeter += 1;
@@ -108,7 +108,8 @@ pub fn solve(env: *Environment) !void {
     // answer of part 1, above).
     //
     // See: https://en.wikipedia.org/wiki/Pick%27s_theorem
-    const answer2 = try std.math.absInt(area) - answer1 + 1;
+    const answer2 = std.math.absCast(area) - answer1 + 1;
+    // const answer2 = @abs(area) - answer1 + 1; // zig 0.12
 
     try env.setAnswers(answer1, answer2);
 }

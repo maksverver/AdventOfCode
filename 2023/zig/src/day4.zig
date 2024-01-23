@@ -56,7 +56,7 @@ pub fn solve(env: *Environment) !void {
     var answer1: isize = 0;
     var answer2: isize = 0;
     for (cards, 0..) |*card, i| {
-        var n = card.countWinning();
+        const n = card.countWinning();
         if (n > 0) {
             answer1 += @as(isize, 1) << @intCast(n - 1);
             for (i + 1..i + 1 + n) |j| {

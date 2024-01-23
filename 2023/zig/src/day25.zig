@@ -61,7 +61,7 @@ const GraphBuilder = struct {
     }
 
     fn getVertexId(self: *GraphBuilder, name: []const u8) !usize {
-        var res = try self._vertex_by_name.getOrPut(self.allocator, name);
+        const res = try self._vertex_by_name.getOrPut(self.allocator, name);
         if (!res.found_existing) {
             res.value_ptr.* = self.vertex_count;
             self.vertex_count += 1;
@@ -110,7 +110,7 @@ fn parseInput(allocator: std.mem.Allocator, input: []const u8) !Graph {
         try scanner.skipText(": ");
         const v = try graph_builder.getVertexId(src);
         while (scanner.peekNewline().len == 0) {
-            var dst = try scanner.scanAlphabetic();
+            const dst = try scanner.scanAlphabetic();
             scanner.skipHorizontalSpace();
             const w = try graph_builder.getVertexId(dst);
             std.debug.assert(v != w);

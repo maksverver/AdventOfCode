@@ -148,7 +148,7 @@ const GraphBuilder = struct {
     fn build(self: *GraphBuilder) !Graph {
         const broadcaster = self.module_index.get("broadcaster") orelse return error.InvalidInput;
         const rx = self.module_index.get("rx"); // missing in examples
-        var modules = try self.allocator.alloc(Module, self.modules.items.len);
+        const modules = try self.allocator.alloc(Module, self.modules.items.len);
         for (self.modules.items, modules) |def, *module| {
             module.* = Module.init(def.name, def.inputs.items, def.outputs.items, def.typ_ orelse .sink);
         }
@@ -166,8 +166,8 @@ fn parseInput(allocator: std.mem.Allocator, input: []const u8) !Graph {
     var line_it = try text.LineIterator.init(input);
     while (line_it.next()) |line| {
         var part_it = std.mem.split(u8, line, " -> ");
-        var head = part_it.next() orelse return error.InvalidInput;
-        var tail = part_it.next() orelse return error.InvalidInput;
+        const head = part_it.next() orelse return error.InvalidInput;
+        const tail = part_it.next() orelse return error.InvalidInput;
         if (part_it.next()) |_| return error.InvalidInput;
         const source = try builder.createSource(head);
         var dest_it = std.mem.split(u8, tail, ", ");

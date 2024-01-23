@@ -26,7 +26,7 @@ fn isSymbol(c: u8) bool {
 
 fn detectSymbol(grid: *const Grid, symbols: *std.ArrayList(Symbol), pos: Coords, dr: i2, dc: i2) !void {
     if (grid.moveBy(pos, dr, dc)) |new_pos| {
-        var ch = grid.ptrAtPos(new_pos);
+        const ch = grid.ptrAtPos(new_pos);
         if (isSymbol(ch.*)) try symbols.append(Symbol{ .ch = ch });
     }
 }

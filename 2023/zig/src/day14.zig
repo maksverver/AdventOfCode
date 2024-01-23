@@ -218,7 +218,7 @@ const Part2Solver = struct {
                 }
             }
         }
-        var solver = Part2Solver{
+        return Part2Solver{
             .grid = grid,
             .stacks = stacks,
             .next_wall_data = next_wall_data,
@@ -226,7 +226,6 @@ const Part2Solver = struct {
             .counts = counts,
             .allocator = allocator,
         };
-        return solver;
     }
 
     fn deinit(self: Part2Solver) void {
@@ -271,7 +270,7 @@ const Part2Solver = struct {
 
             var key: ?[]u8 = try self.allocator.dupe(u8, self.counts);
             defer if (key) |p| self.allocator.free(p);
-            var res = try last_seen.getOrPut(key.?);
+            const res = try last_seen.getOrPut(key.?);
             if (!res.found_existing) {
                 key = null; // last_seen owns the key now
                 res.value_ptr.* = @intCast(steps);

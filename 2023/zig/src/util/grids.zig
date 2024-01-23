@@ -291,8 +291,8 @@ pub fn Grid(comptime T: type, comptime config: GridConfig) type {
         }
 
         pub fn moveBy(self: Self, pos: Coords, dr: isize, dc: isize) ?Coords {
-            var r = @as(isize, @intCast(pos.r)) + dr;
-            var c = @as(isize, @intCast(pos.c)) + dc;
+            const r = @as(isize, @intCast(pos.r)) + dr;
+            const c = @as(isize, @intCast(pos.c)) + dc;
             if (0 <= r and r < self.height and 0 <= c and c < self.width) {
                 return Coords{
                     .r = @as(usize, @intCast(r)),

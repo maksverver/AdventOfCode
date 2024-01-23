@@ -126,10 +126,10 @@ const Solver = struct {
     fn init(allocator: std.mem.Allocator, grid: Grid) !Solver {
         var todo = std.ArrayList(State).init(allocator);
         errdefer todo.deinit();
-        var seen = try allocator.alloc(u4, grid.height * grid.width);
+        const seen = try allocator.alloc(u4, grid.height * grid.width);
         errdefer allocator.free(seen);
         @memset(seen, 0);
-        var exits = try allocator.alloc(bool, entranceCount(grid));
+        const exits = try allocator.alloc(bool, entranceCount(grid));
         errdefer allocator.free(exits);
         @memset(exits, false);
         return Solver{

@@ -32,7 +32,7 @@ const Brick = struct {
 const Input = []const []const usize;
 
 fn parseInput(allocator: std.mem.Allocator, input: []const u8) !Input {
-    var line_count = text.countLines(input) orelse return error.InvalidInput;
+    const line_count = text.countLines(input) orelse return error.InvalidInput;
     var bricks = try allocator.alloc(Brick, line_count);
     defer allocator.free(bricks);
 
@@ -255,7 +255,7 @@ fn solvePart2(allocator: std.mem.Allocator, supported_by: []const []const usize)
 
 pub fn solve(env: *Environment) !void {
     const allocator = env.getArenaAllocator();
-    var supported_by = try env.parseInputAlloc(Input, parseInput, allocator);
+    const supported_by = try env.parseInputAlloc(Input, parseInput, allocator);
     defer freeInput(allocator, supported_by);
 
     try env.setAnswer1(try solvePart1(allocator, supported_by));

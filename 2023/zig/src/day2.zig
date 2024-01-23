@@ -18,10 +18,10 @@ pub fn solve(env: *Environment) !void {
             var g: isize = 0;
             var b: isize = 0;
             while (true) {
-                var count = try scanner.scanInt(isize);
+                const count = try scanner.scanInt(isize);
                 std.debug.assert(count >= 0);
                 scanner.skipHorizontalSpace();
-                var color = try scanner.scanAlphabetic();
+                const color = try scanner.scanAlphabetic();
                 if (std.mem.eql(u8, color, "red")) {
                     std.debug.assert(r == 0);
                     r = count;

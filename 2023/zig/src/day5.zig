@@ -102,26 +102,25 @@ fn solvePart1(input: *const Input) !i64 {
 
 // Translates the range of numbers between begin and end (exclusive) using the
 // given maps, and returns the minimum of the final numbers.
-fn translateRangeToMin(maps: []const []const MapEntry, begin: isize, end: isize) i64 {
+fn translateRangeToMin(maps: []const []const MapEntry, begin_arg: isize, end: isize) i64 {
+    var begin = begin_arg;
     std.debug.assert(begin < end);
     if (maps.len == 0) return begin;
-    var b = begin;
-    var e = end;
     var result: i64 = std.math.maxInt(i64);
     for (maps[0]) |entry| {
-        if (entry.end <= b) continue;
-        if (entry.begin >= e) break;
-        if (b < entry.begin) {
-            result = @min(result, translateRangeToMin(maps[1..], b, entry.begin));
-            b = entry.begin;
+        if (entry.end <= begin) continue;
+        if (entry.begin >= end) break;
+        if (begin < entry.begin) {
+            result = @min(result, translateRangeToMin(maps[1..], begin, entry.begin));
+            begin = entry.begin;
         }
-        if (e <= entry.end) {
-            return @min(result, translateRangeToMin(maps[1..], b + entry.delta, e + entry.delta));
+        if (end <= entry.end) {
+            return @min(result, translateRangeToMin(maps[1..], begin + entry.delta, end + entry.delta));
         }
-        result = @min(result, translateRangeToMin(maps[1..], b + entry.delta, entry.end + entry.delta));
-        b = entry.end;
+        result = @min(result, translateRangeToMin(maps[1..], begin + entry.delta, entry.end + entry.delta));
+        begin = entry.end;
     }
-    return @min(result, translateRangeToMin(maps[1..], b, e));
+    return @min(result, translateRangeToMin(maps[1..], begin, end));
 }
 
 fn solvePart2(input: *const Input) !i64 {

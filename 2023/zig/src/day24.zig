@@ -16,17 +16,17 @@ fn parseInput(allocator: std.mem.Allocator, input: []const u8) ![]Ray {
     errdefer list.deinit();
     var scanner = Scanner.init(input);
     while (!scanner.isEmpty()) {
-        var x = try scanner.scanInt(i64);
+        const x = try scanner.scanInt(i64);
         try scanner.skipText(", ");
-        var y = try scanner.scanInt(i64);
+        const y = try scanner.scanInt(i64);
         try scanner.skipText(", ");
-        var z = try scanner.scanInt(i64);
+        const z = try scanner.scanInt(i64);
         try scanner.skipText(" @ ");
-        var vx = try scanner.scanInt(i64);
+        const vx = try scanner.scanInt(i64);
         try scanner.skipText(", ");
-        var vy = try scanner.scanInt(i64);
+        const vy = try scanner.scanInt(i64);
         try scanner.skipText(", ");
-        var vz = try scanner.scanInt(i64);
+        const vz = try scanner.scanInt(i64);
         try scanner.skipNewline();
         try list.append(Ray{ .x = x, .y = y, .z = z, .vx = vx, .vy = vy, .vz = vz });
     }
@@ -36,14 +36,14 @@ fn parseInput(allocator: std.mem.Allocator, input: []const u8) ![]Ray {
 /// Returns true iff. two 2D lines intersect, with an intersection point (x, y)
 /// where min <= x, y <= max, using only integer arithmetic in the calculation.
 fn intersectInRange(x1: i64, y1: i64, vx1: i64, vy1: i64, x2: i64, y2: i64, vx2: i64, vy2: i64, min_arg: i64, max_arg: i64) bool {
-    var det: i128 = vx2 * vy1 - vx1 * vy2;
+    const det: i128 = vx2 * vy1 - vx1 * vy2;
     if (det == 0) return false; // lines are parallel
 
-    var dx = x2 - x1;
-    var dy = y2 - y1;
+    const dx = x2 - x1;
+    const dy = y2 - y1;
 
-    var f1: i128 = vx2 * dy - vy2 * dx; // f1/det = position of intersection on first line
-    var f2: i128 = vx1 * dy - vy1 * dx; // f2/det = position of intersection on second line
+    const f1: i128 = vx2 * dy - vy2 * dx; // f1/det = position of intersection on first line
+    const f2: i128 = vx1 * dy - vy1 * dx; // f2/det = position of intersection on second line
     std.debug.assert(f1 != 0);
     std.debug.assert(f2 != 0);
 
@@ -59,8 +59,8 @@ fn intersectInRange(x1: i64, y1: i64, vx1: i64, vy1: i64, x2: i64, y2: i64, vx2:
     // Below, we will calculate (min <= xdet/det and xdet/det <= max) as
     // (min*det <= xdet and xdet <= max*det), but this requires that we swap
     // min and max if det is negative:
-    var min = if (det > 0) min_arg else max_arg;
-    var max = if (det > 0) max_arg else min_arg;
+    const min = if (det > 0) min_arg else max_arg;
+    const max = if (det > 0) max_arg else min_arg;
 
     // Check if the intersection point's coordinates lie between min and max, inclusive.
     return (min * det <= xdet and xdet <= max * det) and
@@ -96,7 +96,7 @@ fn solveMatrix(comptime N: usize, matrix: *[N][N + 1]FloatT) ![N]FloatT {
 
         // Normalize row i so it is matrix[i][i] = 1.
         {
-            var x = matrix[i][i];
+            const x = matrix[i][i];
             matrix[i][i] = 1;
             // Note: instead of dividing by x, we could also precalculate 1/x
             // and then multiply by that, which is faster but less precise.
@@ -105,7 +105,7 @@ fn solveMatrix(comptime N: usize, matrix: *[N][N + 1]FloatT) ![N]FloatT {
 
         // Subtract row i from other rows until matrix[r][i] = 0 for all r ≠ i.
         for (0..N) |r| if (r != i) {
-            var x = matrix[r][i];
+            const x = matrix[r][i];
             if (x == 0) continue;
             for (i..N + 1) |c| matrix[r][c] -= x * matrix[i][c];
         };
