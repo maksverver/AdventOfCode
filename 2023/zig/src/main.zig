@@ -210,10 +210,9 @@ fn solveDay(
     input_path: []const u8,
     answer_path: []const u8,
 ) !bool {
-    // Set up memory allocator, which detects leaks and other errors in debug mode.
-    var general_purpose_allocator = std.heap.GeneralPurposeAllocator(.{}){};
-    defer std.debug.assert(general_purpose_allocator.deinit() == .ok);
-    const allocator = general_purpose_allocator.allocator();
+    var af = running.AllocatorFactory.init();
+    defer af.deinit();
+    const allocator = af.allocator();
 
     // Read input file.
     const max_input_size = std.math.maxInt(usize);

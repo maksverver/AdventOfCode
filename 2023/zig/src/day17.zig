@@ -69,7 +69,7 @@ pub fn solve(env: *Environment) !void {
     // For this problem, the arena allocator is a 2x as fast as the heap allocator,
     // at least when using Zig's general purpose allocator instead of the native
     // libc allocator.
-    const allocator = env.getArenaAllocator();
+    const allocator = if (@import("builtin").link_libc) env.getHeapAllocator() else env.getArenaAllocator();
     const grid = try env.parseInput(Grid, Grid.initFromText);
     try env.setAnswer1(try solvePart(allocator, grid, 1, 3));
     try env.setAnswer2(try solvePart(allocator, grid, 4, 10));
