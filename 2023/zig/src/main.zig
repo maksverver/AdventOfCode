@@ -43,72 +43,10 @@ const DefaultInputPathArgs = struct { usize };
 const defaultAnswerPathFmt = "../testdata/{d:0>2}.ref";
 const DefaultAnswerPathArgs = struct { usize };
 
-var stdout = std.io.bufferedWriter(std.io.getStdOut().writer());
-var stdoutWriter = stdout.writer();
-var stdoutSupportsAnsi: ?bool = null;
-
-const AnsiStyle = enum(u8) {
-    reset,
-    bold,
-    dim,
-    fgBlack = 30,
-    fgRed,
-    fgGreen,
-    fgYellow,
-    fgBlue,
-    fgMagenta,
-    fgCyan,
-    fgWhite,
-    bgBlack = 40,
-    bgRed,
-    bgGreen,
-    bgYellow,
-    bgBlue,
-    bgMagenta,
-    bgCyan,
-    bgWhite,
-    fgBrightBlack = 90,
-    fgBrightRed,
-    fgBrightGreen,
-    fgBrightYellow,
-    fgBrightBlue,
-    fgBrightMagenta,
-    fgBrightCyan,
-    fgBrightWhite,
-    bgBrightBlack = 100,
-    bgBrightRed,
-    bgBrightGreen,
-    bgBrightYellow,
-    bgBrightBlue,
-    bgBrightMagenta,
-    bgBrightCyan,
-    bgBrightWhite,
-};
-
-fn useAnsi() bool {
-    if (stdoutSupportsAnsi) |val| {
-        return val;
-    } else {
-        const val = std.io.getStdOut().supportsAnsiEscapeCodes();
-        stdoutSupportsAnsi = val;
-        return val;
-    }
-}
-
-fn setAnsiStyle(style: AnsiStyle) !void {
-    if (!useAnsi()) return;
-    return try stdoutWriter.print("\x1b[{d}m", .{@intFromEnum(style)});
-}
-
-fn setAnsiStyles(styles: []const AnsiStyle) !void {
-    if (!useAnsi() or styles.len == 0) return;
-    try stdoutWriter.print("\x1b[", .{});
-    for (styles, 0..) |style, i| {
-        if (i > 0) try stdoutWriter.print(";", .{});
-        try stdoutWriter.print("{d}", .{@intFromEnum(style)});
-    }
-    try stdoutWriter.print("m", .{});
-}
+var stdout = std.io.getStdOut();
+var stdout_buffer = std.io.bufferedWriter(std.io.getStdOut().writer());
+var stdout_writer = stdout_buffer.writer();
+var tty_config = std.io.tty.Config{ .no_color = {} }; // initialized in main()
 
 inline fn defaultInputPath(comptime day: isize) *const [std.fmt.count(defaultInputPathFmt, DefaultInputPathArgs{@as(usize, day)}):0]u8 {
     comptime return std.fmt.comptimePrint(defaultInputPathFmt, DefaultInputPathArgs{@as(usize, day)});
@@ -172,35 +110,37 @@ const tableFooter =
 ;
 
 fn printTime(opt_nanos: ?u64, emphasize: bool) !void {
-    try stdoutWriter.writeAll("│");
+    try stdout_writer.writeAll("│");
     if (opt_nanos) |nanos| {
-        if (emphasize) try setAnsiStyle(.bold);
-        try stdoutWriter.print("{d: >8.3} ", .{nanosToMillis(nanos)});
-        if (emphasize) try setAnsiStyle(.reset);
+        if (emphasize) try tty_config.setColor(stdout_writer, .bold);
+        try stdout_writer.print("{d: >8.3} ", .{nanosToMillis(nanos)});
+        if (emphasize) try tty_config.setColor(stdout_writer, .reset);
     } else {
-        try setAnsiStyle(.dim);
-        try stdoutWriter.print("{s: >8} ", .{"-"});
-        try setAnsiStyle(.reset);
+        if (emphasize) try tty_config.setColor(stdout_writer, .dim);
+        try stdout_writer.print("{s: >8} ", .{"-"});
+        if (emphasize) try tty_config.setColor(stdout_writer, .reset);
     }
 }
 
 fn printVerdict(verdict: Verdict) !void {
-    try stdoutWriter.print("│", .{});
+    try stdout_writer.print("│", .{});
     switch (verdict) {
         .correct => {
-            try setAnsiStyles(&[_]AnsiStyle{ .fgGreen, .bold });
-            try stdoutWriter.print(" OK     ", .{});
-            try setAnsiStyle(.reset);
+            try tty_config.setColor(stdout_writer, .green);
+            try tty_config.setColor(stdout_writer, .bold);
+            try stdout_writer.print(" OK     ", .{});
+            try tty_config.setColor(stdout_writer, .reset);
         },
         .wrong => {
-            try setAnsiStyles(&[_]AnsiStyle{ .fgRed, .bold });
-            try stdoutWriter.print(" WRONG  ", .{});
-            try setAnsiStyle(.reset);
+            try tty_config.setColor(stdout_writer, .red);
+            try tty_config.setColor(stdout_writer, .bold);
+            try stdout_writer.print(" WRONG  ", .{});
+            try tty_config.setColor(stdout_writer, .reset);
         },
         .missing => {
-            try setAnsiStyle(.dim);
-            try stdoutWriter.print(" -      ", .{});
-            try setAnsiStyle(.reset);
+            try tty_config.setColor(stdout_writer, .dim);
+            try stdout_writer.print(" -      ", .{});
+            try tty_config.setColor(stdout_writer, .reset);
         },
     }
 }
@@ -288,30 +228,31 @@ fn solveDays(configs: []const DayConfig) !void {
     var timer = try std.time.Timer.start();
     var failures: isize = 0;
 
-    try stdoutWriter.writeAll(tableHeader);
+    try stdout_writer.writeAll(tableHeader);
 
     for (configs) |config| {
-        try stdoutWriter.print("║{d: >4} ", .{config.day});
+        try stdout_writer.print("║{d: >4} ", .{config.day});
         if (config.solve) |solve| {
             if (solveDay(solve, config.input_path, config.answer_path)) |ok| {
                 if (!ok) failures += 1;
-                try stdoutWriter.writeAll("║\n");
+                try stdout_writer.writeAll("║\n");
             } else |err| {
-                try stdoutWriter.print("│ ", .{});
-                try setAnsiStyles(&[_]AnsiStyle{ .fgRed, .bold });
-                try stdoutWriter.print("Solver failed! ", .{});
-                try setAnsiStyle(.reset);
-                try stdoutWriter.print("{}\n", .{err});
+                try stdout_writer.print("│ ", .{});
+                try tty_config.setColor(stdout_writer, .bold);
+                try tty_config.setColor(stdout_writer, .red);
+                try stdout_writer.print("Solver failed! ", .{});
+                try tty_config.setColor(stdout_writer, .reset);
+                try stdout_writer.print("{}\n", .{err});
             }
         } else {
-            try stdoutWriter.print("│ Missing solver for day {}\n", .{config.day});
+            try stdout_writer.print("│ Missing solver for day {}\n", .{config.day});
         }
-        try stdout.flush();
+        try stdout_buffer.flush();
     }
     const totalNanos = timer.read();
 
-    try stdoutWriter.writeAll(tableFooter);
-    try stdout.flush();
+    try stdout_writer.writeAll(tableFooter);
+    try stdout_buffer.flush();
 
     std.debug.print("Total time: {d:.3} ms\n", .{nanosToMillis(totalNanos)});
 
@@ -324,19 +265,26 @@ fn solveDays(configs: []const DayConfig) !void {
 const usage = "Usage: aoc [<days>]\n\n";
 
 pub fn main() !void {
+    // Enable colored output (if the TTY supports it).
+    tty_config = std.io.tty.detectConfig(stdout);
+
+    // Create the allocator used during initialization only. The actual
+    // solutions use a separate allocator for each input.
     var general_purpose_allocator = std.heap.GeneralPurposeAllocator(.{}){};
     defer std.debug.assert(general_purpose_allocator.deinit() == .ok);
     const allocator = general_purpose_allocator.allocator();
 
+    // Parse arguments to determine which days to solve (if no arguments given,
+    // just solve each day once).
     const args = try std.process.argsAlloc(allocator);
     defer std.process.argsFree(allocator, args);
     var config_list = std.ArrayList(DayConfig).init(allocator);
     defer config_list.deinit();
     for (args[1..]) |arg| {
         const day = std.fmt.parseInt(usize, arg, 10) catch {
-            try stdoutWriter.print("Invalid argument: \"{s}\"\n\n", .{arg});
-            try stdoutWriter.writeAll(usage);
-            try stdout.flush();
+            try stdout_writer.print("Invalid argument: \"{s}\"\n\n", .{arg});
+            try stdout_writer.writeAll(usage);
+            try stdout_buffer.flush();
             std.process.exit(1);
         };
         try config_list.append(getDayConfig(day));
