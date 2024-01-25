@@ -228,43 +228,181 @@ fn solvePart1(allocator: std.mem.Allocator, input: Input) !usize {
     return answer;
 }
 
+// Slow implementation of the lowest common ancestor algorithm.
+//
+// This just stores the parent and depth of each vertex in the tree, and moves
+// up one level at a time until a common ancestor is found.
+//
+// Every call to lca() takes O(V) time worst-case.
+const SlowLCA = struct {
+    parents: []usize,
+    depths: []usize,
+
+    fn init(allocator: std.mem.Allocator, n: usize) !SlowLCA {
+        var parents = try allocator.alloc(usize, n);
+        errdefer allocator.free(parents);
+        var depths = try allocator.alloc(usize, n);
+        errdefer allocator.free(depths);
+        parents[0] = 0; // floor
+        depths[0] = 0; // floor
+        return .{ .depths = depths, .parents = parents };
+    }
+
+    fn deinit(self: SlowLCA, allocator: std.mem.Allocator) void {
+        defer allocator.free(self.depths);
+        defer allocator.free(self.parents);
+    }
+
+    // Add vertex v with the given parent, and return the depth of v.
+    fn addVertex(self: SlowLCA, v: usize, parent: usize) usize {
+        self.parents[v] = parent;
+        self.depths[v] = self.depths[parent] + 1;
+        return self.depths[v];
+    }
+
+    fn lca(self: SlowLCA, v_in: usize, w_in: usize) usize {
+        var v = v_in;
+        var w = w_in;
+        while (v != w) {
+            if (self.depths[v] > self.depths[w]) {
+                v = self.parents[v];
+            } else if (self.depths[w] > self.depths[v]) {
+                w = self.parents[w];
+            } else {
+                v = self.parents[v];
+                w = self.parents[w];
+            }
+        }
+        return v;
+    }
+};
+
+// Asymptotically faster implementation of the lowest common ancestor algorithm.
+//
+// This uses exponential search to find the lowest common ancestor, so that
+// each call to lca() takes O(log V) amortized time. It requires allocating
+// O(V log V) memory up front.
+const FastLCA = struct {
+    const no_vertex = std.math.maxInt(usize);
+
+    // ceil(log2(n)) where n is the number of vertices, passed to init().
+    log2size: usize,
+
+    // ancestors[v × log2size + k] is the 2^k-th ancestor of v, or 0 if
+    // depth[v] ≤ 2^k, or no_vertex if the value has not been computed yet.
+    //
+    // Specifically, ancestors[v × log2size] is the parent vertex of v.
+    //
+    // The parent value is assigned by addVertex(). Other values are initialized
+    // to no_vertex and computed on-demand by getAncestorPowerOf2().
+    ancestors: []usize,
+
+    // depths[v] = the the depth of vertex v in the tree, with the floor
+    // (vertex 0) having depth 0.
+    depths: []usize,
+
+    fn init(allocator: std.mem.Allocator, n: usize) !FastLCA {
+        var log2size = std.math.log2_int(usize, n) + 1;
+        var ancestors = try allocator.alloc(usize, log2size * n);
+        errdefer allocator.free(ancestors);
+        @memset(ancestors, no_vertex);
+        var depths = try allocator.alloc(usize, n);
+        errdefer allocator.free(depths);
+        ancestors[0] = 0; // floor
+        depths[0] = 0; // floor
+        return .{ .log2size = log2size, .depths = depths, .ancestors = ancestors };
+    }
+
+    fn deinit(self: FastLCA, allocator: std.mem.Allocator) void {
+        defer allocator.free(self.depths);
+        defer allocator.free(self.ancestors);
+    }
+
+    // Add vertex v with the given parent, and return the depth of v.
+    fn addVertex(self: FastLCA, v: usize, parent: usize) usize {
+        self.ancestors[self.log2size * v] = parent;
+        self.depths[v] = self.depths[parent] + 1;
+        return self.depths[v];
+    }
+
+    fn getParent(self: FastLCA, v: usize) usize {
+        return self.ancestors[self.log2size * v];
+    }
+
+    fn getAncestorPowerOf2(self: FastLCA, v: usize, k: usize) usize {
+        std.debug.assert(k < self.log2size);
+        var j = k;
+        while (self.ancestors[self.log2size * v + j] == no_vertex) j -= 1;
+        var a = self.ancestors[self.log2size * v + j];
+        while (j < k) : (j += 1) {
+            a = self.getAncestorPowerOf2(a, j);
+            self.ancestors[self.log2size * v + (j + 1)] = a;
+        }
+        return a;
+    }
+
+    fn getNthAncestor(self: FastLCA, v_in: usize, n: usize) usize {
+        var v = v_in;
+        var k: usize = 0;
+        var bit: usize = 1;
+        while (bit <= n) {
+            if ((n & bit) != 0) v = self.getAncestorPowerOf2(v, k);
+            k += 1;
+            bit += bit;
+        }
+        return v;
+    }
+
+    fn lca(self: FastLCA, v_in: usize, w_in: usize) usize {
+        var v = v_in;
+        var w = w_in;
+
+        var n = self.depths[v];
+        var m = self.depths[w];
+        if (n > m) v = self.getNthAncestor(v, n - m);
+        if (m > n) w = self.getNthAncestor(w, m - n);
+        if (v == w) return v;
+
+        var k: usize = 0;
+        while (self.getAncestorPowerOf2(v, k) != self.getAncestorPowerOf2(w, k)) {
+            k += 1;
+        }
+        while (k > 0) {
+            k -= 1;
+            const a = self.getAncestorPowerOf2(v, k);
+            const b = self.getAncestorPowerOf2(w, k);
+            if (a != b) {
+                v = a;
+                w = b;
+            }
+        }
+        std.debug.assert(v != w and self.getParent(v) == self.getParent(w));
+        return self.getParent(v);
+    }
+};
+
 // For each block i, we define parent[i] as the highest single block whose
 // removal would cause i to fall (0 if it rests on the floor), and depth[i]
 // as the total number of single blocks that would cause block i to fall (i.e.,
 // depth[i] = depth[parent[i]] + 1 if parent[i] != 0). Then we can calculate the
 // answer as the sum of depths[i] for all i.
-fn solvePart2(allocator: std.mem.Allocator, input: Input) !u64 {
-    var depth = try allocator.alloc(usize, input.brickCount());
-    defer allocator.free(depth);
-    var parent = try allocator.alloc(usize, input.brickCount());
-    defer allocator.free(parent);
-    depth[0] = 0;
-    parent[0] = 0;
+//
+// This algorithm calls the lca method |E| - |V| times, where |V| is the number
+// of bricks, and |E| is the number of edges in the graph implied by the
+// supported-by relation.
+//
+// The overall complexity depends on the LCA implementation chosen: O(EV) for
+// SlowLCA, or O(E log V) for FastLCA.
+fn solvePart2(comptime LCA: type, allocator: std.mem.Allocator, input: Input) !u64 {
+    var lca = try LCA.init(allocator, input.brickCount());
+    defer lca.deinit(allocator);
     var answer: u64 = 0;
     for (1..input.brickCount()) |i| {
         const s = input.supportedBy(i);
-        // Find the least common ancestor of the blocks that block i rests on.
-        // This algorithm runs in O(N) per element of s, but could be optimized
-        // to O(log N) using exponential search. For the official test data this
-        // isn't necessary.
-        std.debug.assert(s.len >= 1);
+        std.debug.assert(s.len >= 1); // floor is always included
         var p = s[0];
-        for (s[1..]) |j| {
-            var q = j;
-            while (p != q) {
-                if (depth[p] > depth[q]) {
-                    p = parent[p];
-                } else if (depth[q] > depth[p]) {
-                    q = parent[q];
-                } else {
-                    p = parent[p];
-                    q = parent[q];
-                }
-            }
-        }
-        parent[i] = p;
-        depth[i] = depth[p] + 1;
-        answer += depth[i] - 1; // minus 1 to not count the floor
+        for (s[1..]) |q| p = lca.lca(p, q);
+        answer += lca.addVertex(i, p) - 1; // minus 1 for the floor
     }
     return answer;
 }
@@ -275,7 +413,10 @@ pub fn solve(env: *Environment) !void {
     defer input.deinit(allocator);
 
     try env.setAnswer1(try solvePart1(allocator, input));
-    try env.setAnswer2(try solvePart2(allocator, input));
+
+    // For part 2, we can choose between two LCA implementations. FastLCA is
+    // asymptotically faster, but slower for the official test data.
+    try env.setAnswer2(try solvePart2(SlowLCA, allocator, input));
 }
 
 pub fn main() !void {
@@ -283,7 +424,9 @@ pub fn main() !void {
 }
 
 test "example" {
-    try @import("framework/testing.zig").testSolver(solve,
+    const expectEqual = @import("util/testing.zig").expectEqual;
+    const allocator = std.testing.allocator;
+    const input = try parseInput(allocator,
         \\1,0,1~1,2,1
         \\0,0,2~2,0,2
         \\0,2,3~2,2,3
@@ -292,5 +435,9 @@ test "example" {
         \\0,1,6~2,1,6
         \\1,1,8~1,1,9
         \\
-    , "5", "7");
+    );
+    defer input.deinit(allocator);
+    try expectEqual(try solvePart1(allocator, input), 5);
+    try expectEqual(try solvePart2(SlowLCA, allocator, input), 7);
+    try expectEqual(try solvePart2(FastLCA, allocator, input), 7);
 }
