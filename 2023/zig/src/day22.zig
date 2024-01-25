@@ -23,13 +23,81 @@ const Brick = struct {
 // the index 0 refers to the floor, and the bricks have indices 1 through
 // bricks.len (inclusive).
 //
-// The DAG is an array `supported_by` of type [][]usize, where supported_by[i]
-// is a sorted array of distinct indices, such that supported_by[i] contains j
-// iff. block i rests directly on block j.
-//
 // Both parts of the problem can be solved using only this DAG, without needing
 // to reference to original list of bricks.
-const Input = []const []const usize;
+const Input = struct {
+    starts: []usize,
+    data: []usize,
+
+    fn fromBricks(allocator: std.mem.Allocator, bricks: []Brick) !Input {
+        // Sort bricks from bottom to top.
+        std.mem.sortUnstable(Brick, bricks, {}, Brick.compareZ1);
+
+        // Alocate `start` array and `data` buffer.
+        var starts = try allocator.alloc(usize, bricks.len + 2);
+        errdefer allocator.free(starts);
+        var buf = std.ArrayList(usize).init(allocator);
+        errdefer buf.deinit();
+
+        starts[0] = 0; // floor element
+
+        // For each brick, calculate the set of bricks it is supported by.
+        var index = try HeightIndex.init(allocator, bricks);
+        //var index = HashHeightIndex.init(allocator);
+        defer index.deinit();
+        for (bricks, 1..) |brick, i| {
+            const start = buf.items.len;
+            starts[i] = start;
+            try buf.append(0);
+            // Calculate top height for this brick, as the maximum of the heights
+            // of the cells on which it rests, plus the brick's own height.
+            const new_h = calc: {
+                var max_h: Coord = 0;
+                var x = brick.x1;
+                while (x <= brick.x2) : (x += 1) {
+                    var y = brick.y1;
+                    while (y <= brick.y2) : (y += 1) {
+                        const elem = index.get(x, y);
+                        if (elem.h > max_h) {
+                            buf.shrinkRetainingCapacity(start);
+                            max_h = elem.h;
+                        }
+                        if (elem.h == max_h) {
+                            try buf.append(elem.i);
+                        }
+                    }
+                }
+                break :calc max_h + (brick.z2 - brick.z1 + 1);
+            };
+            // Update brick height index
+            var x = brick.x1;
+            while (x <= brick.x2) : (x += 1) {
+                var y = brick.y1;
+                while (y <= brick.y2) : (y += 1) {
+                    try index.set(x, y, .{ .h = new_h, .i = i });
+                }
+            }
+            sortAndDeduplicate(usize, &buf, start);
+        }
+        starts[bricks.len + 1] = buf.items.len;
+        return Input{ .starts = starts, .data = try buf.toOwnedSlice() };
+    }
+
+    fn deinit(self: Input, allocator: std.mem.Allocator) void {
+        allocator.free(self.starts);
+        allocator.free(self.data);
+    }
+
+    /// Number of bricks, plus 1 for the floor.
+    fn brickCount(self: Input) usize {
+        return self.starts.len - 1;
+    }
+
+    // Returns a slice of distinct block indices j, where i rests directly on j.
+    fn supportedBy(self: Input, i: usize) []const usize {
+        return self.data[self.starts[i]..self.starts[i + 1]];
+    }
+};
 
 fn parseInput(allocator: std.mem.Allocator, input: []const u8) !Input {
     const line_count = text.countLines(input) orelse return error.InvalidInput;
@@ -68,24 +136,21 @@ fn parseInput(allocator: std.mem.Allocator, input: []const u8) !Input {
         i += 1;
     }
     std.debug.assert(i == bricks.len);
-    return calculateSupport(allocator, bricks);
+    return Input.fromBricks(allocator, bricks);
 }
 
-fn freeInput(allocator: std.mem.Allocator, supported_by: Input) void {
-    for (supported_by) |s| allocator.free(s);
-    allocator.free(supported_by);
-}
-
-fn sortAndDeduplicate(comptime T: type, list: *std.ArrayList(T)) void {
-    std.mem.sortUnstable(T, list.items, {}, std.sort.asc(T));
-    var j: usize = 0;
-    for (0..list.items.len) |i| {
-        if (i == 0 or list.items[i] != list.items[i - 1]) {
-            list.items[j] = list.items[i];
-            j += 1;
+fn sortAndDeduplicate(comptime T: type, list: *std.ArrayList(T), pos: usize) void {
+    if (pos == list.items.len) return;
+    std.mem.sortUnstable(T, list.items[pos..], {}, std.sort.asc(T));
+    var i = pos + 1;
+    var j = i;
+    while (j < list.items.len) : (j += 1) {
+        if (list.items[j] != list.items[j - 1]) {
+            list.items[i] = list.items[j];
+            i += 1;
         }
     }
-    list.shrinkRetainingCapacity(j);
+    list.shrinkRetainingCapacity(i);
 }
 
 // Provides a top-level view of the bricks, recording for each (x, y) coordinate
@@ -150,62 +215,12 @@ const HashHeightIndex = struct {
     }
 };
 
-fn calculateSupport(allocator: std.mem.Allocator, bricks: []Brick) !Input {
-    var supported_by = try allocator.alloc([]usize, bricks.len + 1);
-    errdefer freeInput(allocator, supported_by);
-    supported_by[0] = try allocator.alloc(usize, 0); // floor element
-
-    // Sort bricks from bottom to top.
-    std.mem.sortUnstable(Brick, bricks, {}, Brick.compareZ1);
-
-    // For each brick, calculate the set of bricks it is supported by.
-    var index = try HeightIndex.init(allocator, bricks);
-    //var index = HashHeightIndex.init(allocator);
-    defer index.deinit();
-    var buf = std.ArrayList(usize).init(allocator);
-    defer buf.deinit();
-    for (bricks, 1..) |brick, i| {
-        buf.clearRetainingCapacity();
-        try buf.append(0);
-        // Calculate top height for this brick, as the maximum of the heights
-        // of the cells on which it rests, plus the brick's own height.
-        const new_h = calc: {
-            var max_h: Coord = 0;
-            var x = brick.x1;
-            while (x <= brick.x2) : (x += 1) {
-                var y = brick.y1;
-                while (y <= brick.y2) : (y += 1) {
-                    const elem = index.get(x, y);
-                    if (elem.h > max_h) {
-                        buf.clearRetainingCapacity();
-                        max_h = elem.h;
-                    }
-                    if (elem.h == max_h) {
-                        try buf.append(elem.i);
-                    }
-                }
-            }
-            break :calc max_h + (brick.z2 - brick.z1 + 1);
-        };
-        // Update brick height index
-        var x = brick.x1;
-        while (x <= brick.x2) : (x += 1) {
-            var y = brick.y1;
-            while (y <= brick.y2) : (y += 1) {
-                try index.set(x, y, .{ .h = new_h, .i = i });
-            }
-        }
-        sortAndDeduplicate(usize, &buf);
-        supported_by[i] = try allocator.dupe(usize, buf.items);
-    }
-    return supported_by;
-}
-
-fn solvePart1(allocator: std.mem.Allocator, supported_by: []const []const usize) !usize {
-    const safe_to_remove = try allocator.alloc(bool, supported_by.len);
+fn solvePart1(allocator: std.mem.Allocator, input: Input) !usize {
+    const safe_to_remove = try allocator.alloc(bool, input.brickCount());
     @memset(safe_to_remove, true);
     defer allocator.free(safe_to_remove);
-    for (supported_by[1..]) |s| {
+    for (1..input.brickCount()) |i| {
+        const s = input.supportedBy(i);
         if (s.len == 1) safe_to_remove[s[0]] = false;
     }
     var answer: usize = 0;
@@ -218,15 +233,16 @@ fn solvePart1(allocator: std.mem.Allocator, supported_by: []const []const usize)
 // as the total number of single blocks that would cause block i to fall (i.e.,
 // depth[i] = depth[parent[i]] + 1 if parent[i] != 0). Then we can calculate the
 // answer as the sum of depths[i] for all i.
-fn solvePart2(allocator: std.mem.Allocator, supported_by: []const []const usize) !u64 {
-    var depth = try allocator.alloc(usize, supported_by.len);
+fn solvePart2(allocator: std.mem.Allocator, input: Input) !u64 {
+    var depth = try allocator.alloc(usize, input.brickCount());
     defer allocator.free(depth);
-    var parent = try allocator.alloc(usize, supported_by.len);
+    var parent = try allocator.alloc(usize, input.brickCount());
     defer allocator.free(parent);
     depth[0] = 0;
     parent[0] = 0;
     var answer: u64 = 0;
-    for (supported_by[1..], 1..) |s, i| {
+    for (1..input.brickCount()) |i| {
+        const s = input.supportedBy(i);
         // Find the least common ancestor of the blocks that block i rests on.
         // This algorithm runs in O(N) per element of s, but could be optimized
         // to O(log N) using exponential search. For the official test data this
@@ -255,11 +271,11 @@ fn solvePart2(allocator: std.mem.Allocator, supported_by: []const []const usize)
 
 pub fn solve(env: *Environment) !void {
     const allocator = env.getArenaAllocator();
-    const supported_by = try env.parseInputAlloc(Input, parseInput, allocator);
-    defer freeInput(allocator, supported_by);
+    const input = try env.parseInputAlloc(Input, parseInput, allocator);
+    defer input.deinit(allocator);
 
-    try env.setAnswer1(try solvePart1(allocator, supported_by));
-    try env.setAnswer2(try solvePart2(allocator, supported_by));
+    try env.setAnswer1(try solvePart1(allocator, input));
+    try env.setAnswer2(try solvePart2(allocator, input));
 }
 
 pub fn main() !void {
