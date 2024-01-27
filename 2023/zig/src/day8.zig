@@ -1,5 +1,6 @@
 const Environment = @import("framework/Environment.zig");
 const Scanner = @import("util/Scanner.zig");
+const scanning = @import("util/scanning.zig");
 const std = @import("std");
 
 const Instruction = enum(u8) { L, R };
@@ -85,7 +86,7 @@ fn parseInput(allocator: std.mem.Allocator, input: []const u8) !Input {
     var scanner = Scanner.init(input);
 
     // Parse first line: a sequence of instructions ('L' or 'R')
-    const firstLine = try scanner.scanAlphabetic();
+    const firstLine = try scanner.scan(scanning.alphabetic);
     try scanner.skipNewline();
     const instructions = try allocator.alloc(Instruction, firstLine.len);
     errdefer allocator.free(instructions);
@@ -107,11 +108,11 @@ fn parseInput(allocator: std.mem.Allocator, input: []const u8) !Input {
     var builder = GraphBuilder.init(allocator);
     defer builder.deinit();
     while (!scanner.isEmpty()) {
-        const name = try scanner.scanAlphanumeric();
+        const name = try scanner.scan(scanning.alphanumeric);
         try scanner.skipText(" = (");
-        const left = try scanner.scanAlphanumeric();
+        const left = try scanner.scan(scanning.alphanumeric);
         try scanner.skipText(", ");
-        const right = try scanner.scanAlphanumeric();
+        const right = try scanner.scan(scanning.alphanumeric);
         try scanner.skipText(")\n");
         try builder.addVertex(name, left, right);
     }

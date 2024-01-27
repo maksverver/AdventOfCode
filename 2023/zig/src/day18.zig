@@ -1,5 +1,6 @@
 const Environment = @import("framework/Environment.zig");
 const Scanner = @import("util/Scanner.zig");
+const scanning = @import("util/scanning.zig");
 const std = @import("std");
 
 const Dir = enum { r, d, l, u };
@@ -38,7 +39,7 @@ pub fn solve(env: *Environment) !void {
     var solver2 = Solver{};
     while (!scanner.isEmpty()) {
         // Parse input line of the form: "R 6 (#70c710)\n"
-        const dirToken = try scanner.scanAlphabetic();
+        const dirToken = try scanner.scan(scanning.alphabetic);
         scanner.skipHorizontalSpace();
         const steps1 = try scanner.scanInt(usize);
         scanner.skipHorizontalSpace();

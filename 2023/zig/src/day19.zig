@@ -1,5 +1,6 @@
 const Environment = @import("framework/Environment.zig");
 const Scanner = @import("util/Scanner.zig");
+const scanning = @import("util/scanning.zig");
 const std = @import("std");
 
 const Field = enum { x, m, a, s };
@@ -161,10 +162,10 @@ fn parseInput(allocator: std.mem.Allocator, input: []const u8) !Input {
     var parser = try Parser.init(allocator);
     defer parser.deinit();
     while (!ok(scanner.skipNewline())) {
-        try parser.beginRule(try scanner.scanAlphanumeric());
+        try parser.beginRule(try scanner.scan(scanning.alphanumeric));
         try scanner.skipText("{");
         while (true) {
-            const token = try scanner.scanAlphanumeric();
+            const token = try scanner.scan(scanning.alphanumeric);
             if (ok(scanner.skipText("}"))) {
                 try parser.endRule(token);
                 break;
@@ -180,7 +181,7 @@ fn parseInput(allocator: std.mem.Allocator, input: []const u8) !Input {
             const lt = if (ok(scanner.skipText("<"))) true else if (ok(scanner.skipText(">"))) false else return error.InvalidInput;
             const val = try scanner.scanInt(Val);
             try scanner.skipText(":");
-            const dest = try scanner.scanAlphanumeric();
+            const dest = try scanner.scan(scanning.alphanumeric);
             try scanner.skipText(",");
             if (lt) {
                 try parser.ifLessThan(field, val, dest);

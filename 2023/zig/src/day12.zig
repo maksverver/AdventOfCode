@@ -4,6 +4,7 @@
 
 const Environment = @import("framework/Environment.zig");
 const Scanner = @import("util/Scanner.zig");
+const scanning = @import("util/scanning.zig");
 const text = @import("util/text.zig");
 const std = @import("std");
 
@@ -76,9 +77,9 @@ pub fn solve(env: *Environment) !void {
     var answer1: Answer = 0;
     var answer2: Answer = 0;
     while (!scanner.isEmpty()) {
-        const patternString = try scanner.scanToken();
+        const patternString = try scanner.scan(scanning.token);
         scanner.skipHorizontalSpace();
-        const runsString = try scanner.scanToken();
+        const runsString = try scanner.scan(scanning.token);
         try scanner.skipNewline();
 
         patternList.clearRetainingCapacity();

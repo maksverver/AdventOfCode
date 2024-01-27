@@ -1,5 +1,6 @@
 const Environment = @import("framework/Environment.zig");
 const Scanner = @import("util/Scanner.zig");
+const scanning = @import("util/scanning.zig");
 const std = @import("std");
 
 const order = "23456789TJQKA";
@@ -49,7 +50,7 @@ pub fn parseInput(allocator: std.mem.Allocator, input: []const u8) ![]Hand {
     var list = std.ArrayList(Hand).init(allocator);
     errdefer list.deinit();
     while (!scanner.isEmpty()) {
-        const chars = try scanner.scanAlphanumeric();
+        const chars = try scanner.scan(scanning.alphanumeric);
         scanner.skipHorizontalSpace();
         const bid = try scanner.scanInt(u32);
         try scanner.skipNewline();

@@ -1,5 +1,6 @@
 const Environment = @import("framework/Environment.zig");
 const Scanner = @import("util/Scanner.zig");
+const scanning = @import("util/scanning.zig");
 const std = @import("std");
 
 pub fn solve(env: *Environment) !void {
@@ -21,7 +22,7 @@ pub fn solve(env: *Environment) !void {
                 const count = try scanner.scanInt(isize);
                 std.debug.assert(count >= 0);
                 scanner.skipHorizontalSpace();
-                const color = try scanner.scanAlphabetic();
+                const color = try scanner.scan(scanning.alphabetic);
                 if (std.mem.eql(u8, color, "red")) {
                     std.debug.assert(r == 0);
                     r = count;

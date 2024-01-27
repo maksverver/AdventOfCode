@@ -1,5 +1,6 @@
 const Environment = @import("framework/Environment.zig");
 const Scanner = @import("util/Scanner.zig");
+const scanning = @import("util/scanning.zig");
 const std = @import("std");
 
 /// An edge in the graph. Edges are undirected, but in the Ford-Fulkerson
@@ -106,11 +107,11 @@ fn parseInput(allocator: std.mem.Allocator, input: []const u8) !Graph {
     defer graph_builder.deinit();
     var scanner = Scanner.init(input);
     while (!scanner.isEmpty()) {
-        const src = try scanner.scanAlphabetic();
+        const src = try scanner.scan(scanning.alphabetic);
         try scanner.skipText(": ");
         const v = try graph_builder.getVertexId(src);
-        while (scanner.peekNewline().len == 0) {
-            const dst = try scanner.scanAlphabetic();
+        while (scanner.peek(scanning.newline) == null) {
+            const dst = try scanner.scan(scanning.alphabetic);
             scanner.skipHorizontalSpace();
             const w = try graph_builder.getVertexId(dst);
             std.debug.assert(v != w);

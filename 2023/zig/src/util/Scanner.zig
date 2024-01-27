@@ -1,119 +1,93 @@
 // A text scanner.
 //
-// Maybe: refactor this to auto-skip whitespace before tokens?
-// Make peekNewline() and peekText() return the same value
-// Overall this is not a very orthogonal structure :/
+// Also see the scanning functions in scanning.zig.
 
 const std = @import("std");
+const scanning = @import("scanning.zig");
 
 const Scanner = @This();
 
+/// Remaining text.
 text: []const u8,
 
+/// Initializes the scanner from the given text.
 pub fn init(text: []const u8) Scanner {
-    return Scanner{ .text = text };
+    return .{ .text = text };
 }
 
+/// Returns whether the scanner is empty, i.e., the remaining text has length 0.
 pub fn isEmpty(self: Scanner) bool {
     return self.text.len == 0;
 }
 
-fn isHorizontalSpace(c: u8) bool {
-    return c == ' ' or c == '\t';
-}
-
-pub fn skipHorizontalSpace(self: *Scanner) void {
-    self.text = self.text[self.peekPredicate(isHorizontalSpace).len..];
-}
-
-pub fn peekNewline(self: Scanner) []const u8 {
-    var n: usize = 0;
-    if (self.text[0] == '\r') {
-        n = 1;
-        if (n < self.text.len and self.text[n] == '\n') n += 1;
-    } else if (self.text[0] == '\n') {
-        n = 1;
-        if (n < self.text.len and self.text[n] == '\r') n += 1;
+/// Returns the prefix of the remaining text that matches according to the
+/// given scanning function f, and updates the remaining text to skip past it,
+/// or returns error.NoMatch if the text does not match.
+pub fn scan(self: *Scanner, comptime f: scanning.ScanFn) error{NoMatch}![]const u8 {
+    if (f(self.text)) |l| {
+        const res = self.text[0..l];
+        self.text = self.text[l..];
+        return res;
+    } else {
+        return error.NoMatch;
     }
-    return self.text[0..n];
 }
 
-pub fn skipNewline(self: *Scanner) !void {
-    if (self.text.len == 0) return error.EndOfInput;
-    const nl = self.peekNewline();
-    if (nl.len == 0) return error.InvalidCharacter;
-    self.text = self.text[nl.len..];
+/// Similar to scan(), this returns the text matched by f, but it if there is a
+/// match, the remaining text is not updated, and if there is no match, then
+/// this returns null instead of an error.
+pub fn peek(self: Scanner, comptime f: scanning.ScanFn) ?[]const u8 {
+    if (f(self.text)) |l| return self.text[0..l];
+    return null;
 }
 
-// Returns a maximal substring of consecutive characters matching `predicate`.
-pub fn peekPredicate(self: Scanner, comptime predicate: fn (c: u8) bool) []const u8 {
-    var end: usize = 0;
-    while (end < self.text.len and predicate(self.text[end])) end += 1;
-    return self.text[0..end];
+/// Similar to scan(), except this does not return the matched text, only an
+/// void (if there is a match) or error.NoMatch (if there is none).
+pub fn skip(self: *Scanner, comptime f: scanning.ScanFn) error{NoMatch}!void {
+    _ = try scan(self, f);
 }
 
-pub fn scanPredicate(self: *Scanner, comptime predicate: fn (c: u8) bool) ![]const u8 {
-    const s = self.peekPredicate(predicate);
-    if (s.len == 0) return error.InvalidCharacter;
-    self.text = self.text[s.len..];
-    return s;
+/// Similar to skip(), except this does not throw an error if the there is no
+/// match. That means that if the prefix of the remaining text matches the
+/// scanning function f, it is skipped, otherwise nothing happens.
+pub fn maybeSkip(self: Scanner, comptime f: scanning.ScanFn) void {
+    skip(self, f) catch {};
 }
 
+/// Scans a base 10 integer.
 pub fn scanInt(self: *Scanner, comptime T: type) !T {
     return self.scanIntBase(T, 10);
 }
 
+/// Scans an integer in the given base.
 pub fn scanIntBase(self: *Scanner, comptime T: type, base: u8) !T {
-    if (self.text.len == 0) return error.EndOfInput;
-    var end: usize = 0;
-    if (self.text[0] == '+' or self.text[0] == '-') end += 1;
-    // Note: use isAlphanumeric() instead of isDigit() to support base 16 etc.
-    while (end < self.text.len and std.ascii.isAlphanumeric(self.text[end])) end += 1;
-    const res = try std.fmt.parseInt(T, self.text[0..end], base);
-    self.text = self.text[end..];
-    return res;
-}
-
-pub fn peekText(self: Scanner, text: []const u8) bool {
-    if (std.mem.startsWith(u8, self.text, text)) {
-        return true;
+    if (scanning.number(self.text)) |l| {
+        const i = try std.fmt.parseInt(T, self.text[0..l], base);
+        self.text = self.text[l..];
+        return i;
+    } else {
+        return error.NoMatch;
     }
-    return false;
 }
 
-pub fn peekAlphabetic(self: *Scanner) ![]const u8 {
-    return self.peekPredicate(std.ascii.isAlphabetic);
+/// Convenience method to skip any amount of horizontal whitespace (including none at all).
+pub fn skipHorizontalSpace(self: *Scanner) void {
+    return self.skip(scanning.horizontalWhitespace) catch unreachable;
 }
 
-pub fn scanAlphabetic(self: *Scanner) ![]const u8 {
-    return self.scanPredicate(std.ascii.isAlphabetic);
+/// Convenience method to skip an expected newline (which fails if the newline is missing).
+pub fn skipNewline(self: *Scanner) !void {
+    return self.skip(scanning.newline);
 }
 
-pub fn peekAlphanumeric(self: *Scanner) ![]const u8 {
-    return self.peekPredicate(std.ascii.isAlphanumeric);
+/// Convenience method to skip static text, which must be matched exactly,
+/// including space!
+pub fn skipText(self: *Scanner, comptime text: []const u8) !void {
+    return self.skip(scanning.scanText(text));
 }
 
-pub fn scanAlphanumeric(self: *Scanner) ![]const u8 {
-    return self.scanPredicate(std.ascii.isAlphanumeric);
-}
-
-fn isTokenChar(c: u8) bool {
-    return !std.ascii.isWhitespace(c);
-}
-
-pub fn peekToken(self: *Scanner) ![]const u8 {
-    return self.peekPredicate(isTokenChar);
-}
-
-pub fn scanToken(self: *Scanner) ![]const u8 {
-    return self.scanPredicate(isTokenChar);
-}
-
-pub fn skipText(self: *Scanner, text: []const u8) !void {
-    if (!std.mem.startsWith(u8, self.text, text)) return error.InvalidCharacter;
-    self.text = self.text[text.len..];
-}
-
+/// Prints the remaining input of the scanner for debugging. This is useful
+/// to debug parse failures.
 pub fn debugPrintRemainingInput(self: Scanner) void {
     const maxLen = 100;
     if (self.text.len <= maxLen) {
