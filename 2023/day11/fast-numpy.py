@@ -25,7 +25,7 @@ def SolveAxis(counts):
   acc_count  = 0
   # convert to int because numpy does not support bigints :/
   for n in map(int, counts):
-    acc_dist   += 1 + acc_count*(1 if n else expand)
+    acc_dist   += acc_count*(1 if n else expand)
     acc_count  += n
     total_dist += acc_dist*n
   return total_dist
