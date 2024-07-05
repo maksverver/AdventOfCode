@@ -40,11 +40,13 @@ Total time: 219.884 ms
 
 ## Requirements
 
-These solutions require Zig to be installed. They were written for Zig 0.11.0.
-To check which version of Zig is installed, run;
+These solutions require Zig to be installed. The head revision requires Zig
+0.13.0. (Checkout git tag zig-0.11 for an older version of the code.)
+
+To check which version of Zig is installed, run:
 
 % zig version
-0.11.0
+0.13.0
 
 
 ## Running

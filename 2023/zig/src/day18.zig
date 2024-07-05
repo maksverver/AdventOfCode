@@ -28,8 +28,7 @@ const Solver = struct {
 
     fn getAnswer(self: *const Solver) UAnswer {
         std.debug.assert(self.row == 0);
-        return std.math.absCast(self.area) + self.perimeter / 2 + 1;
-        // return @abs(self.area) + self.perimeter / 2 + 1;  // zig 0.12
+        return @abs(self.area) + self.perimeter / 2 + 1;
     }
 };
 

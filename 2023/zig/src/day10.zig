@@ -108,8 +108,7 @@ pub fn solve(env: *Environment) !void {
     // answer of part 1, above).
     //
     // See: https://en.wikipedia.org/wiki/Pick%27s_theorem
-    const answer2 = std.math.absCast(area) - answer1 + 1;
-    // const answer2 = @abs(area) - answer1 + 1; // zig 0.12
+    const answer2 = @abs(area) - answer1 + 1;
 
     try env.setAnswers(answer1, answer2);
 }

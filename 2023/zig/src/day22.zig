@@ -302,7 +302,7 @@ const FastLCA = struct {
     depths: []usize,
 
     fn init(allocator: std.mem.Allocator, n: usize) !FastLCA {
-        var log2size = std.math.log2_int(usize, n) + 1;
+        const log2size = std.math.log2_int(usize, n) + 1;
         var ancestors = try allocator.alloc(usize, log2size * n);
         errdefer allocator.free(ancestors);
         @memset(ancestors, no_vertex);
@@ -357,8 +357,8 @@ const FastLCA = struct {
         var v = v_in;
         var w = w_in;
 
-        var n = self.depths[v];
-        var m = self.depths[w];
+        const n = self.depths[v];
+        const m = self.depths[w];
         if (n > m) v = self.getNthAncestor(v, n - m);
         if (m > n) w = self.getNthAncestor(w, m - n);
         if (v == w) return v;
