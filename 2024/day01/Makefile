@@ -1,6 +1,10 @@
 CXXFLAGS=-O3 -Wall -march=native -std=c++20
 
-all: solve solve2
+SOLUTIONS=solve solve2 solve3
+
+all: $(SOLUTIONS)
 
 clean:
-	rm -f solve solve2
+	rm -f $(SOLUTIONS)
+
+.PHONY: all clean

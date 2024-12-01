@@ -1,3 +1,7 @@
+// Solution that runs in O(n + max_val) time, where n is the number of lines
+// of input, and max_val is the maximum value. This is better than O(n log n)
+// when the values are relatively close to the number of lines.
+
 #include <cstdio>
 #include <cinttypes>
 #include <cassert>

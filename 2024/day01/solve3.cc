@@ -1,15 +1,13 @@
-// Solution that runs in O(n log n) time.
+// Optimized version of solve.cc that runs part in O(n) time but without
+// an axiliary data structure, instead scanning the sorted arrays only once.
 //
-// Reading input: O(n)
-// Solving part 1: O(n log n) due to sorting.
-// Solving part 2: O(n) using a hashtable.
+// This still takes O(n log n) for part 1, where the sorting happens.
 
 #include <algorithm>
 #include <cstdio>
 #include <cassert>
 #include <chrono>
 #include <iostream>
-#include <unordered_map>
 #include <vector>
 
 using namespace std::chrono;
@@ -53,14 +51,23 @@ int main() {
         std::cout << answer1 << std::endl;
     }
 
+    // Needed for part 2.
+    assert(std::ranges::is_sorted(a));
+    assert(std::ranges::is_sorted(b));
+
     {
         Timer timer("Solving part 2");
-        std::unordered_map<long long, long long> a_count;
-        std::unordered_map<long long, long long> b_count;
-        for (int x : a) a_count[x]++;
-        for (int y : b) b_count[y]++;
         long long answer2 = 0;
-        for (auto [x, n] : a_count) answer2 += n * x * b_count[x];
+        size_t i = 0, j = 0;
+        while (i < n && j < n) {
+            long long x = a[i];
+            size_t old_i = i;
+            do ++i; while (i < n && a[i] == x);
+            while (j < n && b[j] < x) ++j;
+            size_t old_j = j;
+            while (j < n && b[j] <= x) ++j;
+            answer2 += x * (j - old_j) * (i - old_i);
+        }
         std::cout << answer2 << std::endl;
     }
 }
