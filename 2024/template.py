@@ -23,7 +23,7 @@ import sys
 #lines1 = part1.split('\n')
 #lines2 = part2.split('\n')
 
-# Parsing regular expressions (see regex.py for more)
+# Parsing regular expressions (see ../library-code/regex.py for more)
 #PATTERN = re.compile(r'^foo (\d*) bar (\d*) baz$')
 #for line in sys.stdin:
 #  a, b = PATTERN.match(line).groups()

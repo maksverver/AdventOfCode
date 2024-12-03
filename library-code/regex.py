@@ -6,6 +6,11 @@ line = '123 + 456 = 789'  # example
 # Extract all numbers, ignoring other characters. This is often sufficient.
 a, b, c = map(int, re.findall(r'\d+', line))
 
+# Or with capture groups, e.g. from https://adventofcode.com/2024/day/3
+# Beware that this silently ignores text that does not match!
+for x, y in re.findall(r'mul[(](\d{1,3}),(\d{1,3})[)]', sys.stdin.read()):
+  print(int(x) * int(y))
+
 assert (a, b, c) == (123, 456, 789)
 
 
