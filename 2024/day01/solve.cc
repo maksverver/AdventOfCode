@@ -5,7 +5,6 @@
 // Solving part 2: O(n) using a hashtable.
 
 #include <algorithm>
-#include <cstdio>
 #include <cassert>
 #include <chrono>
 #include <iostream>
@@ -33,13 +32,15 @@ int main() {
 
     {
         Timer timer("Reading input");
+        std::ios_base::sync_with_stdio(false);
+        std::cin.tie(nullptr);
         long long x, y;
-        while (scanf("%lld %lld\n", &x, &y) == 2) {
+        while (std::cin >> x >> y) {
             a.push_back(x);
             b.push_back(y);
             ++n;
         }
-        assert(feof(stdin));
+        assert(std::cin.eof());
     }
 
     {

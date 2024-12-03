@@ -2,8 +2,6 @@
 // of input, and max_val is the maximum value. This is better than O(n log n)
 // when the values are relatively close to the number of lines.
 
-#include <cstdio>
-#include <cinttypes>
 #include <cassert>
 #include <chrono>
 #include <cstdint>
@@ -37,9 +35,11 @@ int main() {
 
     {
         Timer timer("Reading input");
+        std::ios_base::sync_with_stdio(false);
+        std::cin.tie(nullptr);
         int64_t x, y;
-        while (scanf("%" SCNd64 "%" SCNd64, &x, &y) == 2) input.push_back({x, y});
-        assert(feof(stdin));
+        while (std::cin >> x >> y) input.push_back({x, y});
+        assert(std::cin.eof());
         assert(!input.empty());
     }
 
