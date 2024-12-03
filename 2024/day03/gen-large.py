@@ -17,5 +17,7 @@ def Corrupt(s, p):
 
 output = ''
 for x in range(500):
+    # Create 100 copies of the same string of length 20 KiB so that zip compresses
+    # the output well (the redundancy doesn't really matter for benchmarking).
     output += Corrupt(GenString(20480), uniform(0, 0.1)) * 100
 print(output)
