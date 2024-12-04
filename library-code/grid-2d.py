@@ -21,6 +21,13 @@ DIRS = [(-1, 0), (0, -1), (0, 1), (1, 0)]
 # Directions in clockwise order: up, right, down, left
 DIRS = [(-1, 0), (0, 1), (1, 0), (-1, 0)]
 
+# Eight orthogonal directions in lexicographical order.
+DIRS = (
+    (-1, -1), (-1,  0), (-1,  1),
+    ( 0, -1),           ( 0,  1),
+    ( 1, -1), ( 1,  0), ( 1,  1),
+)
+
 
 if __name__ == '__main__':
   H, W = 3, 4
