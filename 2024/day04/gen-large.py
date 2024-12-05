@@ -17,7 +17,7 @@ def Char(r, c):
     # Random data just to create some variance.
     xmas = 'XMAS'
     rest = 'BCDEFGHIJKLNOPQRTUVWYZ'
-    i = randint(0, len(xmas) - 1)
+    i = randint(0, len(xmas))
     if i < len(xmas):
         return xmas[i]
     return rest[randint(0, len(rest) - 1)]
