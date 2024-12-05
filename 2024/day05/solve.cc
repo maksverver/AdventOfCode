@@ -1,4 +1,6 @@
 // Solution that runs in O(n) time using std::nth_element.
+//
+// Note: this is technically incorrect, just like incorrect.py
 
 #include <algorithm>
 #include <cassert>

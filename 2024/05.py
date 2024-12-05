@@ -1,27 +1,33 @@
-from functools import cmp_to_key
+# Brute force, but correct!
+
 import sys
 
-order = dict()
+part1, part2 = sys.stdin.read().strip().split('\n\n')
 
-sort_key = cmp_to_key(lambda p, q: order.get((p, q), 0))
-
-for line in sys.stdin:
-    line = line.strip()
-    if not line:
-        break
+orders = []
+for line in part1.split():
     a, b = map(int, line.split('|'))
-    assert a != b and (a, b) not in order
-    order[a, b] = -1
-    order[b, a] = +1
+    orders.append((a, b))
+
+def FindInvalidPair(pages):
+    for i in range(len(pages)):
+        for j in range(i + 1, len(pages)):
+            if (pages[j], pages[i]) in orders:
+                return i, j
 
 answer1 = 0
 answer2 = 0
-for line in sys.stdin:
-    pages = list(map(int, line.strip().split(',')))
+for line in part2.split():
+    pages = list(map(int, line.split(',')))
     assert len(pages) % 2 == 1
-    sorted_pages = sorted(pages, key=sort_key)
-    middle = sorted_pages[len(pages) // 2]
-    if pages == sorted_pages:
+    already_sorted = True
+    while ij := FindInvalidPair(pages):
+        # j-th page belongs before i-th page; move it!
+        already_sorted = False
+        i, j = ij
+        pages = pages[:i] + pages[j:j+1] + pages[i:j] + pages[j+1:]
+    middle = pages[len(pages) // 2]
+    if already_sorted:
         answer1 += middle
     else:
         answer2 += middle
