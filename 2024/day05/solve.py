@@ -7,8 +7,6 @@ import sys
 
 initial_order = dict()
 
-sort_key = cmp_to_key(lambda p, q: order.get((p, q), 0))
-
 for line in sys.stdin:
     line = line.strip()
     if not line:
@@ -42,6 +40,7 @@ for line in sys.stdin:
                             order[r, p] = -1
 
     # Now we should be able to sort, if the problem is well-defined.
+    sort_key = cmp_to_key(lambda p, q: order.get((p, q), 0))
     sorted_pages = sorted(pages, key=sort_key)
     assert sorted_pages == sorted(sorted_pages, key=sort_key)
     middle = sorted_pages[len(pages) // 2]
