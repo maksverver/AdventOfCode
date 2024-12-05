@@ -10,7 +10,7 @@ for line in sys.stdin:
     if not line:
         break
     a, b = map(int, line.split('|'))
-    assert a != b and a, b not in order
+    assert a != b and (a, b) not in order
     order[a, b] = -1
     order[b, a] = +1
 
