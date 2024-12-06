@@ -150,7 +150,6 @@ int main() {
             }
             // left
             {
-                if (!seen_states.insert((r * W + c) * 4 + 3).second) goto loop;
                 auto it = blocks_per_row[r].lower_bound(c);
                 if (it == blocks_per_row[r].begin()) goto outside;
                 c = *--it + 1;
