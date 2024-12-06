@@ -1,6 +1,7 @@
 #include <cassert>
 #include <iostream>
 #include <vector>
+#include <map>
 #include <set>
 #include <string>
 #include <utility>
@@ -55,12 +56,15 @@ int main() {
     }
 
     // Part 1 (straightforward)
-    std::set<Point> positions;
+    std::vector<std::pair<Point, int>> todo;
     {
+        std::set<Point> seen;
         Point pos = start;
         int dir = 0;
         for (;;) {
-            positions.insert(pos);
+            if (seen.insert(pos).second) {
+                todo.push_back({pos, dir});
+            }
             auto next_pos = Step(pos, dir);
             if (!next_pos.InBounds()) break;
             if (next_pos.Blocked()) {
@@ -69,18 +73,17 @@ int main() {
                 pos = next_pos;
             }
         }
-        std::cout << positions.size() << std::endl;
     }
+    std::cout << todo.size() << std::endl;
 
-    // Part 2 (straightforward)
 #if 0
+    // Part 2 (straightforward)
     long long answer2 = 0;
-    for (Point blocked : positions) if (blocked != start) {
+    for (auto [blocked, dir] : todo) if (blocked != start) {
         assert(grid[blocked.r][blocked.c] == '.');
         grid[blocked.r][blocked.c] = '#';
         std::set<std::pair<Point, int>> states;
-        Point pos = start;
-        int dir = 0;
+        Point pos = {blocked.r - DR[dir], blocked.c - DC[dir]};
         for (;;) {
             if (!states.insert({pos, dir}).second) {
                 // Already visited. Loop detected!
@@ -104,6 +107,7 @@ int main() {
     std::cout << answer2 << std::endl;
 #endif
 
+#if 1
     // Part 2 (optimized)
     //
     // Store the position of the blocks in a sorted set per row and column.
@@ -121,44 +125,45 @@ int main() {
         }
     }
 
-    std::vector<Point> todo(positions.begin(), positions.end());
-
     // Keep outside the loop to avoid reallocating memory, for a small performance boost.
     std::unordered_set<unsigned> seen_states;
     #pragma omp parallel for firstprivate(blocks_per_row, blocks_per_col, seen_states) shared(answer2)
     for (size_t i = 0; i < todo.size(); ++i) {
-        Point blocked = todo[i];
+        auto [blocked, dir] = todo[i];
         if (blocked == start) continue;
         blocks_per_row[blocked.r].insert(blocked.c);
         blocks_per_col[blocked.c].insert(blocked.r);
-        auto [r, c] = start;
+        int r = blocked.r - DR[dir];
+        int c = blocked.c - DC[dir];
         seen_states.clear();
-        for (;;) {
-            // We could do this after every step, but it's actually faster not to.
-            if (!seen_states.insert(r * W + c).second) goto loop;
-            // up
-            {
-                auto it = blocks_per_col[c].lower_bound(r);
-                if (it == blocks_per_col[c].begin()) goto outside;
-                r = *--it + 1;
-            }
-            // right
-            {
-                auto it = blocks_per_row[r].lower_bound(c);
-                if (it == blocks_per_row[r].end()) goto outside;
-                c = *it - 1;
-            }
-            // down
-            {
-                auto it = blocks_per_col[c].lower_bound(r);
-                if (it == blocks_per_col[c].end()) goto outside;
-                r = *it - 1;
-            }
-            // left
-            {
-                auto it = blocks_per_row[r].lower_bound(c);
-                if (it == blocks_per_row[r].begin()) goto outside;
-                c = *--it + 1;
+        switch ((dir + 1) % 4) {
+            for (;;) {
+                // We could do this after every step, but it's actually faster not to.
+                if (!seen_states.insert(r * W + c).second) goto loop;
+                // up
+                case 0: {
+                    auto it = blocks_per_col[c].lower_bound(r);
+                    if (it == blocks_per_col[c].begin()) goto outside;
+                    r = *--it + 1;
+                }
+                // right
+                case 1: {
+                    auto it = blocks_per_row[r].lower_bound(c);
+                    if (it == blocks_per_row[r].end()) goto outside;
+                    c = *it - 1;
+                }
+                // down
+                case 2: {
+                    auto it = blocks_per_col[c].lower_bound(r);
+                    if (it == blocks_per_col[c].end()) goto outside;
+                    r = *it - 1;
+                }
+                // left
+                case 3: {
+                    auto it = blocks_per_row[r].lower_bound(c);
+                    if (it == blocks_per_row[r].begin()) goto outside;
+                    c = *--it + 1;
+                }
             }
         }
     loop:
@@ -169,4 +174,5 @@ int main() {
         blocks_per_col[blocked.c].erase(blocked.r);
     }
     std::cout << answer2 << std::endl;
+#endif
 }
