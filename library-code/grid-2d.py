@@ -19,7 +19,7 @@ def Neighbors8(r, c):
 DIRS = [(-1, 0), (0, -1), (0, 1), (1, 0)]
 
 # Directions in clockwise order: up, right, down, left
-DIRS = [(-1, 0), (0, 1), (1, 0), (-1, 0)]
+DIRS = [(-1, 0), (0, 1), (1, 0), (0, -1)]
 
 # Eight orthogonal directions in lexicographical order.
 DIRS = (
