@@ -120,9 +120,15 @@ int main() {
             }
         }
     }
+
+    std::vector<Point> todo(positions.begin(), positions.end());
+
     // Keep outside the loop to avoid reallocating memory, for a small performance boost.
     std::unordered_set<unsigned> seen_states;
-    for (Point blocked : positions) if (blocked != start) {
+    #pragma omp parallel for firstprivate(blocks_per_row, blocks_per_col, seen_states) shared(answer2)
+    for (size_t i = 0; i < todo.size(); ++i) {
+        Point blocked = todo[i];
+        if (blocked == start) continue;
         blocks_per_row[blocked.r].insert(blocked.c);
         blocks_per_col[blocked.c].insert(blocked.r);
         auto [r, c] = start;
@@ -156,6 +162,7 @@ int main() {
             }
         }
     loop:
+        #pragma omp critical
         answer2++;
     outside:
         blocks_per_row[blocked.r].erase(blocked.c);

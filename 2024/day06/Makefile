@@ -1,4 +1,4 @@
-CXXFLAGS=-O3 -Wall -march=native -std=c++20
+CXXFLAGS=-O3 -Wall -march=native -std=c++20 -fopenmp
 
 SOLUTIONS=solve
 
