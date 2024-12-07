@@ -8,7 +8,7 @@ def ParseLine(line):
 
 def IntLen(i):
     '''Returns the number of digits in the decimal representation of i.'''
-    return floor(log10(i)) + 1
+    return 1 if i == 0 else floor(log10(i)) + 1
 
 def IsPossible(target, values, part2):
     # Calculates whether it is possible to construct target value `target` using
@@ -30,9 +30,12 @@ def IsPossible(target, values, part2):
         if n == 0:
             return target == v
 
+        if v == 0 and target == 0:
+            return True
+
         return (
-            (target > v and Solve(target - v, n)) or
-            (target % v == 0 and Solve(target // v, n)) or
+            (target >= v and Solve(target - v, n)) or
+            (v != 0 and target % v == 0 and Solve(target // v, n)) or
             (part2 and target % (m := 10**IntLen(v)) == v and Solve(target // m, n)))
 
     assert(v > 0 for v in values)
