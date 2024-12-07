@@ -24,7 +24,7 @@ def IsPossible(target, values, part2):
     #   construct (x / a_n) from [a_1, a_2, .. a_(n-1)], or
     #   construct (x without suffix a_n) from [a_1, a_2, .. a_(n-1)] (part 2 only)
     #
-    # Note: this implementation assumes all values are positive.
+    # Note: this implementation assumes all values are nonnegative.
     def Solve(target, n):
         v = values[n := n - 1]
         if n == 0:
@@ -38,7 +38,7 @@ def IsPossible(target, values, part2):
             (v != 0 and target % v == 0 and Solve(target // v, n)) or
             (part2 and target % (m := 10**IntLen(v)) == v and Solve(target // m, n)))
 
-    assert(v > 0 for v in values)
+    assert all(v >= 0 for v in values)
 
     return Solve(target, len(values))
 

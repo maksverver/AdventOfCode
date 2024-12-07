@@ -24,7 +24,7 @@ def IsPossible(target, values, part2):
     #   construct (x / a_n) from [a_1, a_2, .. a_(n-1)], or
     #   construct (x without suffix a_n) from [a_1, a_2, .. a_(n-1)] (part 2 only)
     #
-    # Note: this implementation assumes all values are positive.
+    # Note: this implementation assumes all values are nonnegative.
 
     memo = {}
     def Solve(target, n):
@@ -44,13 +44,37 @@ def IsPossible(target, values, part2):
                 (part2 and target % (m := 10**IntLen(v)) == v and Solve(target // m, n)))
         return res
 
-    assert(v > 0 for v in values)
+    # Reconstructs the solution expression as a string (or None if the expression
+    # is not solvable). The logic here must be kept in sync with Solve() above.
+    def DebugString(target, n):
+        v = values[n := n - 1]
+        if n == 0:
+            if target == v:
+                return str(v)
+            return None
+        if v == 0 and target == 0:
+            return '+'.join(map(str, values[:n])) + '*0'
+        if target >= v and Solve(target - v, n):
+            return DebugString(target - v, n) + '+' + str(v)
+        if v != 0 and target % v == 0 and Solve(target // v, n):
+            return DebugString(target // v, n) + '*' + str(v)
+        if part2 and target % (m := 10**IntLen(v)) == v and Solve(target // m, n):
+            return DebugString(target // m, n) + '||' + str(v)
+        return None
+
+    assert all(v >= 0 for v in values)
+
+    # Uncomment this to debug-print solutions:
+    #print(part2, target, DebugString(target, len(values)), file=sys.stderr)
 
     return Solve(target, len(values))
 
-def Solve(cases, part2):
-    return sum(target for target, values in cases if IsPossible(target, values, part2))
-
-cases = list(map(ParseLine, sys.stdin))
-print(Solve(cases, False))
-print(Solve(cases, True))
+answer1 = 0
+answer2 = 0
+for target, values in map(ParseLine, sys.stdin):
+    if IsPossible(target, values, 0):
+        answer1 += target
+    elif IsPossible(target, values, 1):
+        answer2 += target
+print(answer1)
+print(answer2)
