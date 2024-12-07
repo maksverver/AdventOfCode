@@ -1,4 +1,4 @@
-from math import floor, log
+from math import floor, log10
 from operator import add, mul
 import sys
 
@@ -17,8 +17,8 @@ def Solve(cases, ops):
     return sum(target for target, values in cases if IsPossible(ops, target, values))
 
 def cat(x, y):
-    #return int(str(x) + str(y))                # straightforward implementation
-    return 10**(floor(log(y, 10)) + 1) * x + y  # slightly faster implementation
+    #return int(str(x) + str(y))              # straightforward implementation
+    return 10**(floor(log10(y)) + 1) * x + y  # slightly faster implementation
 
 cases = list(map(ParseLine, sys.stdin))
 print(Solve(cases, [add, mul]))

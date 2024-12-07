@@ -1,4 +1,4 @@
-from math import floor, log
+from math import floor, log10
 from operator import add, mul
 import sys
 
@@ -8,16 +8,21 @@ def ParseLine(line):
 
 def IntLen(i):
     '''Returns the number of digits in the decimal representation of i.'''
-    return floor(log(i, 10)) + 1
+    return floor(log10(i)) + 1
 
 def IsPossible(target, values, part2):
     # Calculates whether it is possible to construct target value `target` using
-    # the first `n` elements
+    # exactly the first `n` elements of `values`.
     #
-    # Essentially this works back from the end of the array to see if the target
-    # value can be constructed using the given operands, while the slower
-    # implementation in 07.py works from the front to construct all possible
-    # expression values.
+    # Compared to 07.py, which recursively constructs all results from front to
+    # back, this essentially runs from back to front, determining only if it is
+    # possible to construct the desired target.
+    #
+    # To construct x from [a_1, a_2, .. a_n] we need to be able to:
+    #
+    #   construct (x - a_n) from [a_1, a_2, .. a_(n-1)], or
+    #   construct (x / a_n) from [a_1, a_2, .. a_(n-1)], or
+    #   construct (x without suffix a_n) from [a_1, a_2, .. a_(n-1)] (part 2 only)
     #
     # Note: this implementation assumes all values are positive.
     def Solve(target, n):
