@@ -1,6 +1,9 @@
-CXXFLAGS=-O3 -Wall -march=native -std=c++20 -fopenmp
+CXXFLAGS=-O3 -g -Wall -march=native -std=c++20 -fopenmp
 
-SOLUTIONS=solve
+# For debugging:
+#CXXFLAGS=-O0 -g -Wall -march=native -std=c++20 -D_GLIBCXX_DEBUG
+
+SOLUTIONS=solve solve2
 
 all: $(SOLUTIONS)
 
