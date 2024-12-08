@@ -19,45 +19,34 @@ def DebugPrint(points=set()):
 def Part1():
     points = set()
     for positions in antennas_by_type.values():
-        for i, (r1, c1) in enumerate(positions):
-            for r2, c2 in positions[i + 1:]:
-                dr = r2 - r1
-                dc = c2 - c1
-                assert gcd(dr, dc) == 1
-                r = r1 - dr
-                c = c1 - dc
-                if 0 <= r < H and 0 <= c < W:
-                    points.add((r, c))
-                r = r2 + dr
-                c = c2 + dc
-                if 0 <= r < H and 0 <= c < W:
-                    points.add((r, c))
+        for r1, c1 in positions:
+            for r2, c2 in positions:
+                if r1 != r2 or c1 != c2:
+                    dr = r2 - r1
+                    dc = c2 - c1
+                    assert gcd(dr, dc) == 1
+                    r = r1 - dr
+                    c = c1 - dc
+                    if 0 <= r < H and 0 <= c < W:
+                        points.add((r, c))
     #DebugPrint(points)
     return len(points)
 
 def Part2():
     points = set()
     for positions in antennas_by_type.values():
-        for i, (r1, c1) in enumerate(positions):
-            for r2, c2 in positions[i + 1:]:
-                dr = r2 - r1
-                dc = c2 - c1
-                assert gcd(dr, dc) == 1
-                dr = r2 - r1
-                dc = c2 - c1
-                assert gcd(dr, dc) == 1
-                r = r1
-                c = c1
-                while 0 <= r < H and 0 <= c < W:
-                    points.add((r, c))
-                    r -= dr
-                    c -= dc
-                r = r2
-                c = c2
-                while 0 <= r < H and 0 <= c < W:
-                    points.add((r, c))
-                    r += dr
-                    c += dc
+        for r1, c1 in positions:
+            for r2, c2 in positions:
+                if r1 != r2 or c1 != c2:
+                    dr = r2 - r1
+                    dc = c2 - c1
+                    assert gcd(dr, dc) == 1
+                    r = r1
+                    c = c1
+                    while 0 <= r < H and 0 <= c < W:
+                        points.add((r, c))
+                        r -= dr
+                        c -= dc
     #DebugPrint(points)
     return len(points)
 
