@@ -1,5 +1,14 @@
-// Variant of solve.cc that uses a custom int128 implementation instead of
-// the nonstandard __int128_t builtin type.
+// Further optimized verison of solve.cc
+//
+//  - Runs part 1 in O(n) instead of O(nm) where m is the maximum length
+//    (since m is 5 on average this is only a small improvement, but it still
+//    runs about twice as fast).
+//
+//  - Runs part 2 in O(n(m + log n)) just like solve.cc
+//
+//  - Emulates 128-bit operations instead of using nonstandard __int128_t
+//    (not sure if that improves performance or not)
+//
 
 #include <cassert>
 #include <cstdint>
@@ -11,7 +20,7 @@
 #include <vector>
 
 struct File {
-    size_t begin, end;
+    size_t start, size;
     int index;
 };
 
@@ -22,9 +31,8 @@ struct FakeInt128 {
     uint64_t upper = 0;
 
     FakeInt128 &operator+=(int64_t i) {
-        assert(i >= 0);  // I'm too lazy to support this
-        lower += i % mod;
-        upper += i / mod;
+        assert(0 <= i && (uint64_t) i < mod);
+        lower += i;
         if (lower >= mod) {
             upper += 1;
             lower -= mod;
@@ -40,27 +48,58 @@ std::ostream &operator<<(std::ostream &os, const FakeInt128 &i) {
     return os << i.upper << std::setfill('0') << std::setw(18) << i.lower;
 }
 
+int64_t RangeSum(size_t start, size_t len) {
+    return start * len + (len * (len - 1) / 2);
+}
+
 FakeInt128 SolvePart1(const std::string_view &s) {
     std::vector<File> files;
+
+    // First, calculate the position of all files on disk.
     size_t disk_size = 0;
     for (size_t i = 0; i < s.size(); ++i) {
-        int size = s[i] - '0';
+        size_t size = s[i] - '0';
         assert((i % 2 == 0 ? 1 : 0) <= size && size < 10);
-        if (i % 2 == 0) files.push_back(File{disk_size, disk_size + size, static_cast<int>(i / 2)});
+        if (i % 2 == 0) files.push_back(File{disk_size, size, static_cast<int>(i / 2)});
         disk_size += size;
     }
+
+    // Now, we will simulate moving blocks from the files at the end into the
+    // gaps in front. For efficiency, we are not going to actually move blocks,
+    // but we will loop through the block indices starting from 0, and calculat
+    // which file index would be copied there, by keeping two pointers: one to
+    // the first file with start >= block, and one to the last file we have not
+    // yet (entirely) moved into empty gaps.
     FakeInt128 checksum = {};
-    size_t i = 0, j = files.size();
-    for (size_t disk_pos = 0; i < j; ++disk_pos) {
+    for (size_t block = 0, i = 0, j = files.size(); i < j; ) {
         auto &first_file = files[i];
-        auto &last_file = files[j - 1];
-        if (disk_pos == first_file.begin) {
-            checksum += disk_pos * first_file.index;
-            if (++first_file.begin == first_file.end) ++i;
+        if (block == first_file.start) {
+            // Current disk block is at the start of the file, so keep the file.
+        in_file:
+            checksum += RangeSum(block, first_file.size) * first_file.index;
+            block += first_file.size;
+            ++i;
         } else {
-            assert(disk_pos < first_file.begin);
-            checksum += disk_pos * last_file.index;
-            if (--last_file.end == last_file.begin) --j;
+            // Current disk block is at the start of the space. See how much of the last
+            // file we can fit in there.
+            assert(block < first_file.start);
+            size_t space = first_file.start - block;
+            auto &last_file = files[j - 1];
+            if (space < last_file.size) {
+                // Last file does not fit entirely into the gap; only copy part of it.
+                checksum += RangeSum(block, space) * last_file.index;
+                block += space;
+                last_file.size -= space;
+                // Tiny performance optimization: we know we must be at the start of
+                // a file right now, so skip the if-statement at the top of the loop.
+                assert(block == first_file.start);
+                goto in_file;
+            } else {
+                // Last file fits entirely into the gap.
+                checksum += RangeSum(block, last_file.size) * last_file.index;
+                block += last_file.size;
+                --j;
+            }
         }
     }
     return checksum;
