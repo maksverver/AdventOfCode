@@ -69,8 +69,8 @@ def SolvePart2(input):
     # space created by moving files away can never be used to place another file.
     #
     # The loop below is O(n^2) which is slow but good enough for the official input.
-    for i, f in reversed(list(enumerate(files))):
-        for j, s in enumerate(spaces):
+    for f in reversed(files):
+        for s in spaces:
             if s.start >= f.start:
                 break
             if f.size <= s.size:
