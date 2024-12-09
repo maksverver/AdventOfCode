@@ -7,7 +7,6 @@
 
 struct File {
     size_t begin, end;
-    int index;
 };
 
 __int128_t SolvePart1(const std::string_view &s) {
@@ -16,7 +15,7 @@ __int128_t SolvePart1(const std::string_view &s) {
     for (size_t i = 0; i < s.size(); ++i) {
         int size = s[i] - '0';
         assert((i % 2 == 0 ? 1 : 0) <= size && size < 10);
-        if (i % 2 == 0) files.push_back(File{disk_size, disk_size + size, static_cast<int>(i / 2)});
+        if (i % 2 == 0) files.push_back(File{disk_size, disk_size + size});
         disk_size += size;
     }
     __int128_t checksum = 0;
@@ -25,11 +24,11 @@ __int128_t SolvePart1(const std::string_view &s) {
         auto &first_file = files[i];
         auto &last_file = files[j - 1];
         if (disk_pos == first_file.begin) {
-            checksum += (__int128_t) disk_pos * first_file.index;
+            checksum += (__int128_t) disk_pos * i;
             if (++first_file.begin == first_file.end) ++i;
         } else {
             assert(disk_pos < first_file.begin);
-            checksum += (__int128_t) disk_pos * last_file.index;
+            checksum += (__int128_t) disk_pos * (j - 1);
             if (--last_file.end == last_file.begin) --j;
         }
     }
