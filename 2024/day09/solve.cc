@@ -158,13 +158,13 @@ __int128_t SolvePart2Timed(const std::string_view &s) {
 }
 
 std::ostream &operator<<(std::ostream &os, __int128_t i) {
-    assert(i > 0);
+    assert(i >= 0);
     char digits[40];
     size_t pos = 0;
-    while (i > 0) {
+    do {
         digits[pos++] = '0' + i % 10;
         i /= 10;
-    }
+    } while (i > 0);
     while (pos > 0) os << digits[--pos];
     return os;
 }
