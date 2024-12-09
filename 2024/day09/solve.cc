@@ -1,7 +1,7 @@
 #include <cassert>
 #include <iostream>
+#include <queue>
 #include <ranges>
-#include <set>
 #include <string_view>
 #include <vector>
 
@@ -62,9 +62,12 @@ __int128_t SolvePart2(const std::string_view &s) {
         disk_size += size;
     }
 
-    std::set<size_t> starts_by_size[10];
+    // starts_by_size[s] contains the starting indices of all spaces of size i.
+    // This allows us to find the leftmost space where a file of size `fs` fits
+    // by checking the smallest element of starts_by_size[s] where fs <= s <= 9.
+    std::priority_queue<size_t, std::vector<size_t>, std::greater<size_t>> starts_by_size[10];
     for (auto [start, size] : spaces) {
-        if (size > 0) starts_by_size[size].insert(start);
+        if (size > 0) starts_by_size[size].push(start);
     }
 
     for (Span &f : std::ranges::reverse_view(files)) {
@@ -72,7 +75,7 @@ __int128_t SolvePart2(const std::string_view &s) {
         size_t space_size = 0;
         for (int size = f.size; size < 10; ++size) {
             if (starts_by_size[size].empty()) continue;
-            size_t start = *starts_by_size[size].begin();
+            size_t start = starts_by_size[size].top();
             if (start < min_start) {
                 min_start = start;
                 space_size = size;
@@ -80,9 +83,9 @@ __int128_t SolvePart2(const std::string_view &s) {
         }
         if (min_start < f.start) {
             f.start = min_start;
-            starts_by_size[space_size].erase(min_start);
+            starts_by_size[space_size].pop();
             if (f.size < space_size) {
-                starts_by_size[space_size - f.size].insert(min_start + f.size);
+                starts_by_size[space_size - f.size].push(min_start + f.size);
             }
         } else if (f.size == 1) {
             // Tiny optimization: if there is no space to move even the smallest
@@ -109,11 +112,6 @@ __int128_t SolvePart2(const std::string_view &s) {
 
 using namespace std::chrono;
 
-// For memory map
-#include "sys/mman.h"
-#include "sys/stat.h"
-#include "unistd.h"
-
 struct Timer {
     Timer(const char *what) : what(what) {}
 
@@ -126,6 +124,11 @@ struct Timer {
     high_resolution_clock::time_point start = high_resolution_clock::now();
 };
 
+#if OPEN_WITH_MMAP
+#include "sys/mman.h"
+#include "sys/stat.h"
+#include "unistd.h"
+
 static size_t FileSize(int fd) {
   struct stat st;
   int res = fstat(fd, &st);
@@ -136,7 +139,7 @@ static size_t FileSize(int fd) {
   return st.st_size;
 }
 
-std::string_view ReadInput() {
+std::string_view OpenInput() {
     Timer timer("Opening input");
 
     size_t len = FileSize(STDIN_FILENO);
@@ -146,6 +149,16 @@ std::string_view ReadInput() {
     const char *p = reinterpret_cast<const char*>(data);
     assert(len > 0 && p[len - 1] == '\n');
     return std::string_view(p, len - 1);
+}
+#endif
+
+std::string ReadInput() {
+    Timer timer("Reading input");
+    std::ios_base::sync_with_stdio(false);
+    std::cin.tie(nullptr);
+    std::string line;
+    std::getline(std::cin, line);
+    return line;
 }
 
 __int128_t SolvePart1Timed(const std::string_view &s) {
@@ -171,7 +184,13 @@ std::ostream &operator<<(std::ostream &os, __int128_t i) {
 }
 
 int main() {
-    std::string_view s = ReadInput();
+#if OPEN_WITH_MMAP
+    // Open input with mmap().
+    std::string_view s = OpenInput();
+#else
+    // Read input into memory.
+    std::string s = ReadInput();
+#endif
     std::cout << SolvePart1Timed(s) << std::endl;
     std::cout << SolvePart2Timed(s) << std::endl;
 }
