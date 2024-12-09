@@ -1,4 +1,4 @@
-CXXFLAGS=-O3 -g -Wall -march=native -std=c++20
+CXXFLAGS=-O3 -g -Wall -march=native -std=c++20 -DNDEBUG
 
 # For debugging:
 #CXXFLAGS=-O0 -g -Wall -march=native -std=c++20 -D_GLIBCXX_DEBUG
