@@ -11,7 +11,6 @@ struct File {
 };
 
 __int128_t SolvePart1(const std::string_view &s) {
-    // For each file: {{start block, end block}, file index}
     std::vector<File> files;
     size_t disk_size = 0;
     for (size_t i = 0; i < s.size(); ++i) {
@@ -37,43 +36,32 @@ __int128_t SolvePart1(const std::string_view &s) {
     return checksum;
 }
 
-struct Span {
-    size_t start, size;
-};
-
-__int128_t Checksum(const std::vector<int> &disk_layout) {
-    __int128_t checksum = 0;
-    for (size_t block = 0; block < disk_layout.size(); ++block) {
-        int file = disk_layout[block];
-        if (file >= 0) checksum += (__int128_t) block * file;
-    }
-    return checksum;
-}
-
 __int128_t SolvePart2(const std::string_view &s) {
-    std::vector<Span> files;
-    std::vector<Span> spaces;
+    // For each file: begin block index and end block index (exclusive).
+    std::vector<std::pair<size_t, size_t>> files;
+
+    // starts_by_size[s] contains the starting indices of all spaces of size s.
+    // This allows us to find the leftmost space where a file of size `fs` fits
+    // by checking the smallest element of starts_by_size[s] where fs <= s <= 9.
+    std::priority_queue<size_t, std::vector<size_t>, std::greater<size_t>> starts_by_size[10];
     
     size_t disk_size = 0;
     for (size_t i = 0; i < s.size(); ++i) {
         size_t size = s[i] - '0';
-        assert((i % 2 == 0 ? 1 : 0) <= size && size < 10);
-        (i % 2 ? spaces : files).push_back(Span{disk_size, size});
+        assert(0 <= size && size < 10);
+        if (size == 0) continue;
+        if (i % 2 == 0) {
+            files.push_back({disk_size, size});
+        } else {
+            starts_by_size[size].push(disk_size);
+        }
         disk_size += size;
     }
 
-    // starts_by_size[s] contains the starting indices of all spaces of size i.
-    // This allows us to find the leftmost space where a file of size `fs` fits
-    // by checking the smallest element of starts_by_size[s] where fs <= s <= 9.
-    std::priority_queue<size_t, std::vector<size_t>, std::greater<size_t>> starts_by_size[10];
-    for (auto [start, size] : spaces) {
-        if (size > 0) starts_by_size[size].push(start);
-    }
-
-    for (Span &f : std::ranges::reverse_view(files)) {
+    for (auto &[file_start, file_size] : std::ranges::reverse_view(files)) {
         size_t min_start = disk_size;
         size_t space_size = 0;
-        for (int size = f.size; size < 10; ++size) {
+        for (int size = file_size; size < 10; ++size) {
             if (starts_by_size[size].empty()) continue;
             size_t start = starts_by_size[size].top();
             if (start < min_start) {
@@ -81,27 +69,25 @@ __int128_t SolvePart2(const std::string_view &s) {
                 space_size = size;
             }
         }
-        if (min_start < f.start) {
-            f.start = min_start;
+        if (min_start < file_start) {
+            file_start = min_start;
             starts_by_size[space_size].pop();
-            if (f.size < space_size) {
-                starts_by_size[space_size - f.size].push(min_start + f.size);
+            if (file_size < space_size) {
+                starts_by_size[space_size - file_size].push(min_start + file_size);
             }
-        } else if (f.size == 1) {
+        } else if (file_size == 1) {
             // Tiny optimization: if there is no space to move even the smallest
             // file, then no other files will be movable either, so we can stop.
             break;
         }
     }
 
-    std::vector<int> disk_layout(disk_size, -1);
+    __int128_t checksum = 0;
     for (size_t i = 0; i < files.size(); ++i) {
         auto [start, size] = files[i];
-        for (size_t j = start; j < start + size; ++j) {
-            disk_layout[j] = i;
-        }
+        for (size_t j = start; j < start + size; ++j) checksum += (__int128_t) i * j;
     }
-    return Checksum(disk_layout);
+    return checksum;
 }
 
 //
@@ -185,10 +171,8 @@ std::ostream &operator<<(std::ostream &os, __int128_t i) {
 
 int main() {
 #if OPEN_WITH_MMAP
-    // Open input with mmap().
     std::string_view s = OpenInput();
 #else
-    // Read input into memory.
     std::string s = ReadInput();
 #endif
     std::cout << SolvePart1Timed(s) << std::endl;
