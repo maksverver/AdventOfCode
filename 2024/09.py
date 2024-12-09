@@ -1,12 +1,10 @@
+from dataclasses import dataclass
 import sys
 
+@dataclass
 class Span:
-    def __init__(self, start, size):
-        self.start = start
-        self.size = size
-
-    def __repr__(self):
-        return f'Span({self.start},{self.size})'
+    start: int
+    size: int
 
 
 def DecodeInput(input):
