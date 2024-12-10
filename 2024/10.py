@@ -8,6 +8,7 @@ def Neighbors(v):
             if w in grid and grid[v] + 1 == grid[w]]
 
 def CountTotalPeaks(v):
+    # Flood fill to find reachable peaks.
     seen = {v}
     todo = [v]
     for v in todo:
@@ -18,6 +19,7 @@ def CountTotalPeaks(v):
     return sum(grid[v] == 9 for v in seen)
 
 def CountTotalPaths(v):
+    # Depth-first search to find distinct paths.
     return grid[v] == 9 or sum(CountTotalPaths(w) for w in Neighbors(v))
 
 def Solve(f):
@@ -25,4 +27,3 @@ def Solve(f):
    
 print(Solve(CountTotalPeaks))  # Part 1
 print(Solve(CountTotalPaths))  # Part 2
-
