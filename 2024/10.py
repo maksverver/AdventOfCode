@@ -18,7 +18,7 @@ def CountTotalPeaks(v):
     return sum(grid[v] == 9 for v in seen)
 
 def CountTotalPaths(v):
-    return 1 if grid[v] == 9 else sum(CountTotalPaths(w) for w in Neighbors(v))
+    return grid[v] == 9 or sum(CountTotalPaths(w) for w in Neighbors(v))
 
 def Solve(f):
     return sum(f(p) for p, v in grid.items() if v == 0)
