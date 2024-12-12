@@ -18,6 +18,11 @@ import sys
 #W = len(grid[0])
 # see also grid-2d.py for other useful functions
 
+# Alternatively, grid as a dictionary (this is often easier to work with!)
+# grid = {(r, c): ch
+#         for r, line in enumerate(sys.stdin)
+#         for c, ch in enumerate(line.strip())}
+
 # Read parts separated by double newlines.
 #part1, part2 = sys.stdin.read().strip().split('\n\n')
 #lines1 = part1.split('\n')
