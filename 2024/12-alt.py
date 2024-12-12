@@ -1,3 +1,8 @@
+# Advent of Code 2024 day 12: Garden Groups
+# https://adventofcode.com/2024/day/12
+#
+# Simpler implementation of part 2: count corners instead of tracing outlines.
+
 import sys
 
 grid = {(r, c): ch
