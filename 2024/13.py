@@ -1,7 +1,7 @@
 import re
 import sys
 
-def Solve(ax, ay, bx, by, x, y):
+def SolveCase(ax, ay, bx, by, x, y):
     a_cost = 3
     b_cost = 1
 
@@ -10,12 +10,12 @@ def Solve(ax, ay, bx, by, x, y):
         ax, ay, bx, by, a_cost, b_cost = bx, by, ax, ay, b_cost, a_cost
 
     # x/y must lie between ax/ay and bx/by, otherwise it is unsolvable.
-    if not (ax/ay <= x/y <= bx/by):
+    if ax * y > x * ay or bx * y < x * by:
         return None
 
     # If one or both are exactly equal, we would need to do something different.
     # Fortunately, this doesn't happen with the official testdata.
-    assert ax/ay < x/y < bx/by
+    assert ax * y <= x * ay and bx * y >= x * by
 
     # Binary search for `na`, the necessary number of presses of button A,
     # so that the remaining ratio (x - ax*na)/(y - ay*na) = bx / by.
@@ -44,17 +44,19 @@ def Solve(ax, ay, bx, by, x, y):
     return None
 
 
-answer1 = 0
-answer2 = 0
-paragraphs = sys.stdin.read().split('\n\n')
-for paragraph in paragraphs:
-    ax, ay, bx, by, x, y = map(int, re.findall(r'\d+', paragraph))
-    assert ax * by != bx * ay
-    if (cost := Solve(ax, ay, bx, by, x, y)) is not None:
-        answer1 += cost
-    x += 10000000000000
-    y += 10000000000000
-    if (cost := Solve(ax, ay, bx, by, x, y)) is not None:
-        answer2 += cost
-print(answer1)
-print(answer2)
+cases = [tuple(int(s) for s in re.findall(r'\d+', paragraph))
+         for paragraph in sys.stdin.read().split('\n\n')]
+
+def Solve(extra):
+    answer = 0
+    for ax, ay, bx, by, x, y in cases:
+        cost = SolveCase(ax, ay, bx, by, x + extra, y + extra)
+        if cost is not None:
+            answer += cost
+    return answer
+
+# Part 1
+print(Solve(0))
+
+# Part 2
+print(Solve(10000000000000))
