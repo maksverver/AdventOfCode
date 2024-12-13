@@ -15,7 +15,7 @@ def SolveCase(ax, ay, bx, by, x, y):
 
     # If one or both are exactly equal, we would need to do something different.
     # Fortunately, this doesn't happen with the official testdata.
-    assert ax * y <= x * ay and bx * y >= x * by
+    assert ax * y < x * ay and bx * y > x * by
 
     # Binary search for `na`, the necessary number of presses of button A,
     # so that the remaining ratio (x - ax*na)/(y - ay*na) = bx / by.
