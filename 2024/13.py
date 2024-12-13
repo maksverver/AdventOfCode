@@ -44,7 +44,13 @@ def SolveCase(ax, ay, bx, by, x, y):
     return None
 
 
-cases = [tuple(int(s) for s in re.findall(r'\d+', paragraph))
+PATTERN = re.compile(r'''
+Button A: X\+(\d+), Y\+(\d+)
+Button B: X\+(\d+), Y\+(\d+)
+Prize: X=(\d+), Y=(\d+)
+'''.strip())
+
+cases = [tuple(int(s) for s in PATTERN.match(paragraph).groups())
          for paragraph in sys.stdin.read().split('\n\n')]
 
 def Solve(extra):

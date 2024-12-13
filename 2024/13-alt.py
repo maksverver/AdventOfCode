@@ -59,8 +59,13 @@ def SolveCase(xa, ya, xb, yb, x, y):
 
     return 3*na + 1*nb
 
+PATTERN = re.compile(r'''
+Button A: X\+(\d+), Y\+(\d+)
+Button B: X\+(\d+), Y\+(\d+)
+Prize: X=(\d+), Y=(\d+)
+'''.strip())
 
-cases = [tuple(int(s) for s in re.findall(r'\d+', paragraph))
+cases = [tuple(int(s) for s in PATTERN.match(paragraph).groups())
          for paragraph in sys.stdin.read().split('\n\n')]
 
 def Solve(extra):
