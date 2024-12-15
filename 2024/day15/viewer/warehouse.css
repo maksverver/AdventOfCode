@@ -1,0 +1,121 @@
+body {
+    font: 12pt sans-serif;
+    color: white;
+    background: black;
+}
+
+#grid {
+    background-color: #606040;
+    background-image: url(images/ground.png);
+    background-repeat: repeat;
+    display: inline-block;
+    position: relative;
+    margin: 10px;
+}
+
+#moves {
+    margin: 10px;
+    font: bold 14pt Courier, monospace;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.sprite {
+    display: inline-block;
+    width: 64px;
+    height: 64px;
+    position: absolute;
+    background-repeat: no-repeat;
+    background-position: center center;
+}
+
+.sprite.wall {
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-image: url(images/wall.png);
+}
+
+.sprite.crate {
+    background-image: url(images/crate.png);
+}
+
+.sprite.crate.left {
+    background-image: url(images/wide-crate-left.png);
+}
+
+.sprite.crate.right {
+    background-image: url(images/wide-crate-right.png);
+}
+
+.sprite.player {
+    background-image: url(images/player-down-stand.png);
+}
+
+.sprite.player.up {
+    background-image: url(images/player-up-stand.png);
+}
+
+.sprite.player.up.move-1 {
+    background-image: url(images/player-up-walk-1.png);
+}
+
+.sprite.player.up.move-2 {
+    background-image: url(images/player-up-walk-2.png);
+}
+
+.sprite.player.down {
+    background-image: url(images/player-down-stand.png);
+}
+
+.sprite.player.down.move-1 {
+    background-image: url(images/player-down-walk-1.png);
+}
+
+.sprite.player.down.move-2 {
+    background-image: url(images/player-down-walk-2.png);
+}
+
+.sprite.player.left {
+    background-image: url(images/player-left-stand.png);
+}
+
+.sprite.player.right {
+    background-image: url(images/player-right-stand.png);
+}
+
+.sprite.player.left.move-1 {
+    background-image: url(images/player-left-walk.png);
+}
+
+.sprite.player.left.move-2 {
+    background-image: url(images/player-left-stand.png);
+}
+
+.sprite.player.right.move-1 {
+    background-image: url(images/player-right-walk.png);
+}
+
+.sprite.player.right.move-2 {
+    background-image: url(images/player-right-stand.png);
+}
+
+.move {
+    color: #aaa;
+    padding: 4px;
+}
+
+.move.pushed {
+    color: #0f8;
+}
+
+.move.failed {
+    color: #f42;
+}
+
+.move.moved {
+    color: #eee;
+}
+
+.move.current {
+    box-shadow:inset 0px 0px 0px 2px yellow;
+}

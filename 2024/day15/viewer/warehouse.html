@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Advent of Code 2024 day 15: Warehouse Woes</title>
+  <link href="warehouse.css" rel="stylesheet"></style>
+  <script src="warehouse.js" defer></script>
+</head>
+<body onload="handleLoad()">
+<div id="grid"></div>
+<div id="moves"></div>
+<p class="answer"><b>Answer:</b> <span id="answer"></span></p>
+<div class="controls">
+  <p>
+    <b>Simulation speed:</b><br>
+    <input id="speed" type="range" min="0" max="10" value="3" oninput="handleSpeedChange(this.value)">
+  </p>
+  <p>
+    <label>
+      <input id="part2" type="checkbox" onchange="handlePart2Change(this.checked)">
+      <b>Wide cells</b> (part 2)
+    </label>
+
+  </p>
+  <p><b>Input file:</b><br>
+    <input type="file" onchange="handleOpenFile(this)">
+  </p>
+  <p><button onclick="restart()">Restart</button></p>
+</div>
+</body>
+</html>
