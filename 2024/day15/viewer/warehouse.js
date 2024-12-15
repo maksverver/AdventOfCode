@@ -201,13 +201,14 @@ function restart(input) {
 
     const movesElem = document.getElementById('moves');
     const moveElems = [];
+    movesElem.replaceChildren();
     for (let i = 0; i < moves.length; ++i) {
         const span = document.createElement('span');
         span.classList.add('move');
         span.appendChild(document.createTextNode(moves.charAt(i)));
         moveElems.push(span);
+        movesElem.appendChild(span);
     }
-    movesElem.replaceChildren(...moveElems);
 
     function recalculateAnswer(part2) {
         let answer = 0;
@@ -372,8 +373,8 @@ function restart(input) {
 function handleLoad() {
     // Start animation only after resources are loaded.
     //
-    // This should prevent image flickering due to CSS background images
-    // not being loaded yet.
+    // The idea was to prevent image flickering due to CSS background images
+    // not being loaded yet, but it doesn't seem to work.
     restart();
 }
 
