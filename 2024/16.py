@@ -66,8 +66,14 @@ min_dist = min(dist[(end_pos, dir)] for dir in range(4))
 print(min_dist)
 
 # Part 2: calculate number of positions that are part of an optimal path
-optimal = set()
-todo = [(end_pos, dir) for dir in range(4) if dist[(end_pos, dir)] == min_dist]
+#
+# This is essentially a breadth-first-search from the finish back to the start,
+# following only optimal edges.
+todo = [(end_pos, dir) for dir in range(4) if dist.get((end_pos, dir), inf) == min_dist]
+seen = set(todo)
 for v in todo:
-    todo.extend(pred[v])
+    for w in pred[v]:
+        if w not in seen:
+            seen.add(w)
+            todo.append(w)
 print(len(set(pos for (pos, dir) in todo)))
