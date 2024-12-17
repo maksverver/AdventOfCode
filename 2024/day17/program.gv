@@ -1,0 +1,44 @@
+digraph program {
+    rankdir="LR";
+
+    a [label="bst A"];
+    b [label="bxl ?"];
+    c [label="cdv B"];
+    d [label="adv 3"];
+    e [label="bxl ?"];
+    f [label="bxc ?"];
+    g [label="out B"];
+    h [label="jnz 0"];
+
+    a -> b;
+    a -> d;
+    b -> c;
+    c -> d;
+    c -> e;
+    c -> f;
+    e -> g;
+    f -> g;
+    g -> h;
+    d -> h;
+    h -> a;
+
+/*
+If instruction x < y, x must come before y if x writes a value that y reads, OR
+x reads a value that y writes.
+
+Xor operations are commutative so they can occur in either order.
+
+jnz must be sequenced before out.
+
+                                            reads   writes
+  a: 2 4    bst A    B = A & 7              A       B
+  b: 1 5    bxl 5    B ^= 5                 B       B
+  c: 7 5    cdv B    C = A >> B             A B     C
+  d: 0 3    adv 3    A >>= 3                A       A
+  e: 1 6    bxl 6    B ^= 6                 B       B
+  f: 4 3    bxc -    B ^= C                 B       B
+  g: 5 5    out B    yield (B & 7)          B
+  h: 3 0    jnz 0    if A != 0: goto 0      A
+
+*/
+}
