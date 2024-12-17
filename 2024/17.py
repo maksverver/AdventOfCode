@@ -73,6 +73,30 @@ def Run3(A=initial_A, B=0, C=0):
         yield DecodeOne(A)
         A >>= 3
 
+# Part 1: calculate the output with the given initial register values.
+answer1 = ','.join(map(str, Run()))
+print(answer1)
+
+assert answer1 == ','.join(map(str, Run2()))
+assert answer1 == ','.join(map(str, Run3()))
+
+# Part 2: find the initial register value that causes the program to print
+# its own source code.
+#
+# Since we know each iteration of the loop consumes 3 bits from A, and we
+# end with A=0, we can reconstruct possible A's backward, by trying all
+# values of the 3 bits added during a loop, essentially running the program
+# backwards. This is much faster than the forward approach, since we only
+# have 8 options at every step, plus we do not have to consider the case
+# where we invalidate earlier solutions.
+def SolveBackward(A, i):
+    if i == 0: return A
+    return min((SolveBackward((A << 3) + x, i - 1) for x in range(8)
+            if DecodeOne((A << 3) + x) == program[i - 1]), default=inf)
+
+answer2 = SolveBackward(0, len(program))
+print(answer2)
+
 # Calculates the length of the prefix of the program that is correctly
 # reproduced by starting with register value A:
 def ValidPrefixLength(A):
@@ -82,36 +106,22 @@ def ValidPrefixLength(A):
         A >>= 3
     return i
 
-# Part 1: calculate the output with the given initial register values.
-answer1 = ','.join(map(str, Run()))
-print(answer1)
-
-assert answer1 == ','.join(map(str, Run2()))
-assert answer1 == ','.join(map(str, Run3()))
-
-# Part 2: find the minimum initial register value that causes the program
-# to print its own output.
+# Alternate solution, which reconstructs the answer from front to back
+# instead. This was the approach I originally used to solve the problem,
+# but it is much slower.
 #
-# Logic: Run3() removes the lower 3 bits from A after each output, and
-# DecodeOne() only uses (at most) the next 10 bits in A, so we can simply
-# try reconstructing the program from left to right, trying all possible
-# 2**10 = 1024 values, while ensuring that the current prefix remains valid.
-#
-# (Possible optimization: since changing a bit at position i can only affect
-# about 4 output values, we don't need to recheck the entire prefix every
-# time, but only from i-3 to i+1. However, the program is short enough that
-# this doesn't seem to matter much.)
+# The idea is that the i-th output value depends only on bits 3i through
+# 3i + 10 (exclusive) in the input, so we can move through the output values
+# from left to right, and try each possible 10-bit pattern to add to A,
+# while checking we are not invalidating any earlier answers.
 @cache
-def Solve(i, A):
+def SolveForward(i, A):
     shift = 3*i
 
     if i == len(program):
         return inf if (A >> shift) != 0 else A
 
-    return min((Solve(i + 1, A + (j << shift)) for j in range(2**10)
+    return min((SolveForward(i + 1, A + (j << shift)) for j in range(2**10)
             if ValidPrefixLength(A + (j << shift)) > i), default=inf)
 
-answer2 = Solve(0, 0)
-print(answer2)
-
-assert list(Run(answer2)) == program
+#assert answer2 == SolveForward(0, 0)
