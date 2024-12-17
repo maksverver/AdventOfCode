@@ -2,7 +2,8 @@ from functools import cache
 from math import inf
 import sys
 
-# My input for part 2, I assume this is fixed!
+# I hardcoded my input here. For a generic solution that works for all inputs,
+# see 17-generic.py.
 program = [2,4,1,5,7,5,0,3,1,6,4,3,5,5,3,0]
 initial_A = 59590048
 
