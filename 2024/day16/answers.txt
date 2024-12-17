@@ -1,0 +1,6 @@
+turnaround.txt:              2001            2
+twopaths.txt:                3006         1012
+twoturns.txt:                3004         1005
+threeturns.txt:              3006            7
+labyrinth.txt:             327848        29849
+turnalot.txt:             3287640         8240
