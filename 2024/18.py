@@ -15,11 +15,9 @@ until = defaultdict(lambda: inf)
 for i, (x, y) in enumerate(coords):
     until[y, x] = i
 
-
 def Neighbors(v):
     r, c = v
     return [(r2, c2) for (r2, c2) in [(r - 1, c), (r, c - 1), (r, c + 1), (r + 1, c)] if 0 <= r2 < H and 0 <= c2 < W]
-
 
 def ShortestPath(t):
     todo = [(start, 0)]
