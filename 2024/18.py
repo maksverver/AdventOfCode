@@ -4,6 +4,9 @@ import sys
 
 coords = [tuple(map(int, line.split(','))) for line in sys.stdin]
 
+# Guess the bounds from coordinates present in the input. This is not 100%
+# correct, but it's convenient, and works for the official testdata and my
+# own challenge data.
 H = max(r for r, c in coords) + 1
 W = max(c for r, c in coords) + 1
 
