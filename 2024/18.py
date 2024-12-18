@@ -37,9 +37,8 @@ def ShortestPath(t):
 # Part 1: shortest path at t=1024
 print(ShortestPath(1024))
 
-
 # Part 2: binary search for the earliest time where there is no path
-lo = 0
+lo = 1024
 hi = len(coords)
 while lo < hi:
     t = (lo + hi) // 2
@@ -47,4 +46,5 @@ while lo < hi:
         lo = t + 1
     else:
         hi = t
+assert lo > 1024
 print(*coords[lo], sep=',')
