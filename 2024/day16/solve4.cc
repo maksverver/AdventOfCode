@@ -42,7 +42,7 @@ static size_t FileSize(int fd) {
 constexpr int DR[4] = {  0, +1,  0, -1 };
 constexpr int DC[4] = { +1,  0, -1,  0 };
 
-using dist_t = int64_t;
+using dist_t = int32_t;
 
 struct QueueState {
     dist_t dist;
@@ -102,7 +102,6 @@ int main() {
             }
         };
         relax(0, 0, start);
-        int end_dirs_found = 0;
         while (!dist_todo.empty()) {
             dist_t cur_dist = dist_todo.top();
             dist_todo.pop();
@@ -118,8 +117,6 @@ int main() {
                 if (data[w] != '#') relax(cur_dist + move_cost, dir, w);
                 relax(cur_dist + turn_cost, (dir + 1) & 3, v);
                 relax(cur_dist + turn_cost, (dir + 3) & 3, v);
-
-                if (v == end) [[unlikely]] end_dirs_found |= 1 << dir;
             }
             cur.clear();  // reuse later
         }

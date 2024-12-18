@@ -23,7 +23,7 @@ static size_t FileSize(int fd) {
 constexpr int DR[4] = {  0, +1,  0, -1 };
 constexpr int DC[4] = { +1,  0, -1,  0 };
 
-using dist_t = int64_t;
+using dist_t = int32_t;
 
 struct QueueState {
     dist_t dist;
