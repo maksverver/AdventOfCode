@@ -1,3 +1,5 @@
+// Similar to solve.cc, but uses a circular bucket queue instead of an std::priority_queue<>.
+
 #include <cassert>
 #include <iostream>
 #include <limits>
@@ -34,6 +36,10 @@ struct QueueState {
     }
 };
 
+constexpr dist_t move_cost = 1;
+constexpr dist_t turn_cost = 1000;
+constexpr dist_t max_cost = std::max(move_cost, turn_cost);
+
 int main() {
     size_t size = FileSize(STDIN_FILENO);
     const char * const data = (const char*)mmap(NULL, size, PROT_READ, MAP_SHARED, STDIN_FILENO, 0);
@@ -66,21 +72,21 @@ int main() {
     auto dists = std::vector<dist_t>(s.size() * 4, std::numeric_limits<dist_t>::max());
     dist_t answer1 = std::numeric_limits<dist_t>::max();
     {
-        std::vector<std::vector<std::pair<int, size_t>>> todo(1);  // per dist: dir, vertex
+        dist_t max_dist = 0;
+        std::vector<std::pair<int, size_t>> todo[max_cost + 1];  // per dist: dir, vertex
         auto relax = [&](dist_t dist, int dir, size_t v) {
             dist_t &old_dist = dists[4*v + dir];
             if (dist < old_dist) {
                 old_dist = dist;
-                if ((size_t) dist >= todo.size()) todo.resize(dist + 1);
-                todo[dist].push_back({dir, v});
+                todo[dist % (max_cost + 1)].push_back({dir, v});
+                max_dist = std::max(max_dist, dist);
             }
         };
         relax(0, 0, start);
         int end_dirs_found = 0;
-        for (dist_t cur_dist = 0; (size_t) cur_dist < todo.size(); ++cur_dist) {
-            std::vector<std::pair<int, size_t>> batch;
-            todo[cur_dist].swap(batch);
-            for (auto [dir, v] : batch) {
+        for (dist_t cur_dist = 0; cur_dist <= max_dist; ++cur_dist) {
+            auto &cur = todo[cur_dist % (max_cost + 1)];
+            for (auto [dir, v] : cur) {
                 if (cur_dist > dists[4*v + dir]) continue;
                 if (v == end) [[unlikely]] {
                     answer1 = cur_dist;
@@ -88,12 +94,13 @@ int main() {
                 }
 
                 size_t w = v + DR[dir]*(ssize_t)stride + DC[dir];
-                if (data[w] != '#') relax(cur_dist + 1, dir, w);
-                relax(cur_dist + 1000, (dir + 1) & 3, v);
-                relax(cur_dist + 1000, (dir + 3) & 3, v);
+                if (data[w] != '#') relax(cur_dist + move_cost, dir, w);
+                relax(cur_dist + turn_cost, (dir + 1) & 3, v);
+                relax(cur_dist + turn_cost, (dir + 3) & 3, v);
 
                 if (v == end) [[unlikely]] end_dirs_found |= 1 << dir;
             }
+            cur.clear();  // reuse later
         }
         std::cerr << "End not reachable!" << std::endl;
         return 1;
