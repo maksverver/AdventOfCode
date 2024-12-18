@@ -1,8 +1,26 @@
-// Similar to solve.cc, but uses a circular bucket queue instead of an std::priority_queue<>.
+// Similar to solve3.cc, but uses a priority queue to keep track of which
+// distances are used in the bucket queue, so we can skip over empty entries.
+//
+// This changes the time complexity from O(n + d) to O(n + x log y) where
+// d is the maximum distance visited, x is the number of distinct distances
+// visited, and y is the average number of distances in the queue.
+//
+// It turns out that x log y isn't really smaller than d in practice.
+// For maze-large.txt:
+//
+//  - Number of elements in the pq:         79.3 on average (log(79.3, 2) ~ 6.3 )
+//  - Number of distinct distances:  4,208,490
+//  - Maximum distance used:        20,718,422  (= the answer to part 1 + 1000)
+//  - Number of elements pushed:    57,099,732
+//
+// log(79.3, 2) ~ 6.3, while 20,718,422 / 4,208,490 ~ 4.9, so the overhead from
+// the priority queue is larger than the time saved, even ignoring constant
+// factors.
 
 #include <cassert>
 #include <iostream>
 #include <limits>
+#include <queue>
 #include <string_view>
 #include <vector>
 
@@ -72,19 +90,22 @@ int main() {
     auto dists = std::vector<dist_t>(s.size() * 4, std::numeric_limits<dist_t>::max());
     dist_t answer1 = std::numeric_limits<dist_t>::max();
     {
-        dist_t max_dist = 0;
+        std::priority_queue<dist_t, std::vector<dist_t>, std::greater<dist_t>> dist_todo;
         std::vector<std::pair<int, size_t>> todo[max_cost + 1];  // per dist: dir, vertex
         auto relax = [&](dist_t dist, int dir, size_t v) {
             dist_t &old_dist = dists[4*v + dir];
             if (dist < old_dist) {
+                auto &buffer = todo[dist % (max_cost + 1)];
+                if (buffer.empty()) dist_todo.push(dist);
                 old_dist = dist;
-                todo[dist % (max_cost + 1)].push_back({dir, v});
-                max_dist = std::max(max_dist, dist);
+                buffer.push_back({dir, v});
             }
         };
         relax(0, 0, start);
         int end_dirs_found = 0;
-        for (dist_t cur_dist = 0; cur_dist <= max_dist; ++cur_dist) {
+        while (!dist_todo.empty()) {
+            dist_t cur_dist = dist_todo.top();
+            dist_todo.pop();
             auto &cur = todo[cur_dist % (max_cost + 1)];
             for (auto [dir, v] : cur) {
                 if (cur_dist > dists[4*v + dir]) continue;
