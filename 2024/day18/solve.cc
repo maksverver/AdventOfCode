@@ -56,7 +56,7 @@ class UnionFind {
   std::vector<std::pair<int, int>> pr; // list of {parent node, rank (subtree size)} pairs
 
 public:
-  // Constructs a union-find datastructure with of 'nodes' distinct sets
+  // Constructs a union-find datastructure with 'nodes' distinct sets
   UnionFind(int nodes) {
     pr.resize(nodes);
     for (int i = 0; i < nodes; ++i) pr[i] = {i, 1};
@@ -78,18 +78,6 @@ public:
     assert(v >= 0 && v < pr.size());
     if (pr[v].first == v) return v;
     return pr[v].first = find(pr[v].first);
-  }
-
-  // Returns the size of the set containing v.
-  int size(int v) { return pr[find(v)].second; }
-
-  // Returns the number of disjount sets (by counting, so it's slow).
-  int count() {
-    int res = 0;
-    for (int i = 0; i < (int)pr.size(); ++i) {
-      if (pr[i].first == i) ++res;
-    }
-    return res;
   }
 };
 
