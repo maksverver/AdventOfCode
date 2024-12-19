@@ -42,10 +42,6 @@ struct Point {
     int x, y;
 };
 
-template <class T> std::vector<std::vector<T>> MakeSquareGrid(size_t size, T init = {}) {
-    return std::vector<std::vector<T>>(size, std::vector<T>(size, init));
-}
-
 const int DX[4] = { +1, 0, -1,  0};
 const int DY[4] = {  0, +1, 0, -1};
 
