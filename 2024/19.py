@@ -10,11 +10,8 @@ def Calc(target):
     def Search(pos):
         if pos == len(target):
             return 1
-        res = 0
-        for s in patterns:
-            if target.find(s, pos, pos + len(s)) == pos:
-                res += Search(pos + len(s))
-        return res
+        return sum(Search(pos + len(s)) for s in patterns
+            if target.find(s, pos, pos + len(s)) == pos)
     return Search(0)
 
 answer1 = 0
