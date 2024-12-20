@@ -27,11 +27,10 @@ def FindDistances(start):
 # Find distances from start and to end.
 dists1 = FindDistances(start)
 dists2 = FindDistances(end)
-min_dist = min(d + dists2[v] for v, d in dists1.items())
-max_dist = max(d + dists2[v] for v, d in dists1.items())
+min_dist = dists1[end]
 # My solution doesn't require this, but apparently the input is a labyrinth,
 # i.e. one connected path without branches.
-assert min_dist == max_dist
+assert min_dist == max(d + dists2[v] for v, d in dists1.items())
 
 def Solve(max_shortcut, min_saved=100):
     answer = 0
