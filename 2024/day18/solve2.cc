@@ -36,7 +36,7 @@
 #include <limits>
 #include <vector>
 
-enum State { V, U, B, F };
+enum State : char { U, B, F, V };
 
 struct Point {
     int x, y;
@@ -99,10 +99,10 @@ int main(int argc, char *argv[]) {
                 if (0 <= x2 && x2 <= size && 0 <= y2 && y2 <= size) {
                     State &s = grid[x2][y2];
                     switch (s) {
-                      case V: break;
                       case U: todo.push_back({x2, y2}); s = V; break;
                       case B: s = F; break;
                       case F: break;
+                      case V: break;
                     }
                 }
             }
@@ -147,10 +147,10 @@ int main(int argc, char *argv[]) {
             for (int x = 0; x <= size; ++x) {
                 char ch = '?';
                 switch (grid[x][y]) {
-                    case V: ch = 'V'; break;
                     case U: ch = 'U'; break;
                     case B: ch = 'B'; break;
                     case F: ch = 'F'; break;                    
+                    case V: ch = 'V'; break;
                 }
                 std::clog << ch;
             }
