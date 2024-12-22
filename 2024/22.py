@@ -23,7 +23,7 @@ def FirstPricesBySequence(x, n):
     for _ in range(n):
         x = Next(x)
         price = x % 10
-        seq = seq[-3:] + (x%10 - last_price,)
+        seq = seq[-3:] + (price - last_price,)
         last_price = price
         if len(seq) == 4 and seq not in price_by_seq:
             price_by_seq[seq] = price

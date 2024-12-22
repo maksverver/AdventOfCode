@@ -1,4 +1,3 @@
-from collections import Counter
 import sys
 
 sums = [ 0] * 19**4
