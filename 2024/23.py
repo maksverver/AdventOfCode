@@ -26,14 +26,13 @@ print(sum(
 # enumerate all maximal cliques in a graph:
 # https://en.wikipedia.org/wiki/Bron-Kerbosch_algorithm
 
-def BronKerbosch1(R, P, X):
-    if not P and not X:
+def BronKerbosch1(R, P):
+    if not P:
         yield R
 
-    for v in P:
-        yield from BronKerbosch1(R | {v}, P & adj[v], X & adj[v])
-        P = P - {v}
-        X = X | {v}
+    for v in list(P):
+        yield from BronKerbosch1(R | {v}, P & adj[v])
+        P -= {v}
 
-max_clique = max(BronKerbosch1(set(), set(adj), set()), key=len)
+max_clique = max(BronKerbosch1(set(), set(adj)), key=len)
 print(','.join(sorted(max_clique)))
