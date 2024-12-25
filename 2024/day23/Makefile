@@ -1,7 +1,8 @@
-CLAGS=-O3 -Wall -march=native -g
+CLAGS=-O3 -Wall -march=native
+CXXLAGS=-O3 -Wall -march=native
 LDFLAGS=-lcliquer
 
-SOLUTIONS=solve-cliquer
+SOLUTIONS=solve-cliquer solve-part-1
 
 all: $(SOLUTIONS)
 

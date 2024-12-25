@@ -114,7 +114,9 @@ int main() {
         return 1;
     }
 
-    /* Note: for large graphs part 1 is actually much slower than part 2! */    
+    /* Note: for large graphs part 1 is actually much slower than part 2,
+       which is ironic considering how fast part 2 is. For an actually fast
+       solution using bitsets, see solve-part-1.cc */
     ts = timer_start();
     solve_part1(g);
     timer_finish(&ts, "Solving part 1");
