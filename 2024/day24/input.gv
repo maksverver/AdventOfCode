@@ -1,0 +1,670 @@
+digraph {
+rankdir=LR
+node [style=filled fillcolor=cyan]
+drc [label="drc = x44 XOR b" shape=oval fillcolor=lime]
+x44 -> drc
+y44 -> drc
+hjs [label="hjs = phq OR b" shape=diamond fillcolor=orange]
+phq -> hjs
+frm -> hjs
+gqd [label="gqd = vdh AND b" shape=rectangle fillcolor=tomato]
+vdh -> gqd
+nwn -> gqd
+vkn [label="vkn = y40 XOR b" shape=oval fillcolor=lime]
+y40 -> vkn
+x40 -> vkn
+cnb [label="cnb = x21 XOR b" shape=oval fillcolor=lime]
+x21 -> cnb
+y21 -> cnb
+vvk [label="vvk = cnb AND b" shape=rectangle fillcolor=tomato]
+cnb -> vvk
+wmb -> vvk
+hbk [label="hbk = dfb XOR b" shape=oval fillcolor=lime]
+dfb -> hbk
+bfn -> hbk
+z06 [label="z06 = bhd XOR b" shape=oval fillcolor=lime]
+bhd -> z06
+mmh -> z06
+z22 [label="z22 = fkc XOR b" shape=oval fillcolor=lime]
+fkc -> z22
+bwj -> z22
+spq [label="spq = gnj AND b" shape=rectangle fillcolor=tomato]
+gnj -> spq
+jfw -> spq
+fhp [label="fhp = dwh AND b" shape=rectangle fillcolor=tomato]
+dwh -> fhp
+kqn -> fhp
+kkg [label="kkg = x19 AND b" shape=rectangle fillcolor=tomato]
+x19 -> kkg
+y19 -> kkg
+z44 [label="z44 = drc XOR b" shape=oval fillcolor=lime]
+drc -> z44
+qqt -> z44
+jbb [label="jbb = fkc AND b" shape=rectangle fillcolor=tomato]
+fkc -> jbb
+bwj -> jbb
+qwt [label="qwt = y32 XOR b" shape=oval fillcolor=lime]
+y32 -> qwt
+x32 -> qwt
+kgg [label="kgg = y37 AND b" shape=rectangle fillcolor=tomato]
+y37 -> kgg
+x37 -> kgg
+dqn [label="dqn = x07 AND b" shape=rectangle fillcolor=tomato]
+x07 -> dqn
+y07 -> dqn
+hff [label="hff = dsp AND b" shape=rectangle fillcolor=tomato]
+dsp -> hff
+bvp -> hff
+wmt [label="wmt = pmv OR b" shape=diamond fillcolor=orange]
+pmv -> wmt
+pkn -> wmt
+z45 [label="z45 = cjf OR b" shape=diamond fillcolor=orange]
+cjf -> z45
+pfk -> z45
+z27 [label="z27 = hgq XOR b" shape=oval fillcolor=lime]
+hgq -> z27
+phb -> z27
+djp [label="djp = qnq OR b" shape=diamond fillcolor=orange]
+qnq -> djp
+dpc -> djp
+nbb [label="nbb = x32 AND b" shape=rectangle fillcolor=tomato]
+x32 -> nbb
+y32 -> nbb
+fdk [label="fdk = qwt AND b" shape=rectangle fillcolor=tomato]
+qwt -> fdk
+jqm -> fdk
+grp [label="grp = x18 XOR b" shape=oval fillcolor=lime]
+x18 -> grp
+y18 -> grp
+kqn [label="kqn = vkf OR b" shape=diamond fillcolor=orange]
+vkf -> kqn
+hdm -> kqn
+bwd [label="bwd = cqv AND b" shape=rectangle fillcolor=tomato]
+cqv -> bwd
+jss -> bwd
+jfw [label="jfw = x00 AND b" shape=rectangle fillcolor=tomato]
+x00 -> jfw
+y00 -> jfw
+z19 [label="z19 = cjb XOR b" shape=oval fillcolor=lime]
+cjb -> z19
+srm -> z19
+z35 [label="z35 = jss XOR b" shape=oval fillcolor=lime]
+jss -> z35
+cqv -> z35
+ndd [label="ndd = ntt OR b" shape=diamond fillcolor=orange]
+ntt -> ndd
+spq -> ndd
+z43 [label="z43 = cqm XOR b" shape=oval fillcolor=lime]
+cqm -> z43
+qqj -> z43
+ntt [label="ntt = x01 AND b" shape=rectangle fillcolor=tomato]
+x01 -> ntt
+y01 -> ntt
+dfb [label="dfb = y14 XOR b" shape=oval fillcolor=lime]
+y14 -> dfb
+x14 -> dfb
+z05 [label="z05 = nbk XOR b" shape=oval fillcolor=lime]
+nbk -> z05
+wrk -> z05
+z23 [label="z23 = dvw AND b" shape=rectangle fillcolor=tomato]
+dvw -> z23
+rpg -> z23
+qqj [label="qqj = vvc OR b" shape=diamond fillcolor=orange]
+vvc -> qqj
+kcv -> qqj
+z26 [label="z26 = bqc XOR b" shape=oval fillcolor=lime]
+bqc -> z26
+fwr -> z26
+z41 [label="z41 = dwh XOR b" shape=oval fillcolor=lime]
+dwh -> z41
+kqn -> z41
+bkb [label="bkb = x15 XOR b" shape=oval fillcolor=lime]
+x15 -> bkb
+y15 -> bkb
+z24 [label="z24 = rjm XOR b" shape=oval fillcolor=lime]
+rjm -> z24
+gjr -> z24
+bwj [label="bwj = x22 XOR b" shape=oval fillcolor=lime]
+x22 -> bwj
+y22 -> bwj
+hpj [label="hpj = y22 AND b" shape=rectangle fillcolor=tomato]
+y22 -> hpj
+x22 -> hpj
+hnf [label="hnf = x08 XOR b" shape=oval fillcolor=lime]
+x08 -> hnf
+y08 -> hnf
+frm [label="frm = y27 AND b" shape=rectangle fillcolor=tomato]
+y27 -> frm
+x27 -> frm
+fds [label="fds = wrw OR b" shape=diamond fillcolor=orange]
+wrw -> fds
+swr -> fds
+mkv [label="mkv = gtm AND b" shape=rectangle fillcolor=tomato]
+gtm -> mkv
+rmt -> mkv
+ghr [label="ghr = kdh AND b" shape=rectangle fillcolor=tomato]
+kdh -> ghr
+qvq -> ghr
+kcv [label="kcv = fgv AND b" shape=rectangle fillcolor=tomato]
+fgv -> kcv
+mfm -> kcv
+pmv [label="pmv = hnf AND b" shape=rectangle fillcolor=tomato]
+hnf -> pmv
+gqs -> pmv
+vdh [label="vdh = kkg OR b" shape=diamond fillcolor=orange]
+kkg -> vdh
+qvs -> vdh
+rmt [label="rmt = fdk OR b" shape=diamond fillcolor=orange]
+fdk -> rmt
+nbb -> rmt
+cwd [label="cwd = y29 AND b" shape=rectangle fillcolor=tomato]
+y29 -> cwd
+x29 -> cwd
+vkg [label="vkg = hjk OR b" shape=diamond fillcolor=orange]
+hjk -> vkg
+bts -> vkg
+tqb [label="tqb = vtk AND b" shape=rectangle fillcolor=tomato]
+vtk -> tqb
+npm -> tqb
+dbb [label="dbb = dvw XOR b" shape=oval fillcolor=lime]
+dvw -> dbb
+rpg -> dbb
+mnm [label="mnm = y39 XOR b" shape=oval fillcolor=lime]
+y39 -> mnm
+x39 -> mnm
+wrk [label="wrk = y05 XOR b" shape=oval fillcolor=lime]
+y05 -> wrk
+x05 -> wrk
+dqt [label="dqt = djd AND b" shape=rectangle fillcolor=tomato]
+djd -> dqt
+fds -> dqt
+npm [label="npm = tvh OR b" shape=diamond fillcolor=orange]
+tvh -> npm
+sqm -> npm
+z10 [label="z10 = cdr XOR b" shape=oval fillcolor=lime]
+cdr -> z10
+cmt -> z10
+hgd [label="hgd = x28 XOR b" shape=oval fillcolor=lime]
+x28 -> hgd
+y28 -> hgd
+gtm [label="gtm = x33 XOR b" shape=oval fillcolor=lime]
+x33 -> gtm
+y33 -> gtm
+z39 [label="z39 = mnm XOR b" shape=oval fillcolor=lime]
+mnm -> z39
+vhv -> z39
+z38 [label="z38 = fbv XOR b" shape=oval fillcolor=lime]
+fbv -> z38
+bwg -> z38
+vbt [label="vbt = hqs AND b" shape=rectangle fillcolor=tomato]
+hqs -> vbt
+nhr -> vbt
+hgq [label="hgq = kth OR b" shape=diamond fillcolor=orange]
+kth -> hgq
+qcp -> hgq
+bfn [label="bfn = wjj OR b" shape=diamond fillcolor=orange]
+wjj -> bfn
+scs -> bfn
+fkc [label="fkc = bkv OR b" shape=diamond fillcolor=orange]
+bkv -> fkc
+vvk -> fkc
+pph [label="pph = cmt AND b" shape=rectangle fillcolor=tomato]
+cmt -> pph
+cdr -> pph
+bqc [label="bqc = dqt OR b" shape=diamond fillcolor=orange]
+dqt -> bqc
+gqb -> bqc
+jss [label="jss = y35 XOR b" shape=oval fillcolor=lime]
+y35 -> jss
+x35 -> jss
+cdr [label="cdr = vkb OR b" shape=diamond fillcolor=orange]
+vkb -> cdr
+krd -> cdr
+trj [label="trj = mqf AND b" shape=rectangle fillcolor=tomato]
+mqf -> trj
+cvh -> trj
+dsp [label="dsp = x36 XOR b" shape=oval fillcolor=lime]
+x36 -> dsp
+y36 -> dsp
+dwh [label="dwh = y41 XOR b" shape=oval fillcolor=lime]
+y41 -> dwh
+x41 -> dwh
+bwg [label="bwg = y38 XOR b" shape=oval fillcolor=lime]
+y38 -> bwg
+x38 -> bwg
+jqm [label="jqm = ghr OR b" shape=diamond fillcolor=orange]
+ghr -> jqm
+tpc -> jqm
+z07 [label="z07 = ckn XOR b" shape=oval fillcolor=lime]
+ckn -> z07
+hqq -> z07
+vkf [label="vkf = vkn AND b" shape=rectangle fillcolor=tomato]
+vkn -> vkf
+vkg -> vkf
+wkc [label="wkc = y28 AND b" shape=rectangle fillcolor=tomato]
+y28 -> wkc
+x28 -> wkc
+qvq [label="qvq = x31 XOR b" shape=oval fillcolor=lime]
+x31 -> qvq
+y31 -> qvq
+swr [label="swr = rjm AND b" shape=rectangle fillcolor=tomato]
+rjm -> swr
+gjr -> swr
+rjm [label="rjm = gcb OR b" shape=diamond fillcolor=orange]
+gcb -> rjm
+dbb -> rjm
+z18 [label="z18 = y18 AND b" shape=rectangle fillcolor=tomato]
+y18 -> z18
+x18 -> z18
+wrw [label="wrw = y24 AND b" shape=rectangle fillcolor=tomato]
+y24 -> wrw
+x24 -> wrw
+kbh [label="kbh = x17 XOR b" shape=oval fillcolor=lime]
+x17 -> kbh
+y17 -> kbh
+gjr [label="gjr = y24 XOR b" shape=oval fillcolor=lime]
+y24 -> gjr
+x24 -> gjr
+fwr [label="fwr = x26 XOR b" shape=oval fillcolor=lime]
+x26 -> fwr
+y26 -> fwr
+bvm [label="bvm = y43 AND b" shape=rectangle fillcolor=tomato]
+y43 -> bvm
+x43 -> bvm
+sbt [label="sbt = y15 AND b" shape=rectangle fillcolor=tomato]
+y15 -> sbt
+x15 -> sbt
+fvh [label="fvh = y12 XOR b" shape=oval fillcolor=lime]
+y12 -> fvh
+x12 -> fvh
+cjb [label="cjb = kvn OR b" shape=diamond fillcolor=orange]
+kvn -> cjb
+ffb -> cjb
+tpc [label="tpc = y31 AND b" shape=rectangle fillcolor=tomato]
+y31 -> tpc
+x31 -> tpc
+bnh [label="bnh = y37 XOR b" shape=oval fillcolor=lime]
+y37 -> bnh
+x37 -> bnh
+scv [label="scv = y11 AND b" shape=rectangle fillcolor=tomato]
+y11 -> scv
+x11 -> scv
+phr [label="phr = hgd AND b" shape=rectangle fillcolor=tomato]
+hgd -> phr
+hjs -> phr
+z01 [label="z01 = jfw XOR b" shape=oval fillcolor=lime]
+jfw -> z01
+gnj -> z01
+z12 [label="z12 = fvh XOR b" shape=oval fillcolor=lime]
+fvh -> z12
+sfk -> z12
+z25 [label="z25 = fds XOR b" shape=oval fillcolor=lime]
+fds -> z25
+djd -> z25
+z32 [label="z32 = qwt XOR b" shape=oval fillcolor=lime]
+qwt -> z32
+jqm -> z32
+z36 [label="z36 = bvp XOR b" shape=oval fillcolor=lime]
+bvp -> z36
+dsp -> z36
+jdq [label="jdq = phr OR b" shape=diamond fillcolor=orange]
+phr -> jdq
+wkc -> jdq
+hqq [label="hqq = y07 XOR b" shape=oval fillcolor=lime]
+y07 -> hqq
+x07 -> hqq
+cqm [label="cqm = y43 XOR b" shape=oval fillcolor=lime]
+y43 -> cqm
+x43 -> cqm
+z37 [label="z37 = bnh XOR b" shape=oval fillcolor=lime]
+bnh -> z37
+kss -> z37
+kdh [label="kdh = trg OR b" shape=diamond fillcolor=orange]
+trg -> kdh
+vbt -> kdh
+nhr [label="nhr = cwd OR b" shape=diamond fillcolor=orange]
+cwd -> nhr
+pkc -> nhr
+srm [label="srm = y19 XOR b" shape=oval fillcolor=lime]
+y19 -> srm
+x19 -> srm
+pkc [label="pkc = dkd AND b" shape=rectangle fillcolor=tomato]
+dkd -> pkc
+jdq -> pkc
+fnk [label="fnk = wrk AND b" shape=rectangle fillcolor=tomato]
+wrk -> fnk
+nbk -> fnk
+z28 [label="z28 = hjs XOR b" shape=oval fillcolor=lime]
+hjs -> z28
+hgd -> z28
+rcp [label="rcp = rnt AND b" shape=rectangle fillcolor=tomato]
+rnt -> rcp
+qbs -> rcp
+z03 [label="z03 = djp XOR b" shape=oval fillcolor=lime]
+djp -> z03
+mft -> z03
+mqf [label="mqf = cht OR b" shape=diamond fillcolor=orange]
+cht -> mqf
+mkv -> mqf
+z15 [label="z15 = hbk XOR b" shape=oval fillcolor=lime]
+hbk -> z15
+bkb -> z15
+pfk [label="pfk = x44 AND b" shape=rectangle fillcolor=tomato]
+x44 -> pfk
+y44 -> pfk
+qcp [label="qcp = x26 AND b" shape=rectangle fillcolor=tomato]
+x26 -> qcp
+y26 -> qcp
+z02 [label="z02 = ndd XOR b" shape=oval fillcolor=lime]
+ndd -> z02
+jgw -> z02
+dhs [label="dhs = x06 AND b" shape=rectangle fillcolor=tomato]
+x06 -> dhs
+y06 -> dhs
+cpt [label="cpt = ckn AND b" shape=rectangle fillcolor=tomato]
+ckn -> cpt
+hqq -> cpt
+wjj [label="wjj = y13 AND b" shape=rectangle fillcolor=tomato]
+y13 -> wjj
+x13 -> wjj
+tvr [label="tvr = x10 AND b" shape=rectangle fillcolor=tomato]
+x10 -> tvr
+y10 -> tvr
+wmb [label="wmb = ffr OR b" shape=diamond fillcolor=orange]
+ffr -> wmb
+gqd -> wmb
+tjb [label="tjb = y09 XOR b" shape=oval fillcolor=lime]
+y09 -> tjb
+x09 -> tjb
+z30 [label="z30 = nhr XOR b" shape=oval fillcolor=lime]
+nhr -> z30
+hqs -> z30
+phq [label="phq = hgq AND b" shape=rectangle fillcolor=tomato]
+hgq -> phq
+phb -> phq
+z00 [label="z00 = x00 XOR b" shape=oval fillcolor=lime]
+x00 -> z00
+y00 -> z00
+prt [label="prt = y16 AND b" shape=rectangle fillcolor=tomato]
+y16 -> prt
+x16 -> prt
+gqs [label="gqs = dqn OR b" shape=diamond fillcolor=orange]
+dqn -> gqs
+cpt -> gqs
+gcb [label="gcb = x23 AND b" shape=rectangle fillcolor=tomato]
+x23 -> gcb
+y23 -> gcb
+tvh [label="tvh = mft AND b" shape=rectangle fillcolor=tomato]
+mft -> tvh
+djp -> tvh
+qtw [label="qtw = bkb AND b" shape=rectangle fillcolor=tomato]
+bkb -> qtw
+hbk -> qtw
+vgb [label="vgb = kfk AND b" shape=rectangle fillcolor=tomato]
+kfk -> vgb
+chk -> vgb
+hjk [label="hjk = vhv AND b" shape=rectangle fillcolor=tomato]
+vhv -> hjk
+mnm -> hjk
+mfm [label="mfm = y42 XOR b" shape=oval fillcolor=lime]
+y42 -> mfm
+x42 -> mfm
+djd [label="djd = x25 XOR b" shape=oval fillcolor=lime]
+x25 -> djd
+y25 -> djd
+z42 [label="z42 = fgv XOR b" shape=oval fillcolor=lime]
+fgv -> z42
+mfm -> z42
+kvn [label="kvn = grp XOR b" shape=oval fillcolor=lime]
+grp -> kvn
+fgr -> kvn
+chk [label="chk = x16 XOR b" shape=oval fillcolor=lime]
+x16 -> chk
+y16 -> chk
+krd [label="krd = x09 AND b" shape=rectangle fillcolor=tomato]
+x09 -> krd
+y09 -> krd
+mqm [label="mqm = cqb OR b" shape=diamond fillcolor=orange]
+cqb -> mqm
+rmg -> mqm
+hqs [label="hqs = y30 XOR b" shape=oval fillcolor=lime]
+y30 -> hqs
+x30 -> hqs
+dvf [label="dvf = kss AND b" shape=rectangle fillcolor=tomato]
+kss -> dvf
+bnh -> dvf
+rnt [label="rnt = y11 XOR b" shape=oval fillcolor=lime]
+y11 -> rnt
+x11 -> rnt
+ptm [label="ptm = x04 AND b" shape=rectangle fillcolor=tomato]
+x04 -> ptm
+y04 -> ptm
+cbr [label="cbr = y13 XOR b" shape=oval fillcolor=lime]
+y13 -> cbr
+x13 -> cbr
+z11 [label="z11 = rnt XOR b" shape=oval fillcolor=lime]
+rnt -> z11
+qbs -> z11
+kss [label="kss = hff OR b" shape=diamond fillcolor=orange]
+hff -> kss
+fjf -> kss
+gqb [label="gqb = x25 AND b" shape=rectangle fillcolor=tomato]
+x25 -> gqb
+y25 -> gqb
+z31 [label="z31 = kdh XOR b" shape=oval fillcolor=lime]
+kdh -> z31
+qvq -> z31
+mmh [label="mmh = y06 XOR b" shape=oval fillcolor=lime]
+y06 -> mmh
+x06 -> mmh
+z21 [label="z21 = cnb XOR b" shape=oval fillcolor=lime]
+cnb -> z21
+wmb -> z21
+jgw [label="jgw = y02 XOR b" shape=oval fillcolor=lime]
+y02 -> jgw
+x02 -> jgw
+hkn [label="hkn = x17 AND b" shape=rectangle fillcolor=tomato]
+x17 -> hkn
+y17 -> hkn
+cvh [label="cvh = y34 AND b" shape=rectangle fillcolor=tomato]
+y34 -> cvh
+x34 -> cvh
+phb [label="phb = x27 XOR b" shape=oval fillcolor=lime]
+x27 -> phb
+y27 -> phb
+vvc [label="vvc = x42 AND b" shape=rectangle fillcolor=tomato]
+x42 -> vvc
+y42 -> vvc
+mft [label="mft = x03 XOR b" shape=oval fillcolor=lime]
+x03 -> mft
+y03 -> mft
+nvg [label="nvg = y35 AND b" shape=rectangle fillcolor=tomato]
+y35 -> nvg
+x35 -> nvg
+cmt [label="cmt = x10 XOR b" shape=oval fillcolor=lime]
+x10 -> cmt
+y10 -> cmt
+ffr [label="ffr = y20 AND b" shape=rectangle fillcolor=tomato]
+y20 -> ffr
+x20 -> ffr
+trg [label="trg = x30 AND b" shape=rectangle fillcolor=tomato]
+x30 -> trg
+y30 -> trg
+nbk [label="nbk = ptm OR b" shape=diamond fillcolor=orange]
+ptm -> nbk
+tqb -> nbk
+sjr [label="sjr = bfn AND b" shape=rectangle fillcolor=tomato]
+bfn -> sjr
+dfb -> sjr
+qnq [label="qnq = jgw AND b" shape=rectangle fillcolor=tomato]
+jgw -> qnq
+ndd -> qnq
+bts [label="bts = y39 AND b" shape=rectangle fillcolor=tomato]
+y39 -> bts
+x39 -> bts
+knq [label="knq = y38 AND b" shape=rectangle fillcolor=tomato]
+y38 -> knq
+x38 -> knq
+z04 [label="z04 = npm XOR b" shape=oval fillcolor=lime]
+npm -> z04
+vtk -> z04
+jqc [label="jqc = prt OR b" shape=diamond fillcolor=orange]
+prt -> jqc
+vgb -> jqc
+z16 [label="z16 = kfk XOR b" shape=oval fillcolor=lime]
+kfk -> z16
+chk -> z16
+ckn [label="ckn = rvd OR b" shape=diamond fillcolor=orange]
+rvd -> ckn
+dhs -> ckn
+bhd [label="bhd = fnk OR b" shape=diamond fillcolor=orange]
+fnk -> bhd
+wkv -> bhd
+sqm [label="sqm = y03 AND b" shape=rectangle fillcolor=tomato]
+y03 -> sqm
+x03 -> sqm
+pkn [label="pkn = x08 AND b" shape=rectangle fillcolor=tomato]
+x08 -> pkn
+y08 -> pkn
+dpc [label="dpc = y02 AND b" shape=rectangle fillcolor=tomato]
+y02 -> dpc
+x02 -> dpc
+pdw [label="pdw = bwg AND b" shape=rectangle fillcolor=tomato]
+bwg -> pdw
+fbv -> pdw
+z34 [label="z34 = mqf XOR b" shape=oval fillcolor=lime]
+mqf -> z34
+cvh -> z34
+vkb [label="vkb = tjb AND b" shape=rectangle fillcolor=tomato]
+tjb -> vkb
+wmt -> vkb
+z29 [label="z29 = jdq XOR b" shape=oval fillcolor=lime]
+jdq -> z29
+dkd -> z29
+tfn [label="tfn = x34 XOR b" shape=oval fillcolor=lime]
+x34 -> tfn
+y34 -> tfn
+bkv [label="bkv = y21 AND b" shape=rectangle fillcolor=tomato]
+y21 -> bkv
+x21 -> bkv
+cqv [label="cqv = tfn OR b" shape=diamond fillcolor=orange]
+tfn -> cqv
+trj -> cqv
+ffb [label="ffb = fgr AND b" shape=rectangle fillcolor=tomato]
+fgr -> ffb
+grp -> ffb
+bvp [label="bvp = bwd OR b" shape=diamond fillcolor=orange]
+bwd -> bvp
+nvg -> bvp
+fgr [label="fgr = cjv OR b" shape=diamond fillcolor=orange]
+cjv -> fgr
+hkn -> fgr
+fgv [label="fgv = fhp OR b" shape=diamond fillcolor=orange]
+fhp -> fgv
+rnc -> fgv
+z14 [label="z14 = sjr OR b" shape=diamond fillcolor=orange]
+sjr -> z14
+tck -> z14
+z40 [label="z40 = vkn XOR b" shape=oval fillcolor=lime]
+vkn -> z40
+vkg -> z40
+z17 [label="z17 = kbh XOR b" shape=oval fillcolor=lime]
+kbh -> z17
+jqc -> z17
+fbv [label="fbv = kgg OR b" shape=diamond fillcolor=orange]
+kgg -> fbv
+dvf -> fbv
+z09 [label="z09 = tjb XOR b" shape=oval fillcolor=lime]
+tjb -> z09
+wmt -> z09
+qbs [label="qbs = tvr OR b" shape=diamond fillcolor=orange]
+tvr -> qbs
+pph -> qbs
+gsg [label="gsg = qqj AND b" shape=rectangle fillcolor=tomato]
+qqj -> gsg
+cqm -> gsg
+vhv [label="vhv = pdw OR b" shape=diamond fillcolor=orange]
+pdw -> vhv
+knq -> vhv
+z08 [label="z08 = gqs XOR b" shape=oval fillcolor=lime]
+gqs -> z08
+hnf -> z08
+nwn [label="nwn = y20 XOR b" shape=oval fillcolor=lime]
+y20 -> nwn
+x20 -> nwn
+cjv [label="cjv = kbh AND b" shape=rectangle fillcolor=tomato]
+kbh -> cjv
+jqc -> cjv
+kth [label="kth = bqc AND b" shape=rectangle fillcolor=tomato]
+bqc -> kth
+fwr -> kth
+sfk [label="sfk = rcp OR b" shape=diamond fillcolor=orange]
+rcp -> sfk
+scv -> sfk
+kfk [label="kfk = sbt OR b" shape=diamond fillcolor=orange]
+sbt -> kfk
+qtw -> kfk
+rvd [label="rvd = bhd AND b" shape=rectangle fillcolor=tomato]
+bhd -> rvd
+mmh -> rvd
+z20 [label="z20 = nwn XOR b" shape=oval fillcolor=lime]
+nwn -> z20
+vdh -> z20
+dkd [label="dkd = y29 XOR b" shape=oval fillcolor=lime]
+y29 -> dkd
+x29 -> dkd
+rpg [label="rpg = y23 XOR b" shape=oval fillcolor=lime]
+y23 -> rpg
+x23 -> rpg
+dvw [label="dvw = jbb OR b" shape=diamond fillcolor=orange]
+jbb -> dvw
+hpj -> dvw
+z13 [label="z13 = cbr XOR b" shape=oval fillcolor=lime]
+cbr -> z13
+mqm -> z13
+cht [label="cht = y33 AND b" shape=rectangle fillcolor=tomato]
+y33 -> cht
+x33 -> cht
+rmg [label="rmg = y12 AND b" shape=rectangle fillcolor=tomato]
+y12 -> rmg
+x12 -> rmg
+scs [label="scs = mqm AND b" shape=rectangle fillcolor=tomato]
+mqm -> scs
+cbr -> scs
+cqb [label="cqb = sfk AND b" shape=rectangle fillcolor=tomato]
+sfk -> cqb
+fvh -> cqb
+tck [label="tck = y14 AND b" shape=rectangle fillcolor=tomato]
+y14 -> tck
+x14 -> tck
+vtk [label="vtk = x04 XOR b" shape=oval fillcolor=lime]
+x04 -> vtk
+y04 -> vtk
+wkv [label="wkv = y05 AND b" shape=rectangle fillcolor=tomato]
+y05 -> wkv
+x05 -> wkv
+z33 [label="z33 = rmt XOR b" shape=oval fillcolor=lime]
+rmt -> z33
+gtm -> z33
+gnj [label="gnj = y01 XOR b" shape=oval fillcolor=lime]
+y01 -> gnj
+x01 -> gnj
+qvs [label="qvs = srm AND b" shape=rectangle fillcolor=tomato]
+srm -> qvs
+cjb -> qvs
+fjf [label="fjf = x36 AND b" shape=rectangle fillcolor=tomato]
+x36 -> fjf
+y36 -> fjf
+cjf [label="cjf = drc AND b" shape=rectangle fillcolor=tomato]
+drc -> cjf
+qqt -> cjf
+hdm [label="hdm = y40 AND b" shape=rectangle fillcolor=tomato]
+y40 -> hdm
+x40 -> hdm
+rnc [label="rnc = y41 AND b" shape=rectangle fillcolor=tomato]
+y41 -> rnc
+x41 -> rnc
+qqt [label="qqt = gsg OR b" shape=diamond fillcolor=orange]
+gsg -> qqt
+bvm -> qqt
+}
