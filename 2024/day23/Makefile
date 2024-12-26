@@ -1,5 +1,5 @@
 CLAGS=-O3 -Wall -march=native
-CXXLAGS=-O3 -Wall -march=native
+CXXFLAGS=-O3 -Wall -march=native
 
 SOLUTIONS=solve-part-1 solve-cliquer-part-1 solve-cliquer-part-2
 

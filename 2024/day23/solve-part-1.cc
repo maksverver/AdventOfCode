@@ -20,6 +20,7 @@ int ParseVertex(std::string_view s) {
 // Formatting wrapper. Useful for debugging.
 struct F { int v; };
 
+[[maybe_unused]]
 std::ostream &operator<<(std::ostream &os, F f) {
     char c = 't' + f.v / 26;
     char d = 'a' + f.v % 26;
