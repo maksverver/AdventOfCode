@@ -77,6 +77,6 @@ void timer_finish(struct timespec *ts, const char *what) {
     struct timespec finish = now();
     struct timespec start = *ts;
 
-    fprintf(stderr, "%s took: %lld ms\n", what,
+    fprintf(stderr, "%s took: %lld us\n", what,
         (long long) 1e6 * (finish.tv_sec - start.tv_sec) + (finish.tv_nsec - start.tv_nsec) / 1000);
 }
