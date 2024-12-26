@@ -1,10 +1,15 @@
 CLAGS=-O3 -Wall -march=native
 CXXLAGS=-O3 -Wall -march=native
-LDFLAGS=-lcliquer
 
-SOLUTIONS=solve-cliquer solve-part-1
+SOLUTIONS=solve-part-1 solve-cliquer-part-1 solve-cliquer-part-2
 
 all: $(SOLUTIONS)
+
+solve-cliquer-part-1: solve-cliquer-part-1.c solve-cliquer-common.c
+	$(CC) $(CFLAGS) -o $@ $^ -lcliquer
+
+solve-cliquer-part-2: solve-cliquer-part-2.c solve-cliquer-common.c
+	$(CC) $(CFLAGS) -o $@ $^ -lcliquer
 
 clean:
 	rm -f $(SOLUTIONS)
