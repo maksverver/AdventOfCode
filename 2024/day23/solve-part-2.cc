@@ -1,3 +1,15 @@
+// Advent of Code 2024 Day 23: LAN Party
+// https://adventofcode.com/2024/day/23
+//
+// The problem asks us to find the maximum clique in a graph. This solution
+// implements the algorithm from Patric R.J. Östergård
+// “A fast algorithm for the maximum clique problem” (2002)
+// https://www.sciencedirect.com/science/article/pii/S0166218X01002906
+//
+// It is similar to the implementation in Cliquer:
+// https://users.aalto.fi/~pat/cliquer.html
+//
+
 #include <algorithm>
 #include <bitset>
 #include <cassert>
@@ -12,9 +24,7 @@ namespace {
 // adjacent[v] == bitset of vertices w such that there is an edge (v, w)
 std::vector<std::bitset<V>> adjacent(V);
 
-// This is from Cliquer: we start by calculating a vertex ordering based on
-// a greedy coloring of the graph. For details, see:
-// https://users.aalto.fi/~pat/cliquer/cliquer.pdf (section 2.4)
+// Calculates a vertex ordering based on a greedy coloring of the graph.
 std::array<int, V> GreedyColoringOrder() {
     std::vector<int> degree(V);
     for (int v = 0; v < V; ++v) degree[v] = adjacent[v].count();
@@ -67,11 +77,11 @@ void Reorder(const std::array<int, V> &order) {
     adjacent = std::move(a);
 }
 
-// subgraph_max_clique_size[n] is the size of the maximum clique in the subgraph
+// subgraph_max_clique_size[N] is the size of the maximum clique in the subgraph
 // of size N with vertices 0, 1, .., N-1.
 std::vector<int> subgraph_max_clique_size;
 
-// new_clique holds the clique found by Search().
+// new_clique holds the clique found by Search() (if it returns `true`).
 std::vector<int> new_clique;
 
 // Searches for a clique of size `size` in the subgraph induced by the vertex
@@ -84,7 +94,7 @@ bool Search(std::bitset<V> P, int N, int size) {
     if (size > (int) P.count()) return false;
     for (int v = N - 1; v >= 0; --v) {
         if (!P[v]) continue;
-        if (size - 1 > subgraph_max_clique_size[v]) break;
+        if (size - 1 > subgraph_max_clique_size[v]) break;  // prune
         if (Search(P & adjacent[v], v, size - 1)) {
             new_clique.push_back(v);
             return true;
@@ -104,10 +114,12 @@ int main() {
     for (int lineno = 1; std::cin >> line; ++lineno) {
         if (auto res = ParseEdge(line)) {
             auto [v, w] = *res;
-            assert(v != w);
-            if (v > w) std::swap(v, w);
-            adjacent[v][w] = true;
-            adjacent[w][v] = true;
+            if (v != w) {
+                adjacent[v][w] = true;
+                adjacent[w][v] = true;
+            } else {
+                std::cerr << "Loop on line " << lineno << " (ignored)\n";
+            }
         } else {
             std::cerr << "Invalid input on line " << lineno << std::endl;
             return 1;
