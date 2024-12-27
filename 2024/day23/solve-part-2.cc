@@ -139,10 +139,10 @@ int main() {
     for (int v = 0; v < V; ++v) {
         std::bitset<V> P;
         for (int w = 0; w < v; ++w) if (adjacent[v][w]) P.set(w);
-        new_clique.clear();
         if (Search(P, v, max_clique.size())) {
             new_clique.push_back(v);
-            max_clique = new_clique;
+            new_clique.swap(max_clique);
+            new_clique.clear();
         }
         subgraph_max_clique_size.push_back(max_clique.size());
     }
