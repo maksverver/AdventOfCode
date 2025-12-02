@@ -1,4 +1,4 @@
-from heapq import heappush, heappop, heappushpop
+from heapq import heappush, heappop
 
 #
 # Part 1
@@ -54,11 +54,21 @@ def GenSeqs(max_period=10):
     seqs = []
     for p in range(1, max_period + 1):
         seq = GenSeq(p)
-        heappush(seqs, (next(seq), p, seq))
+        seqs.append((next(seq), p, seq))
+    seqs.sort()
+
     last_i = 0
     while True:
         i, p, seq = seqs[0]
-        heappushpop(seqs, (next(seq), p, seq))
+
+        # Reinsert in sorted sequence
+        new_tuple = (next(seq), p, seq)
+        j = 0
+        while j + 1 < len(seqs) and seqs[j + 1] < new_tuple:
+            seqs[j] = seqs[j + 1]
+            j += 1
+        seqs[j] = new_tuple
+
         if i != last_i:
             last_i = i
             yield i
