@@ -12,4 +12,4 @@ def is_nice(word):
 		b = c
 	return vowels >= 3 and doubles > 0
 
-print sum(map(is_nice, sys.stdin))
+print(sum(map(is_nice, sys.stdin)))

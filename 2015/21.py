@@ -1,6 +1,4 @@
-from collections import defaultdict
 from itertools import combinations
-from math import *
 import sys
 
 weapons = [
@@ -45,8 +43,8 @@ for line in sys.stdin:
 
 weapons = [[w] for w in weapons]
 armors = [[]] + [[a] for a in armors]
-rings = [[]] + [[r] for r in rings] + map(list, combinations(rings, 2))
+rings = [[]] + [[r] for r in rings] + [list(t) for t in combinations(rings, 2)]
 outfits = [w + a + r for w in weapons for a in armors for r in rings]
 
-print min(cost(outfit) for outfit in outfits if winning(outfit))      # Part 1
-print max(cost(outfit) for outfit in outfits if not winning(outfit))  # Part 2
+print(min(cost(outfit) for outfit in outfits if winning(outfit)))      # Part 1
+print(max(cost(outfit) for outfit in outfits if not winning(outfit)))  # Part 2

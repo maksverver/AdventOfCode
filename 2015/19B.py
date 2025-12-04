@@ -33,5 +33,5 @@
 #   length of the input - 2*(#sets of parentheses) - 2*(#commas) - 1
 
 import sys
-for l in sys.stdin: pass
-print sum(c.isupper() for c in l) - 2*l.count('Rn') - 2*l.count('Y') - 1
+*_, l = sys.stdin
+print(sum(c.isupper() for c in l) - 2*l.count('Rn') - 2*l.count('Y') - 1)

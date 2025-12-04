@@ -53,6 +53,6 @@ def valid(s):
 password = list(sys.stdin.readline().strip())
 remove_forbidden(password)
 while not valid(inc(password)): pass
-print ''.join(password)
+print(''.join(password))
 while not valid(inc(password)): pass
-print ''.join(password)
+print(''.join(password))

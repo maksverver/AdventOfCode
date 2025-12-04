@@ -59,14 +59,14 @@ def execute(instructions, regs):
 	while 0 <= regs['ip'] < len(instructions):
 		instructions[regs['ip']](regs)
 
-instructions = map(parse, sys.stdin)
+instructions = list(map(parse, sys.stdin))
 
 # Part 1
 regs = {'ip': 0, 'a': 0, 'b': 0}
 execute(instructions, regs)
-print regs['b']
+print(regs['b'])
 
 # Part 2
 regs = {'ip': 0, 'a': 1, 'b': 0}
 execute(instructions, regs)
-print regs['b']
+print(regs['b'])

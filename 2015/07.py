@@ -46,10 +46,10 @@ for line in sys.stdin:
 		elif op == 'LSHIFT': Assign(r, Lshift(x, y))
 		elif op == 'RSHIFT': Assign(r, Rshift(x, y))
 		else:
-			print op
+			print(op)
 			assert False
 	else:
-		print parts
+		print(parts)
 		assert False
 
 # Part 1

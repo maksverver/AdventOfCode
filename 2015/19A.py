@@ -12,7 +12,7 @@ def find_all(s, t):
 
 def calibrate(s):
 	ts = set()
-	for k, rs in replacements.iteritems():
+	for k, rs in replacements.items():
 		for i in find_all(s, k):
 			for r in rs:
 				t = s[:i] + r + s[i + len(k):]
@@ -26,4 +26,4 @@ for line in sys.stdin:
 	replacements[s].append(t)
 for line in sys.stdin:
 	goal = line.strip()
-	print len(calibrate(goal))
+	print(len(calibrate(goal)))

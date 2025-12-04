@@ -1,7 +1,6 @@
 from itertools import combinations
+from math import prod
 import sys
-
-product = lambda a: reduce(lambda x, y: x*y, a, 1)
 
 def can_split(weights, remaining, pos):
 	if remaining == 0:
@@ -16,12 +15,12 @@ def solve(weights):
 	assert sum(weights) % 3 == 0
 	goal_weight = sum(weights) // 3
 	for size in range(1, len(weights)):
-		for c in sorted(combinations(weights, size), key=product):
+		for c in sorted(combinations(weights, size), key=prod):
 			if sum(c) == goal_weight:
 				# assumes weights are unique..
 				rest = [ w for w in weights if w not in c ]
 				if can_split(rest, goal_weight, 0):
-					return product(c)
+					return prod(c)
 
-weights = map(int, sys.stdin)
-print solve(weights)
+weights = list(map(int, sys.stdin))
+print(solve(weights))

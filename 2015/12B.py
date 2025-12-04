@@ -10,4 +10,4 @@ def calc(a):
 		return sum(map(calc, a.values()))
 	return 0
 
-print calc(json.loads(sys.stdin.read()))
+print(calc(json.loads(sys.stdin.read())))

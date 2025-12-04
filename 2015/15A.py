@@ -29,4 +29,4 @@ for line in sys.stdin:
 	for i in range(1, len(parts), 2):
 		properties[name][parts[i]] = int(parts[i + 1].rstrip(','))
 
-print search([], 100)
+print(search([], 100))

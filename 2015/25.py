@@ -1,10 +1,10 @@
-from itertools import izip, count
+from itertools import count
 import re
 import sys
 
 def gen_coords():
 	for diagonal in count(1):
-		for n in xrange(diagonal):
+		for n in range(diagonal):
 			yield diagonal - n, 1 + n
 
 def gen_codes():
@@ -14,8 +14,8 @@ def gen_codes():
 		code = code * 252533 % 33554393
 
 for line in sys.stdin:
-	row, col = map(int, re.findall('\d+', line))
-	for coords, code in izip(gen_coords(), gen_codes()):
+	row, col = map(int, re.findall(r'\d+', line))
+	for coords, code in zip(gen_coords(), gen_codes()):
 		if coords == (row, col):
-			print code
+			print(code)
 			break

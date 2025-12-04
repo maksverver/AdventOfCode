@@ -15,5 +15,5 @@ for line in sys.stdin:
 	if verb == 'lose': n = -n
 	diff[a][b] = n
 
-print max(Evaluate(p, True)  for p in permutations(diff.keys()))  # Part 1
-print max(Evaluate(p, False) for p in permutations(diff.keys()))  # Part 2
+print(max(Evaluate(p, True)  for p in permutations(diff.keys())))  # Part 1
+print(max(Evaluate(p, False) for p in permutations(diff.keys())))  # Part 2

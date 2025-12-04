@@ -8,8 +8,8 @@ for i in count(1):
 	elves[i].append(i)
 	presents = sum(elves[i])*10
 	if presents >= cutoff:
+		print(i)
 		break
 	for j in elves[i]:
 		elves[i + j].append(j)
 	del elves[i]
-print i

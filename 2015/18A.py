@@ -18,4 +18,4 @@ def step(grid):
 grid = [ [ c == '#' for c in line.strip() ] for line in sys.stdin ]
 for _ in range(100):
 	grid = step(grid)
-print sum(sum(row) for row in grid)
+print(sum(sum(row) for row in grid))

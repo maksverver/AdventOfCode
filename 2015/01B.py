@@ -11,4 +11,4 @@ for line in sys.stdin:
 			if level < 0:
 				answer = i
 				break
-	print answer + 1
+	print(answer + 1)

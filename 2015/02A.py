@@ -7,4 +7,4 @@ for line in sys.stdin:
 	sides.sort()
 	a,b,c = sides
 	total += 3*a + 2*b + 2*c
-print total
+print(total)

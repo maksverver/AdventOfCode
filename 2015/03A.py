@@ -12,4 +12,4 @@ for c in sys.stdin.read():
 	elif c == 'v':
 		y -= 1
 	visited.add((x, y))
-print len(visited)
+print(len(visited))

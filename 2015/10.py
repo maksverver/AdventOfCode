@@ -1,3 +1,5 @@
+import sys
+
 def looksay(s):
 	t = ''
 	i = 0
@@ -9,10 +11,10 @@ def looksay(s):
 		i = j
 	return t
 
-s = '1113122113'
+s = sys.stdin.readline().strip()
 for _ in range(40):
 	s = looksay(s)
-print len(s)  # Part 1
+print(len(s))  # Part 1
 for _ in range(10):
 	s = looksay(s)
-print len(s)  # Part 2
+print(len(s))  # Part 2

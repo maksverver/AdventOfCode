@@ -36,4 +36,4 @@ for line in sys.stdin:
 	else:
 		assert False
 
-print sum(map(sum, grid))
+print(sum(map(sum, grid)))

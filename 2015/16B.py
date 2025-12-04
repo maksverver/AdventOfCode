@@ -25,4 +25,4 @@ for line in sys.stdin:
 		if not required[prop](value): break
 	else:
 		sue, number = name.split()
-		print number
+		print(number)

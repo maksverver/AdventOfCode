@@ -51,6 +51,9 @@ class Spell:
 	def __repr__(spell):
 		return spell.name
 
+	def __lt__(spell, other):
+		return id(spell) < id(other)
+
 	def castable(spell, player):
 		return spell.cost <= player.mana
 
@@ -85,6 +88,9 @@ class State:
 	def __init__(state, player, boss):
 		state.player = player
 		state.boss = boss
+
+	def __lt__(state, other):
+		return state.key() < other.key()
 
 	def winning(state):
 		return state.boss.health <= 0
@@ -143,5 +149,5 @@ for line in sys.stdin:
 
 initial_state = State(Player(health = 50, mana = 500),
 	Boss(health = boss_stats['Hit Points'], damage = boss_stats['Damage']))
-print solve(initial_state, 0)  # Part 1
-print solve(initial_state, 1)  # Part 2
+print(solve(initial_state, 0))  # Part 1
+print(solve(initial_state, 1))  # Part 2

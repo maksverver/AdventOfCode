@@ -23,4 +23,4 @@ fix(grid)
 for _ in range(100):
 	grid = step(grid)
 	fix(grid)
-print sum(sum(row) for row in grid)
+print(sum(sum(row) for row in grid))

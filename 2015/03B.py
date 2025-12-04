@@ -20,4 +20,4 @@ def process(instructions):
 instructions = sys.stdin.read()
 process(instructions[0::2])
 process(instructions[1::2])
-print len(visited)
+print(len(visited))
