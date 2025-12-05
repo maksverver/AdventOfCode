@@ -24,8 +24,11 @@ def ParseInput():
     )
 
 @timed
-def SortInput():
+def SortRanges():
     ranges.sort()
+
+@timed
+def SortIngredients():
     ingredients.sort()
 
 @timed
@@ -55,6 +58,7 @@ def Part2():
     return answer
 
 ranges, ingredients = ParseInput()
-SortInput()
+SortRanges()
+SortIngredients()
 print(Part1())
 print(Part2())
