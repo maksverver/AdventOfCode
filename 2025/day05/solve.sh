@@ -1,6 +1,6 @@
 #!/bin/sh
 
-sort -n $1 | grep . | (
+sort -ns $1 | grep . | (
     i=0
     ans1=0
     ans2=0
