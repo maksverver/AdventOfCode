@@ -70,7 +70,7 @@ if __name__ == '__main__':
   assert ds.Size('bar') == 2
   assert ds.Size('baz') == 1
 
-  assert ds.Same('foo', 'bar') == True 
+  assert ds.Same('foo', 'bar') == True
   assert ds.Same('foo', 'baz') == False
   assert ds.Same('bar', 'baz') == False
 
@@ -81,8 +81,8 @@ if __name__ == '__main__':
   assert ds.Size('bar') == 3
   assert ds.Size('baz') == 3
 
-  assert ds.Same('foo', 'bar') == True 
-  assert ds.Same('foo', 'baz') == True 
+  assert ds.Same('foo', 'bar') == True
+  assert ds.Same('foo', 'baz') == True
   assert ds.Same('bar', 'baz') == True
 
   res = ds.Union('bar', 'baz')
