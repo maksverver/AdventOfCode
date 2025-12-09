@@ -12,7 +12,7 @@ for line in sys.stdin:
     adj[v].add(w)
     adj[w].add(v)
 
-sys.setrecursionlimit(len(adj) + 100)
+sys.setrecursionlimit(len(adj)*3 + 100)   # *3 needed for PyPy
 
 vertices = list(adj)
 shuffle(vertices)

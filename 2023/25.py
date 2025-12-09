@@ -107,7 +107,7 @@ def FindCut(adj):
 
 def Solve():
   adj = ParseGraph(sys.stdin)
-  sys.setrecursionlimit(len(adj) + 100)
+  sys.setrecursionlimit(len(adj)*3 + 100)   # *3 needed for PyPy
   a, b = FindComponents(adj, FindCut(adj))
   return len(a) * len(b)
 
