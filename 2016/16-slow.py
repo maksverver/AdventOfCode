@@ -7,10 +7,7 @@ def Generate(s, n):
 
 def Checksum(s):
   while len(s)%2 == 0:
-    t = ''
-    for i in range(0, len(s), 2):
-      t += '01'[s[i] == s[i + 1]]
-    s = t
+    s = ''.join('01'[s[i] == s[i + 1]] for i in range(0, len(s), 2))
   return s
 
 input = sys.stdin.readline().strip()
