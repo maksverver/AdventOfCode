@@ -1,8 +1,29 @@
 from math import prod
 import sys
 
-sys.path.append('../library-code')  # hack
-from disjointset import DisjointSet
+class DisjointSet:
+    def __init__(self, members):
+        self.parents = {k: k for k in members}
+        self.sizes = {k: 1 for k in members}
+
+    def Find(self, x):
+        if (root := self.parents[x]) != x:
+            root = self.parents[x] = self.Find(root)
+        return root
+
+    def Union(self, x, y):
+        x = self.Find(x)
+        y = self.Find(y)
+        if x == y: return False
+        if self.sizes[x] < self.sizes[y]: x, y = y, x
+        self.sizes[x] += self.sizes[y]
+        self.parents[y] = x
+        del self.sizes[y]
+        return True
+
+    def Size(self, x):
+        return self.sizes[self.Find(x)]
+
 
 def ParseLine(line):
     x, y, z = map(int, line.split(','))

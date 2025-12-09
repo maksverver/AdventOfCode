@@ -18,6 +18,13 @@ class DisjointSet:
 
   def Find(self, x):
     '''Returns a representative element for the set to which `x` belongs.'''
+    # Note: this doesn't fully compress paths. A more correct solution would be:
+    #
+    #   if (root := self.parents[x]) != x:
+    #       root = self.parents[x] = self.Find(root)
+    #   return root
+    #
+    # but that risks overflowing the stack.
     while (y := self.parents[x]) != x:
       x, self.parents[x] = y, self.parents[y]
     return x
