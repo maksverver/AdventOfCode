@@ -8,15 +8,15 @@ print(max((abs(x1 - x2) + 1) * (abs(y1 - y2) + 1)
         for ((x1, y1), (x2, y2)) in combinations(coords, 2)))
 
 # For part 2, we will compress the coordinates
-xs = sorted(set(x for x, _ in coords))
-ys = sorted(set(y for _, y in coords))
+xs = sorted(set(x for x, _ in coords for x in (x - 1, x, x + 1)))
+ys = sorted(set(y for _, y in coords for y in (y - 1, y, y + 1)))
 
-xs_index = dict((x, 2*i + 1) for i, x in enumerate(xs))
-ys_index = dict((y, 2*i + 1) for i, y in enumerate(ys))
+xs_index = dict((x, i) for i, x in enumerate(xs))
+ys_index = dict((y, i) for i, y in enumerate(ys))
 
 # Create an empty grid (all cells marked '?')
-W = len(xs)*2 + 1
-H = len(ys)*2 + 1
+W = len(xs)
+H = len(ys)
 grid = [['?']*W for _ in range(H)]
 
 # Draw the outline of the area with '#' characters.
