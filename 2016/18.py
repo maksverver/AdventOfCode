@@ -10,5 +10,5 @@ def Solve(row, width, height):
 
 input = sys.stdin.readline().strip()
 row = int(input.replace('.', '0').replace('^', '1'), 2)
-print Solve(row, len(input), 40)
-print Solve(row, len(input), 400000)
+print(Solve(row, len(input), 40))
+print(Solve(row, len(input), 400000))

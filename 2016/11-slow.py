@@ -55,16 +55,16 @@ def Solve(initial_floors):
       return steps
     for new_level, new_floors in Successors(level, floors):
       Add(steps + 1, new_level, new_floors)
-  
-pattern = re.compile('a (\w*)(?:-compatible)? (generator|microchip)')
+
+pattern = re.compile(r'a (\w*)(?:-compatible)? (generator|microchip)')
 floors = [set(match.groups() for match in pattern.finditer(line)) for line in sys.stdin]
 
 # Part 1
-print Solve(floors)
+print(Solve(floors))
 
 # Part 2 (this is pretty slow... :-/)
 floors[0].add(('elerium', 'generator'))
 floors[0].add(('elerium', 'microchip'))
 floors[0].add(('dilithium', 'generator'))
 floors[0].add(('dilithium', 'microchip'))
-print Solve(floors)
+print(Solve(floors))

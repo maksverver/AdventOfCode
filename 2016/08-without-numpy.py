@@ -14,16 +14,16 @@ def RotateRow(y, n):
 
 def RotateCol(x, n):
   global grid
-  grid = map(list, zip(*grid))
+  grid = list(map(list, zip(*grid)))
   RotateRow(x, n)
-  grid = map(list, zip(*grid))
+  grid = list(map(list, zip(*grid)))
 
 def PrintCount():
-  print sum(cell == '#' for row in grid for cell in row)
+  print(sum(cell == '#' for row in grid for cell in row))
 
 def PrintGrid():
   for row in grid:
-    print ''.join(row)
+    print(''.join(row))
 
 FillRect.pattern = 'rect ([0-9]+)x([0-9]+)'
 RotateRow.pattern = 'rotate row y=([0-9]+) by ([0-9]+)'

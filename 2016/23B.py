@@ -65,7 +65,7 @@ funcs = {
 	'jnz': Jnz,
 	'mul': Mul,
 	'tgl': Tgl,
-} 
+}
 
 instrs = []
 for line in sys.stdin:
@@ -80,4 +80,4 @@ while 0 <= ip < len(instrs):
 	opcode, args = instrs[ip]
 	ip += 1
 	funcs[opcode](*args)
-print regs['a']
+print(regs['a'])

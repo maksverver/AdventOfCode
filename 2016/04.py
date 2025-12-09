@@ -23,5 +23,5 @@ for line in sys.stdin:
     if decode(name, sect) == 'northpole object storage':
       answer2 = sect
 
-print answer1
-print answer2 
+print(answer1)
+print(answer2)

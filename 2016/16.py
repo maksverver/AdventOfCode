@@ -41,5 +41,5 @@ def Solve(pattern, N):
   return ''.join(str(GetBitSum(i, i + chunk_size, len(lengths) - 1) ^ 1)
       for i in range(0, N, chunk_size))
 
-print Solve(pattern, 272)
-print Solve(pattern, 35651584)
+print(Solve(pattern, 272))
+print(Solve(pattern, 35651584))

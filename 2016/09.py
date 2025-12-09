@@ -28,5 +28,5 @@ def GetOutputLength(data, begin, end, recurse):
       return output_length + end - begin
 
 data = sys.stdin.read().strip()
-print GetOutputLength(data, 0, len(data), recurse=False)
-print GetOutputLength(data, 0, len(data), recurse=True)
+print(GetOutputLength(data, 0, len(data), recurse=False))
+print(GetOutputLength(data, 0, len(data), recurse=True))

@@ -1,16 +1,15 @@
-import md5
+from hashlib import md5
 import sys
 
 def solve(door_id):
-  prefix = '0'*5
   password = ['?']*8
   i = 0
   while '?' in password:
-    digest = md5.new(door_id + str(i)).digest()
-    if ord(digest[0]) == 0 and ord(digest[1]) == 0 and ord(digest[2]) < 8:
-      if password[ord(digest[2])] == '?':
-        password[ord(digest[2])] = digest[3].encode('hex')[0]
+    digest = md5(bytes(door_id + str(i), 'ascii')).digest()
+    if digest[0] == 0 and digest[1] == 0 and digest[2] < 8:
+      if password[digest[2]] == '?':
+        password[digest[2]] = '%x'%(digest[3] >> 4)
     i += 1
   return ''.join(password)
 
-print solve(sys.stdin.readline().strip())
+print(solve(sys.stdin.readline().strip()))

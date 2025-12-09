@@ -12,5 +12,5 @@ def Solve(row, height):
   return answer
 
 row = np.array([c == '.' for c in sys.stdin.readline().strip()])
-print Solve(row, 40)
-print Solve(row, 400000)
+print(Solve(row, 40))
+print(Solve(row, 400000))

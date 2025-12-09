@@ -6,7 +6,7 @@ pad = ['~~~~~~~',
        '~56789~',
        '~~ABC~~',
        '~~~D~~~',
-       '~~~~~~~'] 
+       '~~~~~~~']
 code = ''
 r,c = 3,1
 for line in sys.stdin:
@@ -16,4 +16,4 @@ for line in sys.stdin:
     if ch == 'L' and pad[r][c - 1] != '~': c -= 1
     if ch == 'R' and pad[r][c + 1] != '~': c += 1
   code += pad[r][c]
-print code
+print(code)

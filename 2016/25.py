@@ -71,7 +71,7 @@ def Run(regs, ip = 0):
     ip = instructions[ip](ip, regs)
   return regs
 
-instructions = map(Parse, sys.stdin)
+instructions = list(map(Parse, sys.stdin))
 a = 0
 while True:
   try:
@@ -79,4 +79,4 @@ while True:
     break
   except InvalidOutputException:
     a += 1
-print a
+print(a)

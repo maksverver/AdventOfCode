@@ -1,4 +1,4 @@
-import md5
+from hashlib import md5
 import sys
 
 salt = sys.stdin.readline().strip()
@@ -13,9 +13,9 @@ def Memoize(f):
 
 @Memoize
 def GetHash(i):
-  hash = md5.new(salt + str(i)).hexdigest()
+  hash = md5(bytes(salt + str(i), 'ascii')).hexdigest()
   for _ in range(2016):
-    hash = md5.new(hash).hexdigest()
+    hash = md5(bytes(hash, 'ascii')).hexdigest()
   return hash
 
 def GetTriple(i):
@@ -47,4 +47,4 @@ def Keys():
 keygen = Keys()
 for _ in range(64):
   key = next(keygen)
-print key
+print(key)

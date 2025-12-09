@@ -15,4 +15,4 @@ def SupportsSsl(line):
   return bool(abas.intersection(babs))
 
 addrs = [line.strip() for line in sys.stdin]
-print len(filter(SupportsSsl, addrs))
+print(sum(map(SupportsSsl, addrs)))

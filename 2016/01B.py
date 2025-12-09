@@ -13,4 +13,4 @@ def find(commands):
         return abs(x) + abs(y)
       visited.add((x, y))
 
-print find(s.strip() for s in sys.stdin.readline().split(','))
+print(find(s.strip() for s in sys.stdin.readline().split(',')))

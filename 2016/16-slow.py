@@ -14,5 +14,5 @@ def Checksum(s):
   return s
 
 input = sys.stdin.readline().strip()
-print Checksum(Generate(input, 272))
-print Checksum(Generate(input, 35651584))
+print(Checksum(Generate(input, 272)))
+print(Checksum(Generate(input, 35651584)))

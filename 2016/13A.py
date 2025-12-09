@@ -26,4 +26,4 @@ def Search(start, finish):
         Add(steps + 1, (x2, y2))
 
 N = int(sys.stdin.readline())
-print Search((1, 1), (31, 39))
+print(Search((1, 1), (31, 39)))

@@ -6,8 +6,8 @@ def CountAbbas(s):
 
 def SupportsTls(addr):
   parts = addr.replace('[', ']').split(']')
-  abbas = map(CountAbbas, parts)
+  abbas = list(map(CountAbbas, parts))
   return any(abbas[0::2]) and not any(abbas[1::2])
 
 addrs = [line.strip() for line in sys.stdin]
-print len(filter(SupportsTls, addrs))
+print(sum(map(SupportsTls, addrs)))

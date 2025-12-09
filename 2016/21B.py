@@ -61,4 +61,4 @@ for line in reversed(list(sys.stdin)):
     Move(*map(int, m.groups()))
   else:
     assert False
-print ''.join(s)
+print(''.join(s))

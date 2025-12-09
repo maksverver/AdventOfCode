@@ -14,9 +14,9 @@ def Calculate(disks):
 pattern = re.compile(r'Disc #(\d+) has (\d+) positions; at time=0, it is at position (\d+).')
 
 def Parse(line):
-  return map(int, pattern.match(line).groups())
+  return tuple(map(int, pattern.match(line).groups()))
 
-disks = map(Parse, sys.stdin)
-print Calculate(disks)
+disks = list(map(Parse, sys.stdin))
+print(Calculate(disks))
 disks += [(7, 11, 0)]
-print Calculate(disks)
+print(Calculate(disks))

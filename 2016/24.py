@@ -16,7 +16,7 @@ def ShortestPath(visited, loop):
   if len(visited) == len(waypoints):
     return distances[prev, start] if loop else 0
   return min(distances[prev, next] + ShortestPath(visited + [next], loop)
-      for next in waypoints if next not in visited) 
+      for next in waypoints if next not in visited)
 
 grid = [line.strip() for line in sys.stdin]
 
@@ -34,5 +34,5 @@ for a in waypoints:
     if a < b:
       distances[a, b] = distances[b, a] = Distance(a, b)
 
-print ShortestPath([start], False)  # Part 1
-print ShortestPath([start], True)   # Part 2
+print(ShortestPath([start], False))  # Part 1
+print(ShortestPath([start], True))   # Part 2

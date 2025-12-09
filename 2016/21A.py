@@ -56,4 +56,4 @@ for line in sys.stdin:
     Move(*map(int, m.groups()))
   else:
     assert False
-print ''.join(s)
+print(''.join(s))

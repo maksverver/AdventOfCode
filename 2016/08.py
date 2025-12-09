@@ -14,11 +14,11 @@ def RotateCol(x, n):
   grid[:,x] = np.roll(grid[:,x], n)
 
 def PrintCount():
-  print np.count_nonzero(grid)
+  print(np.count_nonzero(grid))
 
 def PrintGrid():
   for row in grid:
-    print ''.join(".#"[cell] for cell in row)
+    print(''.join(".#"[int(cell)] for cell in row))
 
 FillRect.pattern = 'rect ([0-9]+)x([0-9]+)'
 RotateRow.pattern = 'rotate row y=([0-9]+) by ([0-9]+)'

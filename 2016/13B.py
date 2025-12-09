@@ -25,4 +25,4 @@ def Search(start, max_steps):
   return len(seen)
 
 N = int(sys.stdin.readline())
-print Search((1, 1), 50)
+print(Search((1, 1), 50))

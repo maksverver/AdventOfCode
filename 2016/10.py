@@ -5,7 +5,7 @@ instructions = {}  # bot -> (lo_out, lo_dst, hi_out, hi_dst)
 receives = []  # (val, dst)
 
 for line in sys.stdin:
-  m = re.match('bot (\d+) gives low to (bot|output) (\d+) and high to (bot|output) (\d+)', line)
+  m = re.match(r'bot (\d+) gives low to (bot|output) (\d+) and high to (bot|output) (\d+)', line)
   if m:
     src, lo_kind, lo_dst, hi_kind, hi_dst = m.groups()
     instructions[int(src)] = lo_kind == 'output', int(lo_dst), hi_kind == 'output', int(hi_dst)
@@ -37,6 +37,6 @@ for val, dst in receives:
     else:
       receives.append((hi, hi_dst))
     if (lo, hi) == (17, 61):
-      print dst  # Part 1
+      print(dst)  # Part 1
 
-print outputs[0]*outputs[1]*outputs[2]  # Part 2
+print(outputs[0]*outputs[1]*outputs[2])  # Part 2

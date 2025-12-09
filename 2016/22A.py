@@ -8,6 +8,6 @@ for line in sys.stdin:
     x, y, size, used, avail = map(int, m.groups())
     nodes.append((used, avail))
 
-print sum(i != j and 0 < a_used <= b_avail
+print(sum(i != j and 0 < a_used <= b_avail
     for i, (a_used, _) in enumerate(nodes)
-    for j, (_, b_avail) in enumerate(nodes))
+    for j, (_, b_avail) in enumerate(nodes)))

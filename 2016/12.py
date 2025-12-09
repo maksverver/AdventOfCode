@@ -50,10 +50,10 @@ def Run(regs):
     ip = instructions[ip](ip, regs)
   return regs
 
-instructions = map(Parse, sys.stdin)
+instructions = list(map(Parse, sys.stdin))
 
 # Part 1
-print Run({'a': 0, 'b': 0, 'c': 0, 'd': 0})['a']
+print(Run({'a': 0, 'b': 0, 'c': 0, 'd': 0})['a'])
 
 # Part 2
-print Run({'a': 0, 'b': 0, 'c': 1, 'd': 0})['a']
+print(Run({'a': 0, 'b': 0, 'c': 1, 'd': 0})['a'])
