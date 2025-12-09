@@ -1,3 +1,9 @@
+# Advent of Code 2025 day 9 (https://adventofcode.com/2025/day/9)
+#
+# This solution draws the figure in a grid with compressed coordinates.
+# The grid is then used to determine whether a particular rectangle completely
+# overlaps the figure.
+
 from itertools import combinations
 import sys
 
@@ -19,15 +25,16 @@ W = len(xs)
 H = len(ys)
 grid = [['?']*W for _ in range(H)]
 
-# Draw the outline of the area with '#' characters.
+# Draw the outline of the figure with '#' characters.
 for (x1, y1), (x2, y2) in zip(coords, coords[1:] + coords[:1]):
     cx1, cy1 = xs_index[x1], ys_index[y1]
     cx2, cy2 = xs_index[x2], ys_index[y2]
+    assert (cx1 == cx2) != (cy1 == cy2)  # each segment is horizontal/vertical
     for x in range(min(cx1, cx2), max(cx1, cx2) + 1):
         for y in range(min(cy1, cy2), max(cy1, cy2) + 1):
             grid[y][x] = '#'
 
-# Label cells outside the drawn area as '.', using flood fill.
+# Label cells outside the drawn figure as '.', using flood fill.
 grid[0][0] = '.'
 todo = [(0, 0)]
 for x1, y1 in todo:
@@ -49,7 +56,7 @@ def Covered(x1, y1, x2, y2):
             for x in range(min(cx1, cx2), max(cx1, cx2) + 1)
             for y in range(min(cy1, cy2), max(cy1, cy2) + 1))
 
-# Part 2: find the maximum area across all possible rectangles.
+# Part 2: find the maximum area across all possible rectangles that cover the figure.
 # Same as the solution for part 1, except for the call to Covered().
 print(max((abs(x1 - x2) + 1) * (abs(y1 - y2) + 1)
         for ((x1, y1), (x2, y2)) in combinations(coords, 2)
