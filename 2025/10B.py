@@ -5,8 +5,9 @@
 
 import sys
 
-from math import inf
+from itertools import product
 from fractions import Fraction
+from math import inf
 
 # Performs Gauss-Jordan elimination on the first (n-1) columns of the m x n
 # augmented matrix.
@@ -47,27 +48,6 @@ def GaussJordan(a):
 
     return free
 
-# Generates tuples whose elements are between 0 and the corresponding bounds
-# (exclusive). For example, GenerateVariableAssignments(((2, 1, 3)) yields:
-#
-#  (0, 0, 0)
-#  (0, 0, 1)
-#  (0, 0, 2)
-#  (1, 0, 0)
-#  (1, 0, 1)
-#  (1, 0, 2)
-#
-def GenerateVariableAssignments(bounds):
-    values = [0]*len(bounds)
-    def Go(pos):
-        if pos < len(bounds):
-            for i in range(bounds[pos]):
-                values[pos] = i
-                yield from Go(pos + 1)
-        else:
-            yield tuple(values)
-    yield from Go(0)
-
 
 def Solve(buttons, joltage):
     # Create an augmented matrix of size m x (n + 1) where m is the number of
@@ -77,10 +57,10 @@ def Solve(buttons, joltage):
         for i in range(len(joltage))]
 
     free = GaussJordan(augmented)
-    bounds = [min(joltage[i] for i in buttons[j]) + 1 for j in free]
+    bounds = [range(min(joltage[i] for i in buttons[j]) + 1) for j in free]
 
     best_answer = inf
-    for assigned in GenerateVariableAssignments(bounds):
+    for assigned in product(*bounds):
         answer = sum(assigned)
         for row in augmented:
             val = row[-1] - sum(k*row[c] for c, k in zip(free, assigned))
