@@ -10,12 +10,24 @@ for part in parts:
     shapes.append(tuple(lines))
     areas.append(sum(ch == '#' for line in lines for ch in line))
 
-# If the total area of the pieces exceeds the area of the rectangle, then
-# a solution is not possible. The code here blindly assumes the reverse is true
-# as well, which doesn't hold in general, but it works for the official input.
 def Solve(h, w, counts):
+    if (h // 3) * (w // 3) >= sum(counts):
+        # We have enough space to place each box in its own
+        # 3x3 rectangle, so a solution is definitely possible:
+        return 1
+
     min_area = sum(c*a for c, a in zip(counts, areas))
-    return min_area < h*w  # meh
+    if min_area > h * w:
+        # The total number of tiles needed for all boxes is
+        # larger than the area of the floor, so a solution is
+        # definitely impossible:
+        return 0
+
+    # If we get here, it's not obvious if a solution is possible or not.
+    # Fortunately, this never happens in the official input (though it does
+    # in the sample data!)
+    print('Difficult:', h, w, counts, file=sys.stderr)
+    assert False
 
 answer = 0
 for line in last_part.split('\n'):
